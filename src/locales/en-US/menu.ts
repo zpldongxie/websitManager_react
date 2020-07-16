@@ -1,5 +1,7 @@
 export default {
   'menu.welcome': 'Welcome',
+  'menu.contentmanagement': 'Content Management',
+  'menu.membermanagement': 'Member Management',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
   'menu.admin': 'Admin',

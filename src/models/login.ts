@@ -38,7 +38,9 @@ const Model: LoginModelType = {
         payload: response,
       });
       // Login successfully
-      if (response.status === 'ok') {
+      if (response.status === 'ok') { 
+        // TODO: 目前对接的后台只返回登录状态，无身份信息，先手动设置
+        response.currentAuthority= 'admin';
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params as { redirect: string };

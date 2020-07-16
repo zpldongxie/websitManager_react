@@ -1,8 +1,8 @@
 {
-  "name": "ant-design-pro",
-  "version": "4.0.0",
+  "name": "website-manager",
+  "version": "3.0.0",
   "private": true,
-  "description": "An out-of-box UI solution for enterprise applications",
+  "description": "网站管理后台",
   "scripts": {
     "analyze": "cross-env ANALYZE=1 umi build",
     "build": "umi build",
@@ -57,13 +57,13 @@
     "classnames": "^2.2.6",
     "lodash": "^4.17.11",
     "moment": "^2.25.3",
-    "omit.js": "^1.0.2",
+    "omit.js": "^2.0.2",
     "path-to-regexp": "2.4.0",
     "qs": "^6.9.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-helmet-async": "^1.0.4",
-    "umi": "^3.1.2",
+    "umi": "^3.2.0",
     "umi-request": "^1.0.8",
     "use-merge-value": "^1.0.1"
   },
@@ -98,7 +98,7 @@
     "mockjs": "^1.0.1-beta3",
     "prettier": "^2.0.1",
     "pro-download": "1.0.1",
-    "puppeteer-core": "^4.0.1",
+    "puppeteer-core": "^5.0.0",
     "stylelint": "^13.0.0"
   },
   "engines": {

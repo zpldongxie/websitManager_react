@@ -1,5 +1,7 @@
 export default {
   'menu.welcome': '欢迎',
+  'menu.contentmanagement': '文章管理',
+  'menu.membermanagement': '会员管理',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.admin': '管理页',

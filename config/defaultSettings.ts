@@ -1,6 +1,7 @@
 import { Settings as ProSettings } from '@ant-design/pro-layout';
 
 type DefaultSettings = ProSettings & {
+  versoin: string;
   pwa: boolean;
 };
 
@@ -16,7 +17,8 @@ const proSettings: DefaultSettings = {
   menu: {
     locale: true,
   },
-  title: 'Ant Design Pro',
+  title: '网站管理后台',
+  versoin: '3.0.0',
   pwa: false,
   iconfontUrl: '',
 };
