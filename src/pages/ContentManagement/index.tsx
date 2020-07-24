@@ -1,79 +1,81 @@
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, Dropdown, Menu, message, Input, Switch } from 'antd';
+import { Button, Divider, Dropdown, Menu, message, Switch } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
 import CreateForm from './components/CreateForm';
-import UpdateForm, { FormValueType } from './components/UpdateForm';
+// import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem } from './data.d';
-import { queryContentList, updateRule, addRule, removeRule } from './service';
+import { queryContentList } from './service';
+
+import styles from './index.module.less';
 
 /**
  * 添加节点
  * @param fields
  */
-const handleAdd = async (fields: TableListItem) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('添加失败请重试！');
-    return false;
-  }
-};
+// const handleAdd = async (fields: TableListItem) => {
+//   const hide = message.loading('正在添加');
+//   try {
+//     await addRule({ ...fields });
+//     hide();
+//     message.success('添加成功');
+//     return true;
+//   } catch (error) {
+//     hide();
+//     message.error('添加失败请重试！');
+//     return false;
+//   }
+// };
 
 /**
  * 更新节点
  * @param fields
  */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在配置');
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
+// const handleUpdate = async (fields: FormValueType) => {
+//   const hide = message.loading('正在配置');
+//   try {
+//     await updateRule({
+//       name: fields.name,
+//       desc: fields.desc,
+//       key: fields.key,
+//     });
+//     hide();
 
-    message.success('配置成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('配置失败请重试！');
-    return false;
-  }
-};
+//     message.success('配置成功');
+//     return true;
+//   } catch (error) {
+//     hide();
+//     message.error('配置失败请重试！');
+//     return false;
+//   }
+// };
 
 /**
  *  删除节点
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: TableListItem[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('删除成功，即将刷新');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('删除失败，请重试');
-    return false;
-  }
-};
+// const handleRemove = async (selectedRows: TableListItem[]) => {
+//   const hide = message.loading('正在删除');
+//   if (!selectedRows) return true;
+//   try {
+//     await removeRule({
+//       key: selectedRows.map((row) => row.key),
+//     });
+//     hide();
+//     message.success('删除成功，即将刷新');
+//     return true;
+//   } catch (error) {
+//     hide();
+//     message.error('删除失败，请重试');
+//     return false;
+//   }
+// };
 
 const TableList: React.FC<{}> = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
+  // const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [stepFormValues, setStepFormValues] = useState({});
   const [channelId, setChannelId] = useState("-1");
   const actionRef = useRef<ActionType>();
@@ -85,16 +87,7 @@ const TableList: React.FC<{}> = () => {
     },
     {
       title: '标题',
-      dataIndex: 'title',
-      hideInSearch: true
-    },
-    {
-      title: '',
-      hideInTable: true,
-      dataIndex: 'title',
-      renderFormItem: (item, { defaultRender, ...rest }) => {
-        return <Input {...rest} placeholder="请输入标题、作者或文章状态！" />;
-      },
+      dataIndex: 'title'
     },
     {
       title: '发布时间',
@@ -107,7 +100,6 @@ const TableList: React.FC<{}> = () => {
     {
       title: '发布状态',
       dataIndex: 'pubStatus',
-      hideInSearch: true,
       // 当前后台暂时不支持
       // filters: [
       //   {
@@ -149,83 +141,40 @@ const TableList: React.FC<{}> = () => {
       }
     },
     {
+      title: '所属栏目',
+      dataIndex: 'channels',
+      hideInSearch: true,
+      render: (_, record) => {
+        const { channels = [] } = record;
+        const names:string[] = [];
+        const ids:string[] = [];
+        channels.forEach(c => {
+          names.push(c.name);
+          ids.push(c.id);
+        });
+        return <div title={ids.join(',')} style={{cursor: 'default'}}>{names.join(',')}</div>
+      }
+    },
+    {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => {
-        const {
-          pubStatus
-        } = record;
-        if(pubStatus === '已发布'){
-          return (
-            <>
-            <a
-              onClick={() => {
-                handleUpdateModalVisible(true);
-                setStepFormValues(record);
-              }}
-            >
-              详情
-            </a>
-            <Divider type="vertical" />
-            <a
-              onClick={() => {
-                handleUpdateModalVisible(true);
-                setStepFormValues(record);
-              }}
-            >
-              撤稿
-            </a>
-            </>
-          )
-        }
-        return (
-          <>
-            <a
-              onClick={() => {
-                handleUpdateModalVisible(true);
-                setStepFormValues(record);
-              }}
-            >
-              编辑
-            </a>
-            <Divider type="vertical" />
-            <a
-              onClick={() => {
-                handleUpdateModalVisible(true);
-                setStepFormValues(record);
-              }}
-            >
-              发布
-            </a>
-            <Divider type="vertical" />
-            <a
-              onClick={() => {
-                handleUpdateModalVisible(true);
-                setStepFormValues(record);
-              }}
-            >
-              删除
-            </a>
-          </>
-        )
-      },
-      hideInTable: true
+      render: (_, record) => (
+        <Option
+          id={record.id}
+          pubStatus={record.pubStatus}
+        />
+      ),
+      align: 'center',
     },
   ];
 
-  const search = {
-    searchText: '模糊查询',
-  };
-
   return (
-    <PageHeaderWrapper>
+  <PageHeaderWrapper className={styles.contentListWrapper}>
       <ProTable<TableListItem>
         headerTitle="文章管理"
-        tableClassName="contentListTable"
         actionRef={actionRef}
         rowKey="id"
-        search={search}
         toolBarRender={(action, { selectedRows }) => [
           <Button type="primary" onClick={() => handleModalVisible(true)}>
             <PlusOutlined /> 新建
@@ -236,7 +185,7 @@ const TableList: React.FC<{}> = () => {
                 <Menu
                   onClick={async (e) => {
                     if (e.key === 'remove') {
-                      await handleRemove(selectedRows);
+                      // await handleRemove(selectedRows);
                       action.reload();
                     }
                   }}
@@ -264,15 +213,15 @@ const TableList: React.FC<{}> = () => {
       />
       <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>
         <ProTable<TableListItem, TableListItem>
-          onSubmit={async (value) => {
-            const success = await handleAdd(value);
-            if (success) {
-              handleModalVisible(false);
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-            }
-          }}
+          // onSubmit={async (value) => {
+          //   const success = await handleAdd(value);
+          //   if (success) {
+          //     handleModalVisible(false);
+          //     if (actionRef.current) {
+          //       actionRef.current.reload();
+          //     }
+          //   }
+          // }}
           rowKey="key"
           type="form"
           columns={columns}
@@ -280,27 +229,90 @@ const TableList: React.FC<{}> = () => {
         />
       </CreateForm>
       {stepFormValues && Object.keys(stepFormValues).length ? (
-        <UpdateForm
-          onSubmit={async (value) => {
-            const success = await handleUpdate(value);
-            if (success) {
-              handleUpdateModalVisible(false);
-              setStepFormValues({});
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-            }
-          }}
-          onCancel={() => {
-            handleUpdateModalVisible(false);
-            setStepFormValues({});
-          }}
-          updateModalVisible={updateModalVisible}
-          values={stepFormValues}
-        />
+        // <UpdateForm
+        //   onSubmit={async (value) => {
+        //     const success = await handleUpdate(value);
+        //     if (success) {
+        //       handleUpdateModalVisible(false);
+        //       setStepFormValues({});
+        //       if (actionRef.current) {
+        //         actionRef.current.reload();
+        //       }
+        //     }
+        //   }}
+        //   onCancel={() => {
+        //     handleUpdateModalVisible(false);
+        //     setStepFormValues({});
+        //   }}
+        //   updateModalVisible={updateModalVisible}
+        //   values={stepFormValues}
+        // />
+        <div />
       ) : null}
     </PageHeaderWrapper>
   );
 };
+
+interface OptionProps {
+  id: number;
+  pubStatus: string;
+}
+
+/**
+ * 操作列
+ *
+ * @param {{pubStatus: string}} optionProps
+ * @returns
+ */
+const Option = (optionProps: OptionProps) => {
+  const {
+    id,
+    pubStatus
+  } = optionProps;
+  if (pubStatus === '已发布') {
+    return (
+      <>
+        <a
+          onClick={() => {
+            message.info(id)
+          }}
+        >
+          详情
+      </a>
+        <Divider type="vertical" />
+        <a
+          onClick={() => {
+          }}
+        >
+          撤稿
+      </a>
+      </>
+    )
+  }
+  return (
+    <>
+      <a
+        onClick={() => {
+        }}
+      >
+        编辑
+      </a>
+      <Divider type="vertical" />
+      <a
+        onClick={() => {
+        }}
+      >
+        发布
+      </a>
+      <Divider type="vertical" />
+      <a
+        onClick={() => {
+        }}
+      >
+        删除
+      </a>
+    </>
+  )
+}
 
 export default TableList;

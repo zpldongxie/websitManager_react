@@ -14,7 +14,7 @@ const GlobalFooter = () => {
     blankTarget: true
   }];
   return (
-    <DefaultFooter copyright='西安云适配' links={defaultLinks} />
+    <DefaultFooter copyright={`${new Date().getFullYear()} 西安云适配`} links={defaultLinks} />
   )
 }
 

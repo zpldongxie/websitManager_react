@@ -29,7 +29,8 @@ export async function queryContentList(params: TableListParams) {
   const res = await request('/api/getContentList', {
     method: 'POST',
     data: {
-      ...queryContentListParams,
+      // ...queryContentListParams,
+      ...params,
     },
   });
   if (res.status === 'ok') {
