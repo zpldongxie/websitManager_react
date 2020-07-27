@@ -8,7 +8,8 @@
 export default {
   dev: {
     '/api/': {
-      target: 'http://zpldongxie.gicp.net:3000',
+      // target: 'http://www.snains.cn:9001',
+      target: 'http://49.234.158.74:3000',
       changeOrigin: true,
       pathRewrite: { '^/api': '' },
     },

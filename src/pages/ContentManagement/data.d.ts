@@ -179,6 +179,7 @@ export interface TableListData {
 export interface TableListParams {
   status?: string;
   title?: string;
+  pubStatus?: string;
   desc?: string;
   key?: number;
   pageSize?: number;

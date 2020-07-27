@@ -1,9 +1,10 @@
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, Dropdown, Menu, message, Switch } from 'antd';
+import { Button, Divider, Dropdown, Menu, message, Switch, Input } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
+import SelectChannels from '@/components/SelectChannels';
 import CreateForm from './components/CreateForm';
 // import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem } from './data.d';
@@ -75,8 +76,7 @@ import styles from './index.module.less';
 
 const TableList: React.FC<{}> = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  // const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-  const [stepFormValues, setStepFormValues] = useState({});
+  const [showChannels, setShowChannels] = useState(false);
   const [channelId, setChannelId] = useState("-1");
   const actionRef = useRef<ActionType>();
   const columns: ProColumns<TableListItem>[] = [
@@ -87,7 +87,8 @@ const TableList: React.FC<{}> = () => {
     },
     {
       title: '标题',
-      dataIndex: 'title'
+      dataIndex: 'title',
+      ellipsis: true,
     },
     {
       title: '发布时间',
@@ -100,6 +101,10 @@ const TableList: React.FC<{}> = () => {
     {
       title: '发布状态',
       dataIndex: 'pubStatus',
+      valueEnum: {
+        '草稿': { text: '草稿', status: 'Default' },
+        '已发布': { text: '已发布', status: 'Success' },
+      },
       // 当前后台暂时不支持
       // filters: [
       //   {
@@ -143,16 +148,19 @@ const TableList: React.FC<{}> = () => {
     {
       title: '所属栏目',
       dataIndex: 'channels',
-      hideInSearch: true,
       render: (_, record) => {
         const { channels = [] } = record;
-        const names:string[] = [];
-        const ids:string[] = [];
+        const names: string[] = [];
+        const ids: string[] = [];
         channels.forEach(c => {
           names.push(c.name);
           ids.push(c.id);
         });
-        return <div title={ids.join(',')} style={{cursor: 'default'}}>{names.join(',')}</div>
+        return <div title={ids.join(',')} style={{ cursor: 'default' }}>{names.join(',')}</div>
+      },
+      order: 2,
+      renderFormItem: (item, { defaultRender, ...rest }) => {
+        return <Input {...rest} placeholder="请选择" />;
       }
     },
     {
@@ -170,7 +178,7 @@ const TableList: React.FC<{}> = () => {
   ];
 
   return (
-  <PageHeaderWrapper className={styles.contentListWrapper}>
+    <PageHeaderWrapper className={styles.contentListWrapper}>
       <ProTable<TableListItem>
         headerTitle="文章管理"
         actionRef={actionRef}
@@ -191,8 +199,10 @@ const TableList: React.FC<{}> = () => {
                   }}
                   selectedKeys={[]}
                 >
-                  <Menu.Item key="remove">批量删除</Menu.Item>
-                  <Menu.Item key="approval">批量审批</Menu.Item>
+                  <Menu.Item key="pub">批量发布</Menu.Item>
+                  <Menu.Item key="unPub">批量撤稿</Menu.Item>
+                  <Menu.Item key="moveTo">批量移动</Menu.Item>
+                  <Menu.Item key="del">批量删除</Menu.Item>
                 </Menu>
               }
             >
@@ -228,27 +238,7 @@ const TableList: React.FC<{}> = () => {
           rowSelection={{}}
         />
       </CreateForm>
-      {stepFormValues && Object.keys(stepFormValues).length ? (
-        // <UpdateForm
-        //   onSubmit={async (value) => {
-        //     const success = await handleUpdate(value);
-        //     if (success) {
-        //       handleUpdateModalVisible(false);
-        //       setStepFormValues({});
-        //       if (actionRef.current) {
-        //         actionRef.current.reload();
-        //       }
-        //     }
-        //   }}
-        //   onCancel={() => {
-        //     handleUpdateModalVisible(false);
-        //     setStepFormValues({});
-        //   }}
-        //   updateModalVisible={updateModalVisible}
-        //   values={stepFormValues}
-        // />
-        <div />
-      ) : null}
+      <SelectChannels show={showChannels} />
     </PageHeaderWrapper>
   );
 };

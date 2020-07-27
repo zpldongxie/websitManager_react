@@ -9,6 +9,8 @@ export interface StateType {
   status?: 'ok' | 'error';
   type?: string;
   currentAuthority?: 'user' | 'guest' | 'admin';
+  // TODO: 登录错误信息需要处理并合理显示
+  errorMessage?: string;
 }
 
 export interface LoginModelType {
@@ -39,8 +41,6 @@ const Model: LoginModelType = {
       });
       // Login successfully
       if (response.status === 'ok') { 
-        // TODO: 目前对接的后台只返回登录状态，无身份信息，先手动设置
-        response.currentAuthority= 'admin';
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params as { redirect: string };

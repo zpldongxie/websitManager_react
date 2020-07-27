@@ -5,7 +5,8 @@ export async function queryContentList(params: TableListParams) {
     const {
       pageSize = 10,
       current = 1,
-      title='',
+      title,
+      pubStatus,
       // filter,
       sorter={'conDate': 'desc'}, // 默认以时间降序排序
       channelId
@@ -22,15 +23,14 @@ export async function queryContentList(params: TableListParams) {
       length: pageSize,
       orderName,
       orderValue,
-      search: title,
+      search: title || pubStatus || '',
       start: (current - 1) * pageSize,
     }
 
   const res = await request('/api/getContentList', {
     method: 'POST',
     data: {
-      // ...queryContentListParams,
-      ...params,
+      ...queryContentListParams,
     },
   });
   if (res.status === 'ok') {
