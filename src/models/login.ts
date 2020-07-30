@@ -8,9 +8,7 @@ import { getPageQuery } from '@/utils/utils';
 export interface StateType {
   status?: 'ok' | 'error';
   type?: string;
-  currentAuthority?: 'user' | 'guest' | 'admin';
-  // TODO: 登录错误信息需要处理并合理显示
-  errorMessage?: string;
+  currentAuthority?: "user" | "guest" | "admin";
 }
 
 export interface LoginModelType {
@@ -35,12 +33,18 @@ const Model: LoginModelType = {
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(fakeAccountLogin, payload);
+      
       yield put({
         type: 'changeLoginStatus',
-        payload: response,
+        payload: {
+          ...response,
+          type: payload.type
+        },
       });
       // Login successfully
-      if (response.status === 'ok') { 
+      if (response.status === 'ok') {
+        setAuthority(response.currentAuthority);
+
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params as { redirect: string };
@@ -70,13 +74,13 @@ const Model: LoginModelType = {
             redirect: window.location.href,
           }),
         });
+        setAuthority('guest');
       }
     },
   },
 
   reducers: {
     changeLoginStatus(state, { payload }) {
-      setAuthority(payload.currentAuthority);
       return {
         ...state,
         status: payload.status,

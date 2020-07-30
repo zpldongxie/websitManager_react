@@ -38,6 +38,7 @@ export default defineConfig({
     {
       path: '/',
       component: '../layouts/SecurityLayout',
+      authority: ['admin', 'user'],
       routes: [
         {
           path: '/',
@@ -47,12 +48,14 @@ export default defineConfig({
             {
               path: '/',
               redirect: '/welcome',
+              authority: ['admin', 'user'],
             },
             {
               path: '/welcome',
               name: 'welcome',
               icon: 'smile',
               component: './Welcome',
+              authority: ['admin', 'user'],
             },
             {
               path: '/admin',
@@ -72,22 +75,42 @@ export default defineConfig({
             },
             {
               name: 'contentmanagement',
-              // icon: 'smile',
               path: '/contentmanagement',
               component: './ContentManagement',
+              authority: ['admin', 'user'],
             },
             {
               name: 'membermanagement',
-              // icon: 'smile',
               path: '/membermanagement',
               component: './MemberManagement',
+              authority: ['admin', 'user'],
+            },
+            {
+              name: 'trainingmanagement',
+              path: '/trainingmanagement',
+              authority: ['admin', 'user'],
+              routes: [
+                {
+                  name: 'management',
+                  path: '/trainingmanagement/management',
+                  component: './TrainingManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'regmanagement',
+                  path: '/trainingmanagement/regmanagement',
+                  component: './TrainingRegManagement',
+                  authority: ['admin', 'user'],
+                },
+              ]
             },
             {
               name: 'list.table-list',
               icon: 'table',
               path: '/list',
               component: './ListTableList',
-            },
+              authority: ['admin', 'user'],
+            },            
             {
               component: './404',
             },

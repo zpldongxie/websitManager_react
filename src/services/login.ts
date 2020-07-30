@@ -8,6 +8,7 @@ export interface LoginParamsType {
 }
 
 export async function fakeAccountLogin(params: LoginParamsType) {
+  // TODO: 密码需要加密处理
   return request('/api/doLogin', {
     method: 'POST',
     data: params,
