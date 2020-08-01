@@ -50,7 +50,6 @@ const CommonFormItem = (props: Props) => {
  */
 const FormInput = (props: FormInputProps) => {
   const {
-    value,
     placeholder,
     ...formProps
   } = props;

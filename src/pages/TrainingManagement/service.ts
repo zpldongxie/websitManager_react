@@ -1,28 +1,22 @@
 import request from 'umi-request';
-import { BasicListItemDataType } from './data.d';
+import { TrainingDataType, QueryListDataType } from './data.d';
 
-interface ParamsType extends Partial<BasicListItemDataType> {
+interface ParamsType extends Partial<TrainingDataType> {
   count?: number;
 }
 
-export async function queryTrainingList(params: ParamsType) {
-  return request('/api/trainings', {
-    params,
+export async function queryTrainingList(params: QueryListDataType) {
+  return request('/api/getTrainingList', {
+    method: 'POST',
+    data: {...params, current: params.pageNum},
   });
 }
 
 export async function removeFakeList(params: ParamsType) {
-  const { count = 5, ...restParams } = params;
-  return request('/api/fake_list', {
-    method: 'POST',
-    params: {
-      count,
-    },
-    data: {
-      ...restParams,
-      method: 'delete',
-    },
-  });
+  return request('/api/training', {
+    method: 'DELETE',
+    data: params,
+  })
 }
 
 export async function addFakeList(params: ParamsType) {
@@ -33,15 +27,8 @@ export async function addFakeList(params: ParamsType) {
 }
 
 export async function updateFakeList(params: ParamsType) {
-  const { count = 5, ...restParams } = params;
-  return request('/api/fake_list', {
-    method: 'POST',
-    params: {
-      count,
-    },
-    data: {
-      ...restParams,
-      method: 'update',
-    },
+  return request('/api/training', {
+    method: 'PUT',
+    data: params,
   });
 }

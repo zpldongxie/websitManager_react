@@ -1,17 +1,16 @@
-import React, { FC, useEffect, useState } from 'react';
-import moment from 'moment';
+import React, { FC, useEffect } from 'react';
 import { Modal, Result, Button, Form } from 'antd';
 import {FormInput, FormSelect, FormTimeRange, FormTextArea} from './CustomFormItem';
-import { BasicListItemDataType } from '../data.d';
+import { TrainingDataType } from '../data.d';
 import styles from '../style.less';
 import { FormSelectProps } from './interfice';
 
 interface OperationModalProps {
   done: boolean;
   visible: boolean;
-  current: Partial<BasicListItemDataType> | undefined;
+  current: Partial<TrainingDataType> | undefined;
   onDone: () => void;
-  onSubmit: (values: BasicListItemDataType) => void;
+  onSubmit: (values: TrainingDataType) => void;
   onCancel: () => void;
 }
 
@@ -35,7 +34,6 @@ const OperationModal: FC<OperationModalProps> = (props) => {
     if (current) {
       form.setFieldsValue({
         ...current,
-        createdAt: current.createdAt ? moment(current.createdAt) : null,
       });
     }
   }, [props.current]);
@@ -47,7 +45,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
 
   const handleFinish = (values: { [key: string]: any }) => {
     if (onSubmit) {
-      onSubmit(values as BasicListItemDataType);
+      onSubmit(values as TrainingDataType);
     }
   };
 
@@ -119,16 +117,16 @@ const OperationModal: FC<OperationModalProps> = (props) => {
             const {type, ...currentProps} = formItem;
             switch(type) {
               case 'input':
-                return <FormInput {...currentProps} />
+                return <FormInput {...currentProps} key={formItem.label} />
                 // return formInput(currentProps)
               case 'select':
-                return <FormSelect {...currentProps as FormSelectProps} />
+                return <FormSelect {...currentProps as FormSelectProps} key={formItem.label} />
                 // return formSelect(currentProps as FormSelectProps)
               case 'timeRange':
-                return <FormTimeRange {...currentProps} />
+                return <FormTimeRange {...currentProps} key={formItem.label} />
                 // return formTimeRange(currentProps)
               case 'textArae':
-                return <FormTextArea {...currentProps} />
+                return <FormTextArea {...currentProps} key={formItem.label} />
                 // return formTextArae(currentProps)
               default: 
                 return ''

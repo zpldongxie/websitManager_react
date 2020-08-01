@@ -1,3 +1,5 @@
+import { Moment } from 'moment';
+
 export interface TrainingDataType {
   id?: string;
   /**
@@ -14,6 +16,13 @@ export interface TrainingDataType {
    * @memberof TrainingDataType
    */
   subTitle: string;
+  /**
+   * 虚拟属性，报名时间范围
+   *
+   * @type {[string, string]}
+   * @memberof registTimeRange
+   */
+  registTimeRange?: [Moment, Moment];
   /**
    * 报名开始时间
    *
@@ -36,6 +45,13 @@ export interface TrainingDataType {
    */
   trainingMethod: string;
   /**
+   * 虚拟属性，培训时间范围
+   *
+   * @type {[string, string]}
+   * @memberof registTimeRange
+   */
+  timeRange?: [Moment, Moment];
+  /**
    * 培训开始时间
    *
    * @type {string}
@@ -56,6 +72,16 @@ export interface TrainingDataType {
    * @memberof TrainingDataType
    */
   desc: string;
+  Channel: {
+    name: string
+  }
+}
+
+export interface QueryListDataType {
+  ChannelId?: number;
+  search?: {name: string, value: string}[],
+  pageNum?: number;
+  pageSize?: number;
 }
 
 export interface Member {

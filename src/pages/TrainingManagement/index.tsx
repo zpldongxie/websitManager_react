@@ -1,96 +1,134 @@
 import React, { FC, useRef, useState, useEffect } from 'react';
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import {
-  Avatar,
   Button,
   Card,
-  Col,
   Dropdown,
   Input,
   List,
   Menu,
   Modal,
   Progress,
-  Radio,
-  Row,
 } from 'antd';
 
 import { findDOMNode } from 'react-dom';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect, Dispatch } from 'umi';
 import moment from 'moment';
+import { PaginationConfig } from 'antd/lib/pagination/Pagination';
 import OperationModal from './components/OperationModal';
 import { StateType } from './model';
-import { TrainingDataType, BasicListItemDataType } from './data.d';
+import { TrainingDataType } from './data.d';
 import styles from './style.less';
 
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
 const { Search } = Input;
 
 interface TrainingManagementProps {
   trainingManagement: StateType;
-  dispatch: Dispatch<any>;
+  dispatch: Dispatch;
   loading: boolean;
 }
 
-const Info: FC<{
-  title: React.ReactNode;
-  value: React.ReactNode;
-  bordered?: boolean;
-}> = ({ title, value, bordered }) => (
-  <div className={styles.headerInfo}>
-    <span>{title}</span>
-    <p>{value}</p>
-    {bordered && <em />}
-  </div>
-);
-
+/**
+ * 配置列
+ *
+ * @param {{
+ *   data: TrainingDataType;
+ * }} {
+ *   data: { trainingMethod, Channel, startTime, endTime },
+ * }
+ */
 const ListContent = ({
-  data: { owner, createdAt, percent, status },
+  data: { trainingMethod, Channel, startTime, endTime },
 }: {
-  data: BasicListItemDataType;
+  data: TrainingDataType;
 }) => (
-  <div className={styles.listContent}>
-    <div className={styles.listContentItem}>
-      <span>Owner</span>
-      <p>{owner}</p>
+    <div className={styles.listContent}>
+      <div className={styles.listContentItem}>
+        <span>培训方式</span>
+        <p>{trainingMethod}</p>
+      </div>
+      <div className={styles.listContentItem}>
+        <span>培训类型</span>
+        <p>{Channel.name}</p>
+      </div>
+      <div className={styles.listContentItem}>
+        <span>开始时间</span>
+        <p>{moment(startTime).format('YYYY-MM-DD HH:mm')}</p>
+      </div>
+      <div className={styles.listContentItem}>
+        <span>结束时间</span>
+        <p>{moment(endTime).format('YYYY-MM-DD HH:mm')}</p>
+      </div>
+      <div className={`${styles.listContentItem} ${styles.center}`}>
+        <Progress type="circle" percent={50} width={50} />
+        <div>签到百分比</div>
+      </div>
     </div>
-    <div className={styles.listContentItem}>
-      <span>开始时间</span>
-      <p>{moment(createdAt).format('YYYY-MM-DD HH:mm')}</p>
-    </div>
-    <div className={styles.listContentItem}>
-      <Progress percent={percent} status={status} strokeWidth={6} style={{ width: 180 }} />
-    </div>
-  </div>
-);
+  );
 
 export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   const addBtn = useRef(null);
   const {
     loading,
     dispatch,
-    trainingManagement: { list },
+    trainingManagement: { 
+      pageNum,
+      pageSize,
+      total,
+      list,
+      filter 
+    },
   } = props;
+  
   const [done, setDone] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
-  const [current, setCurrent] = useState<Partial<BasicListItemDataType> | undefined>(undefined);
+  const [current, setCurrent] = useState<Partial<TrainingDataType> | undefined>(undefined);
 
-  useEffect(() => {
+  /**
+   * 所有查询，包括搜索、排序、翻页，都走这里
+   *
+   * @param {{
+   *     channel_id?: number; page_size: number, page_num: number, filter_str?: string
+   *   }} 
+   */
+  const queryList = ({
+    channel_id, page_size, page_num, filter_str=filter
+  }: {
+    channel_id?: number; page_size: number, page_num: number, filter_str?: string
+  }) => {
     dispatch({
       type: 'trainingManagement/fetch',
       payload: {
-        count: 5,
+        ChannelId: channel_id,
+        pageNum: page_num,
+        pageSize: page_size,
+        filter: filter_str
       },
     });
+  }
+
+  useEffect(() => {
+    queryList({page_num: pageNum, page_size: pageSize});
   }, [1]);
 
-  const paginationProps = {
+  const paginationProps: PaginationConfig = {
     showSizeChanger: true,
     showQuickJumper: true,
-    pageSize: 5,
-    total: 50,
+    pageSize,
+    total,
+    onChange: (page: number, size?: number) => {
+      queryList({page_size: size || pageSize, page_num: page})
+    },
+    onShowSizeChange: (page: number, size: number) => {
+      dispatch({
+        type: 'trainingManagement/pageChange',
+        payload: {
+          pageNum: page,
+          pageSize: size
+        },
+      });
+    }
   };
 
   const showModal = () => {
@@ -98,9 +136,18 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     setCurrent(undefined);
   };
 
-  const showEditModal = (item: BasicListItemDataType) => {
+  const showEditModal = (item: TrainingDataType) => {
+    const currentItem = { ...item };
+    currentItem.registTimeRange = [
+      moment(item.registStartTime, 'YYYY-MM-DD HH:mm'),
+      moment(item.registEndTime, 'YYYY-MM-DD HH:mm')
+    ]
+    currentItem.timeRange = [
+      moment(item.startTime, 'YYYY-MM-DD HH:mm'),
+      moment(item.endTime, 'YYYY-MM-DD HH:mm')
+    ]
     setVisible(true);
-    setCurrent(item);
+    setCurrent(currentItem);
   };
 
   const deleteItem = (id: string) => {
@@ -110,36 +157,37 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     });
   };
 
-  const editAndDelete = (key: string, currentItem: BasicListItemDataType) => {
+  const editAndDelete = (key: string, currentItem: TrainingDataType) => {
     if (key === 'edit') showEditModal(currentItem);
     else if (key === 'delete') {
       Modal.confirm({
-        title: '删除任务',
-        content: '确定删除该任务吗？',
+        title: '删除培训',
+        content: <div><div>培训标题： {currentItem.title}</div>确定删除该培训吗？</div>,
         okText: '确认',
         cancelText: '取消',
-        onOk: () => deleteItem(currentItem.id),
+        onOk: () => deleteItem(currentItem.id || ''),
       });
     }
   };
 
   const extraContent = (
     <div className={styles.extraContent}>
-      <RadioGroup defaultValue="all">
-        <RadioButton value="all">全部</RadioButton>
-        <RadioButton value="progress">进行中</RadioButton>
-        <RadioButton value="waiting">等待中</RadioButton>
-      </RadioGroup>
-      <Search className={styles.extraContentSearch} placeholder="请输入" onSearch={() => ({})} />
+      <Search className={styles.extraContentSearch} placeholder="请输入" onSearch={(val: string) => {
+        queryList({
+          page_size: pageSize,
+          page_num: pageNum,
+          filter_str: val
+        })
+      }} />
     </div>
   );
 
   const MoreBtn: React.FC<{
-    item: BasicListItemDataType;
+    item: TrainingDataType;
   }> = ({ item }) => (
     <Dropdown
       overlay={
-        <Menu onClick={({ key }) => editAndDelete(key, item)}>
+        <Menu onClick={({ key }) => editAndDelete(key as string, item)}>
           <Menu.Item key="edit">编辑</Menu.Item>
           <Menu.Item key="delete">删除</Menu.Item>
         </Menu>
@@ -172,7 +220,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   };
 
   const handleSubmit = (values: TrainingDataType) => {
-    const pram = {...values};
+    const pram = { ...values };
     if (current) pram.id = current.id;
 
     setAddBtnblur();
@@ -188,24 +236,10 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     <div>
       <PageHeaderWrapper>
         <div className={styles.standardList}>
-          <Card bordered={false}>
-            <Row>
-              <Col sm={8} xs={24}>
-                <Info title="我的待办" value="8个任务" bordered />
-              </Col>
-              <Col sm={8} xs={24}>
-                <Info title="本周任务平均处理时间" value="32分钟" bordered />
-              </Col>
-              <Col sm={8} xs={24}>
-                <Info title="本周完成任务数" value="24个任务" />
-              </Col>
-            </Row>
-          </Card>
-
           <Card
             className={styles.listCard}
             bordered={false}
-            title="基本列表"
+            title="培训列表"
             style={{ marginTop: 24 }}
             bodyStyle={{ padding: '0 32px 40px 32px' }}
             extra={extraContent}
@@ -242,9 +276,8 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
                   ]}
                 >
                   <List.Item.Meta
-                    avatar={<Avatar src={item.logo} shape="square" size="large" />}
-                    title={<a href={item.href}>{item.title}</a>}
-                    description={item.subDescription}
+                    title={<a href=''>{item.title}</a>}
+                    description={item.subTitle}
                   />
                   <ListContent data={item} />
                 </List.Item>

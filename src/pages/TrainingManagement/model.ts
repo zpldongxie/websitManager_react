@@ -1,10 +1,14 @@
 import { Effect, Reducer } from 'umi';
 import { addFakeList, queryTrainingList, removeFakeList, updateFakeList } from './service';
 
-import { BasicListItemDataType } from './data.d';
+import { TrainingDataType } from './data.d';
 
 export interface StateType {
-  list: BasicListItemDataType[];
+  filter: string;
+  pageNum: number;
+  pageSize: number;
+  total: number;
+  list: TrainingDataType[];
 }
 
 export interface ModelType {
@@ -12,12 +16,12 @@ export interface ModelType {
   state: StateType;
   effects: {
     fetch: Effect;
-    appendFetch: Effect;
     submit: Effect;
+    pageChange: Effect;
   };
   reducers: {
     queryList: Reducer<StateType>;
-    appendList: Reducer<StateType>;
+    pageChange: Reducer<StateType>;
   };
 }
 
@@ -25,53 +29,57 @@ const Model: ModelType = {
   namespace: 'trainingManagement',
 
   state: {
+    filter: '',
+    pageNum: 1,
+    pageSize: 20,
+    total: 0,
     list: [],
   },
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryTrainingList, payload);
+      const param = {...payload, search: payload.filter};
+      const response = yield call(queryTrainingList, param);
       yield put({
         type: 'queryList',
-        payload: Array.isArray(response) ? response : [],
-      });
-    },
-    *appendFetch({ payload }, { call, put }) {
-      const response = yield call(queryTrainingList, payload);
-      yield put({
-        type: 'appendList',
-        payload: Array.isArray(response) ? response : [],
+        payload: response.status === 'ok' ? { ...payload, ...response} : {},
       });
     },
     *submit({ payload }, { call, put }) {
       
-      let callback;
+      let callback = addFakeList;
       if (payload.id) {
         callback = Object.keys(payload).length === 1 ? removeFakeList : updateFakeList;
-      } else {
-        callback = addFakeList;
       }
-      const response = yield call(callback, payload); // post
+      yield call(callback, payload); // post
+      const response = yield call(queryTrainingList, payload);
+      
       yield put({
         type: 'queryList',
-        payload: response,
+        payload: response.status === 'ok' ? response.list : [],
       });
     },
+    pageChange({ payload }, { put }) {
+      put({
+        type: 'pageChange',
+        payload
+      })
+    }
   },
 
   reducers: {
     queryList(state, action) {
       return {
         ...state,
-        list: action.payload,
+        ...action.payload,
       };
     },
-    appendList(state = { list: [] }, action) {
+    pageChange(state, action) {
       return {
         ...state,
-        list: state.list.concat(action.payload),
-      };
-    },
+        ...action.payload
+      }
+    }
   },
 };
 
