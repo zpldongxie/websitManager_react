@@ -53,4 +53,26 @@ const request = extend({
   credentials: 'include', // 默认请求是否带上cookie
 });
 
+// request拦截器, 改变url 或 options.
+type HeadersInit = Headers | string[][] | Record<string, string>;
+request.interceptors.request.use((url, options) => {
+// options.headers
+  const token = localStorage.getItem("token");
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    // 'Content-Type': 'application/x-www-form-urlencoded',
+    'Accept': 'application/json',  
+  };
+
+  if (token) {
+    headers.token = token;
+  }
+  return (
+    {
+      url,
+      options: { ...options, headers },
+    }
+  );
+})
+
 export default request;

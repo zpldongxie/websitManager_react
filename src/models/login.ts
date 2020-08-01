@@ -43,6 +43,7 @@ const Model: LoginModelType = {
       });
       // Login successfully
       if (response.status === 'ok') {
+        localStorage.setItem('token', response.token);
         setAuthority(response.currentAuthority);
 
         const urlParams = new URL(window.location.href);
@@ -74,6 +75,7 @@ const Model: LoginModelType = {
             redirect: window.location.href,
           }),
         });
+        localStorage.removeItem('token');
         setAuthority('guest');
       }
     },

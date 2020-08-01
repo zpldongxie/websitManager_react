@@ -102,7 +102,7 @@ export default defineConfig({
                   component: './TrainingRegManagement',
                   authority: ['admin', 'user'],
                 },
-              ]
+              ],
             },
             {
               name: 'list.table-list',
@@ -110,7 +110,7 @@ export default defineConfig({
               path: '/list',
               component: './ListTableList',
               authority: ['admin', 'user'],
-            },            
+            },
             {
               component: './404',
             },
