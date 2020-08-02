@@ -74,7 +74,7 @@ export interface TrainingDataType {
   desc: string;
   Channel: {
     name: string
-  }
+  },
 }
 
 export interface QueryListDataType {

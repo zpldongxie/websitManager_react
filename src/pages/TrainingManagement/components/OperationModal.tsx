@@ -9,6 +9,7 @@ interface OperationModalProps {
   done: boolean;
   visible: boolean;
   current: Partial<TrainingDataType> | undefined;
+  channelList: {id: string; name: string;}[];
   onDone: () => void;
   onSubmit: (values: TrainingDataType) => void;
   onCancel: () => void;
@@ -22,7 +23,7 @@ const formLayout = {
 const OperationModal: FC<OperationModalProps> = (props) => {
   const [form] = Form.useForm();
   
-  const { done, visible, current, onDone, onCancel, onSubmit } = props;
+  const { done, visible, current, channelList=[], onDone, onCancel, onSubmit } = props;
 
   useEffect(() => {
     if (form && !visible) {
@@ -84,10 +85,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
       })
     }
 
-    const channelItems = [
-      {value: 1, text: '首页'}, 
-      {value: 3, text: '关于协会'}
-    ];
+    const channelItems = channelList.map(channel => ({value: channel.id, text: channel.name}));
 
     const trainingMethodItems = [
       {value: '线上公开', text: '线上公开'},

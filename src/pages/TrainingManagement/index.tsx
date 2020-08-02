@@ -39,11 +39,15 @@ interface TrainingManagementProps {
  * }
  */
 const ListContent = ({
-  data: { trainingMethod, Channel, startTime, endTime },
+  data: { id, trainingMethod, Channel, startTime, endTime },
 }: {
   data: TrainingDataType;
 }) => (
     <div className={styles.listContent}>
+      <div className={styles.listContentItem}>
+        <span>id</span>
+        <p>{id}</p>
+      </div>
       <div className={styles.listContentItem}>
         <span>培训方式</span>
         <p>{trainingMethod}</p>
@@ -72,16 +76,18 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   const {
     loading,
     dispatch,
-    trainingManagement: { 
+    trainingManagement: {
       pageNum,
       pageSize,
       total,
       list,
-      filter 
+      filter,
+      channelList,
+      done
     },
   } = props;
-  
-  const [done, setDone] = useState<boolean>(false);
+
+  // const [done, setDone] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
   const [current, setCurrent] = useState<Partial<TrainingDataType> | undefined>(undefined);
 
@@ -92,11 +98,19 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
    *     channel_id?: number; page_size: number, page_num: number, filter_str?: string
    *   }} 
    */
-  const queryList = ({
-    channel_id, page_size, page_num, filter_str=filter
-  }: {
-    channel_id?: number; page_size: number, page_num: number, filter_str?: string
-  }) => {
+  type QueryPram = {
+    channel_id?: number;
+    page_size?: number;
+    page_num?: number;
+    filter_str?: string;
+  };
+  const queryList = (
+    {
+      channel_id,
+      page_size = pageSize,
+      page_num = pageNum,
+      filter_str = filter,
+    }: QueryPram) => {
     dispatch({
       type: 'trainingManagement/fetch',
       payload: {
@@ -109,8 +123,19 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   }
 
   useEffect(() => {
-    queryList({page_num: pageNum, page_size: pageSize});
+    queryList({});
   }, [1]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'trainingManagement/getChannels',
+      payload: '培训',
+    });
+  }, []);
+
+  useEffect(() => {
+    queryList({});
+  }, [done === true]);
 
   const paginationProps: PaginationConfig = {
     showSizeChanger: true,
@@ -118,7 +143,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     pageSize,
     total,
     onChange: (page: number, size?: number) => {
-      queryList({page_size: size || pageSize, page_num: page})
+      queryList({ page_size: size || pageSize, page_num: page })
     },
     onShowSizeChange: (page: number, size: number) => {
       dispatch({
@@ -173,11 +198,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   const extraContent = (
     <div className={styles.extraContent}>
       <Search className={styles.extraContentSearch} placeholder="请输入" onSearch={(val: string) => {
-        queryList({
-          page_size: pageSize,
-          page_num: pageNum,
-          filter_str: val
-        })
+        queryList({ filter_str: val })
       }} />
     </div>
   );
@@ -210,7 +231,11 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   const handleDone = () => {
     setAddBtnblur();
 
-    setDone(false);
+    dispatch({
+      type: 'trainingManagement/setDone',
+      payload: false,
+    });
+    // setDone(false);
     setVisible(false);
   };
 
@@ -225,7 +250,8 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
 
     setAddBtnblur();
 
-    setDone(true);
+    // setDone(true);
+
     dispatch({
       type: 'trainingManagement/submit',
       payload: pram,
@@ -290,6 +316,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
       <OperationModal
         done={done}
         current={current}
+        channelList={channelList}
         visible={visible}
         onDone={handleDone}
         onCancel={handleCancel}

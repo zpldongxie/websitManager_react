@@ -5,6 +5,10 @@ interface ParamsType extends Partial<TrainingDataType> {
   count?: number;
 }
 
+export async function getChannelList(filter: string) {
+  return request(`/api/channels/${filter}`);
+}
+
 export async function queryTrainingList(params: QueryListDataType) {
   return request('/api/getTrainingList', {
     method: 'POST',
