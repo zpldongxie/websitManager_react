@@ -1,9 +1,10 @@
 import React, { FC, useEffect } from 'react';
-import { Modal, Result, Button, Form } from 'antd';
-import {FormInput, FormSelect, FormTimeRange, FormTextArea} from './CustomFormItem';
+import { Modal, Result, Button } from 'antd';
+import CustomForm, {form} from '@/components/CustomForm';
+// import {FormInput, FormSelect, FormTimeRange, FormTextArea} from './CustomFormItem';
 import { TrainingDataType } from '../data.d';
 import styles from '../style.less';
-import { FormSelectProps } from './interfice';
+// import { FormSelectProps } from './interfice';
 
 interface OperationModalProps {
   done: boolean;
@@ -21,8 +22,6 @@ const formLayout = {
 };
 
 const OperationModal: FC<OperationModalProps> = (props) => {
-  const [form] = Form.useForm();
-  
   const { done, visible, current, channelList=[], onDone, onCancel, onSubmit } = props;
 
   useEffect(() => {
@@ -32,7 +31,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
   }, [props.visible]);
 
   useEffect(() => {
-    if (current) {
+    if (form && current) {
       form.setFieldsValue({
         ...current,
       });
@@ -72,14 +71,14 @@ const OperationModal: FC<OperationModalProps> = (props) => {
     }
 
     const onRegTimeChange = (_: any, formatString: [string, string]) => {
-      form.setFieldsValue({
+      form!.setFieldsValue({
         registStartTime: new Date(formatString[0]),
         registEndTime: new Date(formatString[1]),
       })
     }
     
     const onTimeChange = (_: any, formatString: [string, string]) => {
-      form.setFieldsValue({
+      form!.setFieldsValue({
         startTime: new Date(formatString[0]),
         endTime: new Date(formatString[1]),
       })
@@ -109,29 +108,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
     ];
 
     return (
-      <Form {...formLayout} form={form} onFinish={handleFinish}>
-        {
-          formItems.map(formItem => {
-            const {type, ...currentProps} = formItem;
-            switch(type) {
-              case 'input':
-                return <FormInput {...currentProps} key={formItem.label} />
-                // return formInput(currentProps)
-              case 'select':
-                return <FormSelect {...currentProps as FormSelectProps} key={formItem.label} />
-                // return formSelect(currentProps as FormSelectProps)
-              case 'timeRange':
-                return <FormTimeRange {...currentProps} key={formItem.label} />
-                // return formTimeRange(currentProps)
-              case 'textArae':
-                return <FormTextArea {...currentProps} key={formItem.label} />
-                // return formTextArae(currentProps)
-              default: 
-                return ''
-            }            
-          })
-        }
-      </Form>
+      <CustomForm formLayout={formLayout} formItems={formItems} onFinish={handleFinish}  />
     );
   };
 
