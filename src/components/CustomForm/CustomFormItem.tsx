@@ -1,47 +1,12 @@
 import React from 'react'
 import { Form, Input, Select, DatePicker } from 'antd';
 import moment, { Moment } from 'moment';
+
 import { FormInputProps, FormSelectProps, FormTimeRangeProps, FormTextAreaProps } from './interfice';
 
 const { TextArea } = Input;
 
-interface Props {
-  name: string;
-  label?: string;
-  requiredMsg?: string;
-  children?: any;
-  hidden?: boolean;
-}
-
-const CommonFormItem = (props: Props) => {
-  const {
-    name,
-    label,
-    requiredMsg,
-    children,
-    hidden
-  } = props;
-
-  return (
-    <Form.Item
-      name={name}
-      label={label}
-      rules={[{
-        required: !!requiredMsg,
-        message: requiredMsg || ''
-      }]}
-      hidden={hidden}
-    >
-      {children}
-    </Form.Item>
-  )
-}
-
-// interface FormInputProps extends Props {
-//   value?: string;
-//   placeholder?: string;
-// }
-
+// -----------------------------FormInput------------------------------------
 /**
  * 表单输入框
  *
@@ -50,26 +15,19 @@ const CommonFormItem = (props: Props) => {
  */
 const FormInput = (props: FormInputProps) => {
   const {
+    disabled,
     placeholder,
     ...formProps
   } = props;
 
   return (
-    <CommonFormItem {...formProps}>
-      <Input placeholder={placeholder || "请输入"} />
-    </CommonFormItem >
+    <Form.Item {...formProps}  >
+      <Input disabled={disabled} placeholder={placeholder || "请输入"} />
+    </Form.Item>
   )
 }
 
-// interface FormSelectProps extends Props {
-//   placeholder?: string;
-//   items: {
-//     value: string | number;
-//     text: string;
-//   }[];
-//   defaultValue?: string | number;
-// }
-
+// -----------------------------FormSelect------------------------------------
 /**
  * 表单选择框
  *
@@ -78,21 +36,31 @@ const FormInput = (props: FormInputProps) => {
  */
 const FormSelect = (props: FormSelectProps) => {
   const {
+    disabled,
     placeholder,
     items,
     ...formProps
   } = props;
   return (
-    <CommonFormItem {...formProps}>
-      <Select placeholder={placeholder || '请选择'}>
+    <Form.Item {...formProps}  >
+      <Select 
+        disabled={disabled}
+        showSearch
+        placeholder={placeholder || '请选择'}
+        optionFilterProp='children'
+        filterOption={(inputValue: string, option: any) =>
+          option.children.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0
+        }
+      >
         {
           items.map(item => <Select.Option key={item.value} value={item.value}>{item.text}</Select.Option>)
         }
       </Select>
-    </CommonFormItem>
+    </Form.Item>
   )
 }
 
+// -----------------------------FormTimeRange------------------------------------
 const range = (start: number, end: number) => {
   const result = [];
   for (let i = start; i < end; i += 1) {
@@ -109,9 +77,6 @@ const disabledDate = (current: Moment) => {
   // Can not select days before today
   return current < moment().endOf('day');
 }
-// interface FormTimeRangeProps extends Props {
-//   onChange?: (_: any, formatString: [string, string]) => void;
-// }
 
 /**
  * 表单时间范围选择框
@@ -121,12 +86,14 @@ const disabledDate = (current: Moment) => {
  */
 const FormTimeRange = (props: FormTimeRangeProps) => {
   const {
+    disabled,
     onChange,
     ...formProps
   } = props;
   return (
-    <CommonFormItem {...formProps}>
+    <Form.Item {...formProps}  >
       <DatePicker.RangePicker
+         disabled={disabled}
         showTime={{
           hideDisabledOptions: true,
           defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
@@ -137,23 +104,21 @@ const FormTimeRange = (props: FormTimeRangeProps) => {
         onChange={onChange}
         style={{ width: '100%' }}
       />
-    </CommonFormItem>
+    </Form.Item>
   )
 }
 
-// interface FormTextAreaProps extends Props {
-//   placeholder?: string;
-// }
-
+// -----------------------------FormTextArea------------------------------------
 const FormTextArea = (props: FormTextAreaProps) => {
   const {
+    disabled,
     placeholder,
     ...formProps
   } = props;
   return (
-    <CommonFormItem {...formProps}>
-      <TextArea rows={4} placeholder={placeholder || '请输入'} />
-    </CommonFormItem>
+    <Form.Item {...formProps}  >
+      <TextArea disabled={disabled} rows={4} placeholder={placeholder || '请输入'} />
+    </Form.Item>
   )
 }
 

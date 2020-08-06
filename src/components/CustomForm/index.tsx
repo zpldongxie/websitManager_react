@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Form } from 'antd'
-import { FormInstance } from 'antd/lib/form/hooks/useForm.d'
 import { FormItemType, FormSelectProps } from './interfice';
 import { FormInput, FormSelect, FormTimeRange, FormTextArea } from './CustomFormItem';
 
@@ -10,19 +9,35 @@ interface Props {
     wrapperCol: { span: number };
   };
   formItems: FormItemType[];
+  values?: any;
+  /**
+   * 可选，获取提交方法，支持在外部进行触发
+   *
+   * @memberof Props
+   */
+  setSubmitFun?: (submit: ()=>void)=>void;
   onFinish: (values: any) => void
 }
-
-// eslint-disable-next-line import/no-mutable-exports
-let [form]: (FormInstance | undefined)[] = [];
 
 const CustomForm = (props: Props) => {
   const {
     formLayout,
     formItems,
+    values,
+    setSubmitFun,
     onFinish
   } = props;
-  [form] = Form.useForm();
+  const [form] = Form.useForm();
+
+  useEffect(()=>{
+    if(typeof setSubmitFun === 'function'){
+      setSubmitFun(form.submit)
+    }
+  }, [])
+
+  useEffect(() => {
+    form.setFieldsValue(values)
+  }, [values]);
 
   return (
     <Form {...formLayout} form={form} onFinish={onFinish}>
@@ -46,7 +61,5 @@ const CustomForm = (props: Props) => {
     </Form>
   )
 }
-
-export {form};
 
 export default CustomForm
