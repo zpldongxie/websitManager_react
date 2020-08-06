@@ -1,65 +1,57 @@
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, Dropdown, Menu, message, Input } from 'antd';
-import React, { useState, useRef } from 'react';
+import { Button, Divider, Dropdown, Menu, message, Modal, Select } from 'antd';
+import React, { useState, useRef, useEffect } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
-import CreateForm from './components/CreateForm';
-import UpdateForm, { FormValueType } from './components/UpdateForm';
-import { TableListItem } from './data.d';
-import { queryRule, updateRule, addRule, removeRule } from './service';
+import EditModal from './components/EditModal';
+import { TableListItem } from './data';
+import { queryList, putTrainingReg, removeTrainingReg, getTrainings } from './service';
+
+const { confirm } = Modal;
+const { Option } = Select;
 
 /**
- * 添加节点
+ * 添加/修改 报名
  * @param fields
  */
-const handleAdd = async (fields: TableListItem) => {
-  const hide = message.loading('正在添加');
+const handleAddOrUpdate = async (fields: TableListItem) => {
+  const label = fields.id ? '修改' : '添加';
+  const hide = message.loading(`正在${label}`);
   try {
-    await addRule({ ...fields });
+    // if (fields.id) {
+    //   await updateTrainingReg({ ...fields });
+    // }
+    await putTrainingReg({ ...fields });
     hide();
-    message.success('添加成功');
+    message.success(`${label}成功`);
     return true;
   } catch (error) {
     hide();
-    message.error('添加失败请重试！');
+    const errorData = error.data;
+    switch (errorData) {
+      case "mobile must be unique":
+        message.error(`该手机号已经提交过申请！`);
+        break;
+
+      default:
+        message.error(`${label}失败请重试！`);
+        break;
+    }
     return false;
   }
 };
 
 /**
- * 更新节点
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在配置');
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
-
-    message.success('配置成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('配置失败请重试！');
-    return false;
-  }
-};
-
-/**
- *  删除节点
+ *  删除报名
  * @param selectedRows
  */
 const handleRemove = async (selectedRows: TableListItem[]) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
   try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
+    await removeTrainingReg({
+      ids: selectedRows.map((row) => row.id!),
     });
     hide();
     message.success('删除成功，即将刷新');
@@ -71,78 +63,156 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
   }
 };
 
-const TableList: React.FC<{}> = () => {
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-  const [stepFormValues, setStepFormValues] = useState({});
+const TableList: React.FC = () => {
+  const [editModalVisible, handleModalVisible] = useState<boolean>(false);
+  const [trainings, setTrainings] = useState([]);
+  const [channelId, setChannelId] = useState('');
+  const [trainingId, setTrainingId] = useState('');
+  const [current, setCurrent] = useState<TableListItem | null>(null);
   const actionRef = useRef<ActionType>();
+
+  useEffect(() => {
+    // 获取所有培训名称，用于创建和筛选
+    (async () => { setTrainings(await getTrainings()) })()
+  }, [])
+
   const columns: ProColumns<TableListItem>[] = [
     {
-      title: '规则名称',
+      title: '培训信息',
+      dataIndex: 'TrainingId',
+      hideInTable: true,
+      rules: [
+        {
+          required: true,
+          message: '请选择培训信息',
+        },
+      ],
+      renderFormItem: () => {
+        return (
+          <Select
+            showSearch
+            style={{ width: 200 }}
+            placeholder="选择一个培训活动"
+            optionFilterProp="children"
+            filterOption={(inputValue: string, option: any) =>
+              option.children.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0
+            }
+          >
+            {
+              trainings.map((training: { id: string; title: string }) => (
+                <Option key={training.id} value={training.id}>{training.title}</Option>
+              ))
+            }
+          </Select>
+        );
+      },
+    },
+    {
+      title: '培训信息',
+      dataIndex: 'Training',
+      hideInTable: !!trainingId, // 过滤条件trainingId存在时，不显示此列
+      hideInForm: true,
+      hideInSearch: true,
+      renderText: (training: { id: string; title: string; }) => training.title,
+    },
+    {
+      title: '培训类型',
+      dataIndex: 'Training',
+      hideInForm: true,
+      hideInTable: !!channelId, // 过滤条件channelId存在时，不显示此列
+      renderText: (training: {
+        id: string;
+        title: string;
+        Channel: { id: string, name: string; }
+      }) => training.Channel.name,
+    },
+    {
+      title: '姓名',
       dataIndex: 'name',
       rules: [
         {
           required: true,
-          message: '规则名称为必填项',
+          message: '姓名为必填项',
         },
       ],
     },
     {
-      title: '描述',
-      dataIndex: 'desc',
-      valueType: 'textarea',
+      title: '手机',
+      dataIndex: 'mobile',
+      rules: [
+        {
+          required: true,
+          message: '手机为必填项',
+        },
+      ],
     },
     {
-      title: '服务调用次数',
-      dataIndex: 'callNo',
+      title: '邮箱',
+      dataIndex: 'email',
+      rules: [
+        {
+          required: true,
+          message: '邮箱为必填项',
+        },
+      ],
+    },
+    {
+      title: '公司',
+      dataIndex: 'comp',
+      rules: [
+        {
+          required: true,
+          message: '公司为必填项',
+        },
+      ],
       sorter: true,
-      hideInForm: true,
-      renderText: (val: string) => `${val} 万`,
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      hideInForm: true,
-      valueEnum: {
-        0: { text: '关闭', status: 'Default' },
-        1: { text: '运行中', status: 'Processing' },
-        2: { text: '已上线', status: 'Success' },
-        3: { text: '异常', status: 'Error' },
-      },
-    },
-    {
-      title: '上次调度时间',
-      dataIndex: 'updatedAt',
+      title: '报名时间',
+      dataIndex: 'createdAt',
       sorter: true,
       valueType: 'dateTime',
       hideInForm: true,
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return <Input {...rest} placeholder="请输入异常原因！" />;
-        }
-        return defaultRender(item);
-      },
+      hideInSearch: true,
+    },
+    {
+      title: '签到时间',
+      dataIndex: 'signInTime',
+      sorter: true,
+      valueType: 'dateTime',
+      hideInForm: true,
+      hideInSearch: true,
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => (
+      render: (_, record, action: any) => (
         <>
           <a
             onClick={() => {
-              handleUpdateModalVisible(true);
-              setStepFormValues(record);
+              message.info(`修改${record.name}`)
+              setCurrent(record);
+              handleModalVisible(true)
             }}
           >
-            配置
+            修改
           </a>
           <Divider type="vertical" />
-          <a href="">订阅警报</a>
+          <a
+            onClick={() => {
+              confirm({
+                title: '确定删除以下报名吗？',
+                content: record.name,
+                onOk() {
+                  (async ()=>{
+                    await handleRemove([record]);
+                    action.reload();
+                  })()
+                },
+              });
+            }}
+          >删除</a>
         </>
       ),
     },
@@ -153,7 +223,7 @@ const TableList: React.FC<{}> = () => {
       <ProTable<TableListItem>
         headerTitle="查询表格"
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         toolBarRender={(action, { selectedRows }) => [
           <Button type="primary" onClick={() => handleModalVisible(true)}>
             <PlusOutlined /> 新建
@@ -164,8 +234,16 @@ const TableList: React.FC<{}> = () => {
                 <Menu
                   onClick={async (e) => {
                     if (e.key === 'remove') {
-                      await handleRemove(selectedRows);
-                      action.reload();
+                      confirm({
+                        title: '确定删除以下报名吗？',
+                        content: `批量选中${selectedRows.length}个。`,
+                        onOk() {
+                          (async ()=>{
+                            await handleRemove(selectedRows);
+                            action.reload();
+                          })()
+                        },
+                      });
                     }
                   }}
                   selectedKeys={[]}
@@ -183,53 +261,39 @@ const TableList: React.FC<{}> = () => {
         ]}
         tableAlertRender={({ selectedRowKeys, selectedRows }) => (
           <div>
-            已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项&nbsp;&nbsp;
+            已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 个&nbsp;&nbsp;
             <span>
-              服务调用次数总计 {selectedRows.reduce((pre, item) => pre + item.callNo, 0)} 万
+              已签到 {selectedRows.reduce((pre, item) => pre + (item.signInTime ? 1 : 0), 0)} 个
             </span>
           </div>
         )}
-        request={(params, sorter, filter) => queryRule({ ...params, sorter, filter })}
+        request={(params, sorter, filter) => queryList({ ...params, sorter, filter })}
         columns={columns}
         rowSelection={{}}
       />
-      <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>
-        <ProTable<TableListItem, TableListItem>
-          onSubmit={async (value) => {
-            const success = await handleAdd(value);
+      <EditModal
+        modalVisible={editModalVisible}
+        current={current}
+        trainingItems={
+          trainings.map((t: { id: string; title: string; }) => ({ value: t.id, text: t.title }))
+        }
+        onSubmit={
+          async (value: TableListItem) => {
+            const success = await handleAddOrUpdate(value);
             if (success) {
               handleModalVisible(false);
               if (actionRef.current) {
                 actionRef.current.reload();
               }
+              setCurrent(null);
             }
-          }}
-          rowKey="key"
-          type="form"
-          columns={columns}
-          rowSelection={{}}
-        />
-      </CreateForm>
-      {stepFormValues && Object.keys(stepFormValues).length ? (
-        <UpdateForm
-          onSubmit={async (value) => {
-            const success = await handleUpdate(value);
-            if (success) {
-              handleUpdateModalVisible(false);
-              setStepFormValues({});
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-            }
-          }}
-          onCancel={() => {
-            handleUpdateModalVisible(false);
-            setStepFormValues({});
-          }}
-          updateModalVisible={updateModalVisible}
-          values={stepFormValues}
-        />
-      ) : null}
+          }
+        }
+        onCancel={() => {
+          handleModalVisible(false)
+          setCurrent(null);
+        }}
+      />
     </PageHeaderWrapper>
   );
 };

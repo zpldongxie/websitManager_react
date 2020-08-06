@@ -1,39 +1,48 @@
 import request from 'umi-request';
-import { TableListParams } from './data.d';
+import { TableListParams, TableListItem } from './data.d';
 
-export async function queryRule(params?: TableListParams) {
-  return request('/api/getTrainingRegList', {
+export async function queryList(params?: TableListParams) {
+  const result = await request('/api/getTrainingRegList', {
     method: 'POST',
     data: {...params},
   });
+
+  if(result.status === 'ok') {
+    return {
+      data: result.list,
+      total: result.total,
+      success: true,
+      pageSize: params?.pageSize,
+      current: params?.currentPage,
+    }
+  }
+  return {
+    data: [],
+    total: 0,
+    success: false,
+    pageSize: 0,
+    current: 1,
+  }
 }
 
-export async function removeRule(params: { key: number[] }) {
-  return request('/api/rule', {
-    method: 'POST',
+export async function removeTrainingReg(params: { ids: string[] }) {
+  return request('/api/trainingRegs', {
+    method: 'DELETE',
     data: {
       ...params,
-      method: 'delete',
     },
   });
 }
 
-export async function addRule(params: TableListParams) {
-  return request('/api/rule', {
-    method: 'POST',
+export async function putTrainingReg(params: TableListItem) {
+  return request('/api/trainingReg', {
+    method: 'PUT',
     data: {
       ...params,
-      method: 'post',
     },
   });
 }
 
-export async function updateRule(params: TableListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'update',
-    },
-  });
+export async function getTrainings (){
+  return request('/api/trainings')
 }
