@@ -65,7 +65,6 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
 const TableList: React.FC = () => {
   const [editModalVisible, handleModalVisible] = useState<boolean>(false);
   const [trainings, setTrainings] = useState([]);
-  const [channelId, setChannelId] = useState('');
   const [trainingId, setTrainingId] = useState('');
   const [current, setCurrent] = useState<TableListItem | null>(null);
   const actionRef = useRef<ActionType>();
@@ -119,7 +118,7 @@ const TableList: React.FC = () => {
       dataIndex: 'Training',
       hideInForm: true,
       hideInSearch: true,
-      hideInTable: !!channelId, // 过滤条件channelId存在时，不显示此列
+      hideInTable: !!trainingId, // 过滤条件trainingId存在时，不显示此列
       renderText: (training: {
         id: string;
         title: string;
@@ -325,6 +324,11 @@ const TableList: React.FC = () => {
               ...params,
               passed: !!params.passed
             }
+          }
+          if (typeof params.TrainingId !== 'undefined') {
+            setTrainingId(params.TrainingId)
+          } else {
+            setTrainingId('')
           }
           return params;
         }}
