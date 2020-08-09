@@ -4,6 +4,7 @@ export interface TableListItem {
   mobile: string;
   email: string;
   comp: string;
+  passed: boolean;
   signInTime?: string;
   TrainingId: string;
   Training?: {id: string, title: string, Channel: {id: number, name: string}};

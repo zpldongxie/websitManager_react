@@ -1,15 +1,14 @@
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, Dropdown, Menu, message, Modal, Select } from 'antd';
+import { Button, Divider, Dropdown, Menu, message, Modal, Select, Switch } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
 import EditModal from './components/EditModal';
 import { TableListItem } from './data';
-import { queryList, putTrainingReg, removeTrainingReg, getTrainings } from './service';
+import { queryList, putTrainingReg, removeTrainingReg, getTrainings, setPassed } from './service';
 
 const { confirm } = Modal;
-const { Option } = Select;
 
 /**
  * 添加/修改 报名
@@ -100,7 +99,7 @@ const TableList: React.FC = () => {
           >
             {
               trainings.map((training: { id: string; title: string }) => (
-                <Option key={training.id} value={training.id}>{training.title}</Option>
+                <Select.Option key={training.id} value={training.id}>{training.title}</Select.Option>
               ))
             }
           </Select>
@@ -113,18 +112,19 @@ const TableList: React.FC = () => {
       hideInTable: !!trainingId, // 过滤条件trainingId存在时，不显示此列
       hideInForm: true,
       hideInSearch: true,
-      renderText: (training: { id: string; title: string; }) => training.title,
+      renderText: (training: { id: string; title: string; }) => training?.title,
     },
     {
       title: '培训类型',
       dataIndex: 'Training',
       hideInForm: true,
+      hideInSearch: true,
       hideInTable: !!channelId, // 过滤条件channelId存在时，不显示此列
       renderText: (training: {
         id: string;
         title: string;
         Channel: { id: string, name: string; }
-      }) => training.Channel.name,
+      }) => training?.Channel?.name,
     },
     {
       title: '姓名',
@@ -176,6 +176,34 @@ const TableList: React.FC = () => {
       hideInSearch: true,
     },
     {
+      title: '审批',
+      dataIndex: 'passed',
+      sorter: true,
+      hideInForm: true,
+      align: 'center',
+      render: (passed, record) => {
+        return <Switch
+          defaultChecked={passed as boolean}
+          size="small"
+          onChange={async (checked: boolean) => {
+            await setPassed({
+              ids: [record.id!],
+              passed: checked
+            })
+          }}
+        />
+      },
+      renderFormItem: () => (
+        <Select
+          placeholder='请选择'
+          optionFilterProp='children'
+        >
+          <Select.Option value={1}>已审批</Select.Option>
+          <Select.Option value={0}>未审批</Select.Option>
+        </Select>
+      )
+    },
+    {
       title: '签到时间',
       dataIndex: 'signInTime',
       sorter: true,
@@ -187,7 +215,7 @@ const TableList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record, action: any) => (
+      render: (_, record, index, action: any) => (
         <>
           <a
             onClick={() => {
@@ -205,7 +233,7 @@ const TableList: React.FC = () => {
                 title: '确定删除以下报名吗？',
                 content: record.name,
                 onOk() {
-                  (async ()=>{
+                  (async () => {
                     await handleRemove([record]);
                     action.reload();
                   })()
@@ -233,17 +261,34 @@ const TableList: React.FC = () => {
               overlay={
                 <Menu
                   onClick={async (e) => {
-                    if (e.key === 'remove') {
-                      confirm({
-                        title: '确定删除以下报名吗？',
-                        content: `批量选中${selectedRows.length}个。`,
-                        onOk() {
-                          (async ()=>{
-                            await handleRemove(selectedRows);
-                            action.reload();
-                          })()
-                        },
-                      });
+                    switch (e.key) {
+                      case 'remove':
+                        confirm({
+                          title: '确定删除以下报名吗？',
+                          content: `批量选中${selectedRows.length}个。`,
+                          onOk() {
+                            (async () => {
+                              await handleRemove(selectedRows);
+                              action.reload();
+                            })()
+                          },
+                        });
+                        break;
+                      case 'approval':
+                        confirm({
+                          title: '确定批量通过审批吗？',
+                          content: `批量选中${selectedRows.length}个。`,
+                          onOk() {
+                            (async () => {
+                              await handleRemove(selectedRows);
+                              action.reload();
+                            })()
+                          },
+                        });
+                        break;
+                    
+                      default:
+                        break;
                     }
                   }}
                   selectedKeys={[]}
@@ -263,6 +308,9 @@ const TableList: React.FC = () => {
           <div>
             已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 个&nbsp;&nbsp;
             <span>
+              已审批 {selectedRows.reduce((pre, item) => pre + (item.passed ? 1 : 0), 0)} 个
+            </span>
+            <span>
               已签到 {selectedRows.reduce((pre, item) => pre + (item.signInTime ? 1 : 0), 0)} 个
             </span>
           </div>
@@ -270,6 +318,16 @@ const TableList: React.FC = () => {
         request={(params, sorter, filter) => queryList({ ...params, sorter, filter })}
         columns={columns}
         rowSelection={{}}
+        beforeSearchSubmit={(params: Partial<TableListItem>) => {
+          // 查询工具栏中的下拉选无法设置boolean，发起查询前需要先做转换
+          if(typeof params.passed !== 'undefined'){
+            return {
+              ...params,
+              passed: !!params.passed
+            }
+          }
+          return params;
+        }}
       />
       <EditModal
         modalVisible={editModalVisible}
