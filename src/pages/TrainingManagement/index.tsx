@@ -45,7 +45,7 @@ const ListContent = ({
 }) => (
     <div className={styles.listContent}>
       <div className={styles.listContentItem}>
-        <span>id</span>
+        <span>文章关键词</span>
         <p>{id}</p>
       </div>
       <div className={styles.listContentItem}>

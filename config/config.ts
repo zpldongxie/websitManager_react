@@ -82,8 +82,27 @@ export default defineConfig({
             {
               name: 'membermanagement',
               path: '/membermanagement',
-              component: './MemberManagement',
               authority: ['admin', 'user'],
+              routes: [
+                {
+                  name: 'company',
+                  path: '/membermanagement/company',
+                  component: './MemberManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'indivic',
+                  path: '/membermanagement/indivic',
+                  component: './MemberManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'regmanagement',
+                  path: '/membermanagement/regmanagement',
+                  component: './MemberManagement',
+                  authority: ['admin', 'user'],
+                },
+              ],
             },
             {
               name: 'trainingmanagement',
