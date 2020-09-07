@@ -27,12 +27,11 @@ const handleAddOrUpdate = async (fields: TableListItem) => {
     return true;
   } catch (error) {
     hide();
-    const errorData = error.data;
-    switch (errorData) {
+    const errorMessage = error.data.message;
+    switch (errorMessage) {
       case "mobile must be unique":
         message.error(`该手机号已经提交过申请！`);
         break;
-
       default:
         message.error(`${label}失败请重试！`);
         break;
@@ -61,6 +60,19 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
     return false;
   }
 };
+
+/**
+ * 设置审批状态
+ *
+ * @param {((string | undefined)[])} ids
+ * @param {boolean} passed
+ */
+const handleApproval = async (ids: (string | undefined)[], passed: boolean) => {
+  await setPassed({
+    ids,
+    passed
+  })
+}
 
 const TableList: React.FC = () => {
   const [editModalVisible, handleModalVisible] = useState<boolean>(false);
@@ -184,11 +196,8 @@ const TableList: React.FC = () => {
         return <Switch
           defaultChecked={passed as boolean}
           size="small"
-          onChange={async (checked: boolean) => {
-            await setPassed({
-              ids: [record.id!],
-              passed: checked
-            })
+          onChange={(checked: boolean) => {
+            handleApproval([record.id], checked)
           }}
         />
       },
@@ -218,7 +227,7 @@ const TableList: React.FC = () => {
         <>
           <a
             onClick={() => {
-              message.info(`修改${record.name}`)
+              message.info(`修改： ${record.name}`)
               setCurrent(record);
               handleModalVisible(true)
             }}
@@ -279,7 +288,8 @@ const TableList: React.FC = () => {
                           content: `批量选中${selectedRows.length}个。`,
                           onOk() {
                             (async () => {
-                              await handleRemove(selectedRows);
+                              const ids = selectedRows.map(row => row.id);
+                              await handleApproval(ids, true);
                               action.reload();
                             })()
                           },

@@ -15,7 +15,7 @@ export async function queryList(params?: TableListParams) {
     data: {...params},
   });
 
-  if(result.status === 1) {
+  if(result.status === 'ok') {
     return {
       data: result.data.list,
       total: result.data.total,
@@ -79,10 +79,10 @@ export async function getTrainings (){
  * 设置审核状态
  *
  * @export
- * @param {{ids: string[]; passed: boolean;}} params
- * @returns
+ * @param {({ids: (string | undefined)[]; passed: boolean;})} params
+ * @return {*} 
  */
-export async function setPassed(params: {ids: string[]; passed: boolean;}){
+export async function setPassed(params: {ids: (string | undefined)[]; passed: boolean;}){
   return request('/api/trainingRegs/setPassed', {
     method: 'POST',
     data: {

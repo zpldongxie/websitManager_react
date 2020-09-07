@@ -1,6 +1,9 @@
 export default {
   'menu.welcome': 'Welcome',
-  'menu.contentmanagement': 'Content Management',
+  'menu.contentmanagement': 'Article Management',
+  'menu.contentmanagement.list': 'Article List',
+  'menu.contentmanagement.review': 'Manuscript Review',
+  'menu.contentmanagement.recycle-bin': 'Recycle Bin',
   'menu.membermanagement': 'Member Management',
   'menu.membermanagement.company': 'Member companies',
   'menu.membermanagement.indivic': 'individual member',

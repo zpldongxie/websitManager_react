@@ -76,8 +76,28 @@ export default defineConfig({
             {
               name: 'contentmanagement',
               path: '/contentmanagement',
-              component: './ContentManagement',
               authority: ['admin', 'user'],
+              routes: [
+                {
+                  name: 'list',
+                  path: '/contentmanagement/list',
+                  component: './ContentManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'review',
+                  path: '/contentmanagement/recycleBin',
+                  component: './ContentManagement',
+                  // authority: ['admin'],
+                  authority: [], // 位置预留，暂不显示
+                },
+                {
+                  name: 'recycle-bin',
+                  path: '/contentmanagement/recycleBin',
+                  component: './ContentManagement',
+                  authority: ['admin', 'user'],
+                },
+              ],
             },
             {
               name: 'membermanagement',
