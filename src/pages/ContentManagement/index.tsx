@@ -8,7 +8,7 @@ import SelectChannels from '@/components/SelectChannels';
 import CreateForm from './components/CreateForm';
 // import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem } from './data.d';
-import { queryContentList } from './service';
+import { queryContentList, queryList } from './service';
 
 import styles from './index.module.less';
 
@@ -217,7 +217,7 @@ const TableList: React.FC<{}> = () => {
             已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项&nbsp;&nbsp;
           </div>
         )}
-        request={(params, sorter, filter) => queryContentList({ ...params, sorter, filter, channelId })}
+        request={(params, sorter, filter) => queryList({ ...params, sorter, filter, channelId })}
         columns={columns}
         rowSelection={{}}
       />

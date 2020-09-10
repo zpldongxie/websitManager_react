@@ -81,9 +81,19 @@ const TableList: React.FC = () => {
   const [current, setCurrent] = useState<TableListItem | null>(null);
   const actionRef = useRef<ActionType>();
 
+  let setTs = setTrainings;
+
   useEffect(() => {
     // 获取所有培训名称，用于创建和筛选
-    (async () => { setTrainings(await getTrainings()) })()
+    const fetchData = async () => { 
+      const tras = await getTrainings();
+      setTs(tras);
+    };
+    fetchData();
+    return () => {
+      // 防止内存泄漏
+      setTs = () => false;
+    }
   }, [])
 
   const columns: ProColumns<TableListItem>[] = [
@@ -91,12 +101,14 @@ const TableList: React.FC = () => {
       title: '培训信息',
       dataIndex: 'TrainingId',
       hideInTable: true,
-      rules: [
-        {
-          required: true,
-          message: '请选择培训信息',
-        },
-      ],
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '请选择培训信息',
+          },
+        ],
+      },
       renderFormItem: () => {
         return (
           <Select
@@ -140,42 +152,50 @@ const TableList: React.FC = () => {
     {
       title: '姓名',
       dataIndex: 'name',
-      rules: [
-        {
-          required: true,
-          message: '姓名为必填项',
-        },
-      ],
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '姓名为必填项',
+          },
+        ],
+      },
     },
     {
       title: '手机',
       dataIndex: 'mobile',
-      rules: [
-        {
-          required: true,
-          message: '手机为必填项',
-        },
-      ],
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '手机为必填项',
+          },
+        ],
+      },
     },
     {
       title: '邮箱',
       dataIndex: 'email',
-      rules: [
-        {
-          required: true,
-          message: '邮箱为必填项',
-        },
-      ],
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '邮箱为必填项',
+          },
+        ],
+      },
     },
     {
       title: '公司',
       dataIndex: 'comp',
-      rules: [
-        {
-          required: true,
-          message: '公司为必填项',
-        },
-      ],
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '公司为必填项',
+          },
+        ],
+      },
       sorter: true,
     },
     {
@@ -327,6 +347,9 @@ const TableList: React.FC = () => {
         request={(params, sorter, filter) => queryList({ ...params, sorter, filter })}
         columns={columns}
         rowSelection={{}}
+        pagination={{
+          showQuickJumper: true,
+        }}
         beforeSearchSubmit={(params: Partial<TableListItem>) => {
           // 查询工具栏中的下拉选无法设置boolean，发起查询前需要先做转换
           if(typeof params.passed !== 'undefined'){

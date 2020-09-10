@@ -8,7 +8,7 @@ import { getPageQuery } from '@/utils/utils';
 export interface StateType {
   status?: 'ok' | 'error';
   type?: string;
-  currentAuthority?: "user" | "guest" | "admin";
+  currentAuthority?: 'user' | 'guest' | 'admin';
 }
 
 export interface LoginModelType {

@@ -2,7 +2,9 @@
 import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
+
 const { REACT_APP_ENV } = process.env;
+
 export default defineConfig({
   hash: true,
   antd: {},
@@ -12,8 +14,8 @@ export default defineConfig({
   locale: {
     // default zh-CN
     default: 'zh-CN',
-    // default true, when it is true, will use `navigator.language` overwrite default
     antd: true,
+    // default true, when it is true, will use `navigator.language` overwrite default
     baseNavigator: true,
   },
   dynamicImport: {
