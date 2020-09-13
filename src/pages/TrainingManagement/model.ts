@@ -1,5 +1,11 @@
 import { Effect, Reducer } from 'umi';
-import { getChannelList, addFakeList, queryTrainingList, removeFakeList, updateFakeList } from './service';
+import {
+  getChannelList,
+  addFakeList,
+  queryTrainingList,
+  removeFakeList,
+  updateFakeList,
+} from './service';
 
 import { TrainingDataType } from './data.d';
 
@@ -9,7 +15,7 @@ export interface StateType {
   pageSize: number;
   total: number;
   list: TrainingDataType[];
-  channelList: {id: string; name: string;}[];
+  channelList: { id: string; name: string }[];
   done: boolean;
 }
 
@@ -26,7 +32,7 @@ export interface ModelType {
   reducers: {
     queryChannels: Reducer<StateType>;
     queryList: Reducer<StateType>;
-    setDone: Reducer<StateType>;    
+    setDone: Reducer<StateType>;
   };
 }
 
@@ -52,14 +58,14 @@ const Model: ModelType = {
       });
     },
     *fetch({ payload }, { call, put }) {
-      const param = {...payload, search: payload.filter};
+      const param = { ...payload, search: payload.filter };
       const response = yield call(queryTrainingList, param);
       yield put({
         type: 'queryList',
-        payload: response.status === 'ok' ? { ...payload, ...response} : {},
+        payload: response.status === 'ok' ? { ...payload, ...response.data } : {},
       });
     },
-    *submit({ payload }, { call, put }) {      
+    *submit({ payload }, { call, put }) {
       let callback = addFakeList;
       if (payload.id) {
         callback = Object.keys(payload).length === 1 ? removeFakeList : updateFakeList;
@@ -74,14 +80,14 @@ const Model: ModelType = {
     pageChange({ payload }, { put }) {
       put({
         type: 'queryList',
-        payload
-      })
+        payload,
+      });
     },
     setDone({ payload }, { put }) {
       put({
         type: 'setDone',
-        payload
-      })
+        payload,
+      });
     },
   },
 
