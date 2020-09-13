@@ -1,4 +1,3 @@
-
 import request from 'umi-request';
 import { TableListParams, TableListItem } from './data.d';
 
@@ -12,17 +11,17 @@ import { TableListParams, TableListItem } from './data.d';
 export async function queryList(params?: TableListParams) {
   const result = await request('/api/getTrainingRegList', {
     method: 'POST',
-    data: {...params},
+    data: { ...params },
   });
 
-  if(result.status === 'ok') {
+  if (result.status === 'ok') {
     return {
       data: result.data.list,
       total: result.data.total,
       success: true,
       pageSize: params?.pageSize,
       current: params?.currentPage,
-    }
+    };
   }
   return {
     data: [],
@@ -30,7 +29,7 @@ export async function queryList(params?: TableListParams) {
     success: false,
     pageSize: 0,
     current: 1,
-  }
+  };
 }
 
 /**
@@ -71,8 +70,12 @@ export async function putTrainingReg(params: TableListItem) {
  * @export
  * @returns
  */
-export async function getTrainings (){
-  return request('/api/trainings')
+export async function getTrainings() {
+  const result = await request('/api/trainings');
+  if (result.status === 'ok') {
+    return result.data;
+  }
+  return [];
 }
 
 /**
@@ -80,13 +83,13 @@ export async function getTrainings (){
  *
  * @export
  * @param {({ids: (string | undefined)[]; passed: boolean;})} params
- * @return {*} 
+ * @return {*}
  */
-export async function setPassed(params: {ids: (string | undefined)[]; passed: boolean;}){
+export async function setPassed(params: { ids: (string | undefined)[]; passed: boolean }) {
   return request('/api/trainingRegs/setPassed', {
     method: 'POST',
     data: {
       ...params,
-    }
-  })
+    },
+  });
 }
