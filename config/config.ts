@@ -43,6 +43,18 @@ export default defineConfig({
       authority: ['admin', 'user'],
       routes: [
         {
+          path: '/editArticle',
+          component: '../layouts/BlankLayout',
+          authority: ['admin', 'user'],
+          routes: [
+            {
+              name: 'edit',
+              path: '/editArticle/edit',
+              component: './ContentManagement/EditArticle',
+            },
+          ],
+        },
+        {
           path: '/',
           component: '../layouts/BasicLayout',
           authority: ['admin', 'user'],

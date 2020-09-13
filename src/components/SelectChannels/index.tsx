@@ -5,24 +5,16 @@
  * @LastEditTime: 2020-07-17 18:01:54
  * @LastEditors: zpl
  */
-import React from 'react'
+import React from 'react';
 
 interface Props {
-  show: boolean;
   currentIds: string[];
 }
 
 const SelectChannels = (props: Props) => {
-  const { show = false, currentIds = [] } = props;
-  return (
-    <>
-      {
-        show
-          ? <div>channels</div>
-          : ''
-      }
-    </>
-  )
-}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { currentIds = [] } = props;
+  return <div>channels</div>;
+};
 
-export default SelectChannels
+export default SelectChannels;

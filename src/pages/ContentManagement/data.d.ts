@@ -1,6 +1,7 @@
+// 渲染表单行
 export interface TableListItem {
   key: number;
-  id: number;
+  id: string;
   /**
    * 标题
    *
@@ -14,7 +15,7 @@ export interface TableListItem {
    * @type {{ name: string; id: string }[]}
    * @memberof TableListItem
    */
-  channels: { name: string; id: string }[];
+  Channels: { name: string; id: string }[];
   /**
    * 文章类型
    *
@@ -165,19 +166,21 @@ export interface TableListItem {
   createTime: string;
 }
 
+// 翻页信息
 export interface TableListPagination {
   total: number;
   pageSize: number;
   current: number;
 }
 
+// 表结构定义
 export interface TableListData {
   list: TableListItem[];
   pagination: Partial<TableListPagination>;
 }
 
+// 查询参数
 export interface TableListParams {
-  status?: string;
   title?: string;
   pubStatus?: string;
   desc?: string;
@@ -186,15 +189,5 @@ export interface TableListParams {
   current?: number;
   filter?: { [key: string]: any[] };
   sorter?: { [key: string]: any };
-  channelId: string;
-}
-
-export interface QueryContentListParams {
-  channelId: string,
-  contentType: string,
-  length: number,
-  orderName: string,
-  orderValue: string,
-  search: string;
-  start: number,
+  channelId?: string;
 }

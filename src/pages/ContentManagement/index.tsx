@@ -1,89 +1,55 @@
-import { DownOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, Dropdown, Menu, message, Switch, Input } from 'antd';
-import React, { useState, useRef } from 'react';
+import { DownOutlined, PlusOutlined, createFromIconfontCN } from '@ant-design/icons';
+import { Button, Dropdown, Menu, Switch, Popover, Cascader } from 'antd';
+import React, { useState, useRef, useEffect } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
+import { convertChannelsToTree } from '@/utils/utils';
 import SelectChannels from '@/components/SelectChannels';
-import CreateForm from './components/CreateForm';
+import { CascaderOptionType } from 'antd/lib/cascader';
+import { ChannelType } from '@/utils/data';
+import SelectForm from './components/SelectChannelForm';
+import Option from './components/Option';
 // import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem } from './data.d';
-import { queryContentList, queryList } from './service';
+import { queryList, queryChannels } from './service';
 
 import styles from './index.module.less';
 
-/**
- * 添加节点
- * @param fields
- */
-// const handleAdd = async (fields: TableListItem) => {
-//   const hide = message.loading('正在添加');
-//   try {
-//     await addRule({ ...fields });
-//     hide();
-//     message.success('添加成功');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('添加失败请重试！');
-//     return false;
-//   }
-// };
-
-/**
- * 更新节点
- * @param fields
- */
-// const handleUpdate = async (fields: FormValueType) => {
-//   const hide = message.loading('正在配置');
-//   try {
-//     await updateRule({
-//       name: fields.name,
-//       desc: fields.desc,
-//       key: fields.key,
-//     });
-//     hide();
-
-//     message.success('配置成功');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('配置失败请重试！');
-//     return false;
-//   }
-// };
-
-/**
- *  删除节点
- * @param selectedRows
- */
-// const handleRemove = async (selectedRows: TableListItem[]) => {
-//   const hide = message.loading('正在删除');
-//   if (!selectedRows) return true;
-//   try {
-//     await removeRule({
-//       key: selectedRows.map((row) => row.key),
-//     });
-//     hide();
-//     message.success('删除成功，即将刷新');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('删除失败，请重试');
-//     return false;
-//   }
-// };
+const IconFont = createFromIconfontCN({
+  scriptUrl: '//at.alicdn.com/t/font_2063431_zeaap9rtglr.js',
+});
 
 const TableList: React.FC<{}> = () => {
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [showChannels, setShowChannels] = useState(false);
-  const [channelId, setChannelId] = useState("-1");
+  const [selectModalVisible, handleSelectVisible] = useState<boolean>(false); // 选择栏目显示控制
+  const [channels, setChannels] = useState<CascaderOptionType[]>([]);
+  const [hoverId, setHoverId] = useState('');
   const actionRef = useRef<ActionType>();
+
+  const filterChannels = (inputValue: string, path: CascaderOptionType[]) => {
+    return path.some(
+      (option) => (option?.label as string).toLowerCase().indexOf(inputValue.toLowerCase()) > -1,
+    );
+  };
+
   const columns: ProColumns<TableListItem>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
-      hideInSearch: true
+      hideInSearch: true,
+      render: (id) => (
+        <Popover content={id} title="id">
+          <IconFont
+            onMouseOver={() => {
+              setHoverId(id as string);
+            }}
+            onMouseLeave={() => {
+              setHoverId('');
+            }}
+            type={hoverId === id ? 'iconyanjing' : 'iconyanjing_bi'}
+          />
+        </Popover>
+      ),
     },
     {
       title: '标题',
@@ -96,26 +62,25 @@ const TableList: React.FC<{}> = () => {
       sorter: true,
       valueType: 'dateTime',
       hideInForm: true,
-      hideInSearch: true
+      hideInSearch: true,
     },
     {
       title: '发布状态',
       dataIndex: 'pubStatus',
       valueEnum: {
-        '草稿': { text: '草稿', status: 'Default' },
-        '已发布': { text: '已发布', status: 'Success' },
+        草稿: { text: '草稿', status: 'Default' },
+        已发布: { text: '已发布', status: 'Success' },
       },
-      // 当前后台暂时不支持
-      // filters: [
-      //   {
-      //     text: '已发布',
-      //     value: '已发布'
-      //   },
-      //   {
-      //     text: '草稿',
-      //     value: '草稿'
-      //   }
-      // ]
+      filters: [
+        {
+          text: '已发布',
+          value: '已发布',
+        },
+        {
+          text: '草稿',
+          value: '草稿',
+        },
+      ],
     },
     {
       title: '审核状态',
@@ -123,17 +88,18 @@ const TableList: React.FC<{}> = () => {
       sorter: true,
       hideInForm: true,
       hideInSearch: true,
-      hideInTable: true
+      hideInTable: true,
     },
     {
       title: '头条',
       dataIndex: 'isHead',
+      defaultSortOrder: 'descend',
       sorter: true,
       hideInSearch: true,
       align: 'center',
       render: (text) => {
-        return <Switch checked={!!text} size="small" />
-      }
+        return <Switch checked={!!text} size="small" />;
+      },
     },
     {
       title: '推荐',
@@ -142,40 +108,56 @@ const TableList: React.FC<{}> = () => {
       hideInSearch: true,
       align: 'center',
       render: (text) => {
-        return <Switch defaultChecked={!!text} size="small" />
-      }
+        return <Switch defaultChecked={!!text} size="small" />;
+      },
     },
     {
       title: '所属栏目',
-      dataIndex: 'channels',
+      dataIndex: 'Channels',
       render: (_, record) => {
-        const { channels = [] } = record;
+        const { Channels = [] } = record;
         const names: string[] = [];
         const ids: string[] = [];
-        channels.forEach(c => {
+        Channels.forEach((c) => {
           names.push(c.name);
           ids.push(c.id);
         });
-        return <div title={ids.join(',')} style={{ cursor: 'default' }}>{names.join(',')}</div>
+        return (
+          <div title={ids.join(',')} style={{ cursor: 'default' }}>
+            {names.join(',')}
+          </div>
+        );
       },
-      order: 2,
-      renderFormItem: (item, { defaultRender, ...rest }) => {
-        return <Input {...rest} placeholder="请选择" />;
-      }
+      order: 1,
+      renderFormItem: () => {
+        return (
+          <Cascader
+            options={channels}
+            showSearch={{ filter: filterChannels }}
+            placeholder="请选择"
+          />
+        );
+      },
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => (
-        <Option
-          id={record.id}
-          pubStatus={record.pubStatus}
-        />
-      ),
+      render: (_, record) => <Option pubStatus={record.pubStatus} />,
       align: 'center',
     },
   ];
+
+  useEffect(() => {
+    (async () => {
+      // 组件加载完成立即获取栏目信息
+      const channelList: ChannelType[] = await queryChannels();
+      // 更新栏目组件
+      const cns: CascaderOptionType[] = [];
+      convertChannelsToTree(channelList, cns, null);
+      setChannels(cns);
+    })();
+  }, []);
 
   return (
     <PageHeaderWrapper className={styles.contentListWrapper}>
@@ -184,7 +166,12 @@ const TableList: React.FC<{}> = () => {
         actionRef={actionRef}
         rowKey="id"
         toolBarRender={(action, { selectedRows }) => [
-          <Button type="primary" onClick={() => handleModalVisible(true)}>
+          <Button
+            type="primary"
+            onClick={() => {
+              window.open('/editArticle/edit');
+            }}
+          >
             <PlusOutlined /> 新建
           </Button>,
           selectedRows && selectedRows.length > 0 && (
@@ -217,92 +204,28 @@ const TableList: React.FC<{}> = () => {
             已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项&nbsp;&nbsp;
           </div>
         )}
-        request={(params, sorter, filter) => queryList({ ...params, sorter, filter, channelId })}
+        request={(params, sorter, filter) =>
+          queryList({
+            ...params,
+            sorter: Object.keys(sorter).length ? sorter : { isHead: 'descend' },
+            filter,
+          })
+        }
+        beforeSearchSubmit={(params: any) => {
+          const { Channels = [] } = params;
+          const channelId = Channels.length ? Channels[Channels.length - 1] : null;
+          const newParams = { ...params, channelId };
+          delete newParams.Channels;
+          return newParams;
+        }}
         columns={columns}
         rowSelection={{}}
       />
-      <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>
-        <ProTable<TableListItem, TableListItem>
-          // onSubmit={async (value) => {
-          //   const success = await handleAdd(value);
-          //   if (success) {
-          //     handleModalVisible(false);
-          //     if (actionRef.current) {
-          //       actionRef.current.reload();
-          //     }
-          //   }
-          // }}
-          rowKey="key"
-          type="form"
-          columns={columns}
-          rowSelection={{}}
-        />
-      </CreateForm>
-      <SelectChannels show={showChannels} />
+      <SelectForm onCancel={() => handleSelectVisible(false)} modalVisible={selectModalVisible}>
+        <SelectChannels currentIds={[]} />
+      </SelectForm>
     </PageHeaderWrapper>
   );
 };
-
-interface OptionProps {
-  id: number;
-  pubStatus: string;
-}
-
-/**
- * 操作列
- *
- * @param {{pubStatus: string}} optionProps
- * @returns
- */
-const Option = (optionProps: OptionProps) => {
-  const {
-    id,
-    pubStatus
-  } = optionProps;
-  if (pubStatus === '已发布') {
-    return (
-      <>
-        <a
-          onClick={() => {
-            message.info(id)
-          }}
-        >
-          详情
-      </a>
-        <Divider type="vertical" />
-        <a
-          onClick={() => {
-          }}
-        >
-          撤稿
-      </a>
-      </>
-    )
-  }
-  return (
-    <>
-      <a
-        onClick={() => {
-        }}
-      >
-        编辑
-      </a>
-      <Divider type="vertical" />
-      <a
-        onClick={() => {
-        }}
-      >
-        发布
-      </a>
-      <Divider type="vertical" />
-      <a
-        onClick={() => {
-        }}
-      >
-        删除
-      </a>
-    </>
-  )
-}
 
 export default TableList;
