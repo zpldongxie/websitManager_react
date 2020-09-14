@@ -1,18 +1,16 @@
-import { DownOutlined, PlusOutlined, createFromIconfontCN } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Switch, Popover, Cascader } from 'antd';
+import { DownOutlined, PlusOutlined, createFromIconfontCN, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Menu, Switch, Popover, Cascader, Modal } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import { CascaderOptionType } from 'antd/lib/cascader';
 
 import { convertChannelsToTree } from '@/utils/utils';
-import SelectChannels from '@/components/SelectChannels';
-import { CascaderOptionType } from 'antd/lib/cascader';
 import { ChannelType } from '@/utils/data';
-import SelectForm from './components/SelectChannelForm';
-import Option from './components/Option';
-// import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem } from './data.d';
-import { queryList, queryChannels } from './service';
+import Option from './components/Option';
+
+import { queryList, queryChannels, remove } from './service';
 
 import styles from './index.module.less';
 
@@ -20,8 +18,22 @@ const IconFont = createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2063431_zeaap9rtglr.js',
 });
 
+const removeHandler = (selectedRows: {id: string}[], action: any) => {
+  Modal.confirm({
+    title: `确认删除选中的${selectedRows.length}条吗？`,
+    icon: <ExclamationCircleOutlined />,
+    onOk() {
+      (async () => {
+        const result = await remove(selectedRows.map(row => row.id));
+        if (result.status === 'ok') {
+          action.reload();
+        }
+      })()
+    }
+  });
+};
+
 const TableList: React.FC<{}> = () => {
-  const [selectModalVisible, handleSelectVisible] = useState<boolean>(false); // 选择栏目显示控制
   const [channels, setChannels] = useState<CascaderOptionType[]>([]);
   const [hoverId, setHoverId] = useState('');
   const actionRef = useRef<ActionType>();
@@ -143,7 +155,15 @@ const TableList: React.FC<{}> = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => <Option pubStatus={record.pubStatus} />,
+      render: (_, record) => <Option
+        id={record.id}
+        pubStatus={record.pubStatus}
+        onSuccess={() => {
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+        }}
+      />,
       align: 'center',
     },
   ];
@@ -179,9 +199,8 @@ const TableList: React.FC<{}> = () => {
               overlay={
                 <Menu
                   onClick={async (e) => {
-                    if (e.key === 'remove') {
-                      // await handleRemove(selectedRows);
-                      action.reload();
+                    if (e.key === 'del') {
+                      removeHandler(selectedRows, action);                      
                     }
                   }}
                   selectedKeys={[]}
@@ -221,9 +240,6 @@ const TableList: React.FC<{}> = () => {
         columns={columns}
         rowSelection={{}}
       />
-      <SelectForm onCancel={() => handleSelectVisible(false)} modalVisible={selectModalVisible}>
-        <SelectChannels currentIds={[]} />
-      </SelectForm>
     </PageHeaderWrapper>
   );
 };

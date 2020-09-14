@@ -11,16 +11,19 @@ import {
   DatePicker,
   Button,
   Space,
+  message,
 } from 'antd';
 // 引入编辑器组件
 import BraftEditor from 'braft-editor';
+import moment from 'moment';
 // 引入编辑器样式
 import 'braft-editor/dist/index.css';
 
 import { convertChannelsToTree } from '@/utils/utils';
 import { TreeNodeType, ChannelType } from '@/utils/data';
 import styles from './index.module.less';
-import { queryChannels } from './service';
+import { queryChannels, upsert } from './service';
+import Success from './components/Success';
 
 const { TreeNode } = TreeSelect;
 const { Option } = Select;
@@ -32,19 +35,27 @@ const formItemLayout = {
   },
 };
 
-const createOrUpdate = (values: any) => {
-  const prams = { ...values, mainCon: values.mainCon.toHTML() };
-  // TODO: 向后台提交数据
-  // eslint-disable-next-line no-console
-  console.log(prams);
+const createOrUpdate = async (values: any) => {
+  const params = {
+    ...values,
+    conDate: values.conDate.format('YYYY-MM-DD HH:mm:ss'),
+    mainCon: values.mainCon.toHTML()
+  };
+  const result = await upsert(params);
+  return result.status === 'ok';
 };
 
 const EditArticle = () => {
+  const [successVisible, setSuccessVisible] = useState(false);
+  const [errorVisible, setErrorVisible] = useState(false);
   const [channels, setChannels] = useState<TreeNodeType[]>([]);
   const initialValues = {
     contentType: '文章',
     orderIndex: 10,
+    conDate: moment(new Date(), 'YYYY-MM-DD HH:mm:ss'),
     source: '本站原创',
+    isHead: false,
+    isRecom: false
   };
 
   useEffect(() => {
@@ -74,7 +85,25 @@ const EditArticle = () => {
 
   return (
     <div className={styles.container}>
-      <Form {...formItemLayout} initialValues={initialValues} onFinish={createOrUpdate}>
+      <Form {...formItemLayout}
+        initialValues={initialValues}
+        onFinish={(params) => {
+          (async () => {
+            try {
+              const result = await createOrUpdate(params);
+              if (result) {
+                setSuccessVisible(true);
+              } else {
+                message.error('保存失败，请联系管理员或稍后再试。');
+              }
+            } catch (err) {
+              // eslint-disable-next-line no-console
+              console.log(err);
+              message.error('保存失败，请联系管理员或稍后再试。');
+            }
+          })()
+        }}
+      >
         <Divider orientation="left">文章属性</Divider>
         <Row>
           <Col className="gutter-row" sm={12} xs={24}>
@@ -171,7 +200,14 @@ const EditArticle = () => {
             </Form.Item>
           </Col>
           <Col className="gutter-row" sm={6} xs={12}>
-            <Form.Item name="conDate" label="时间：" labelCol={{ sm: { span: 8 } }}>
+            <Form.Item name="conDate" label="时间：" labelCol={{ sm: { span: 8 } }}
+              rules={[
+                {
+                  required: true,
+                  message: '请选择时间！',
+                },
+              ]}
+            >
               <DatePicker showTime />
             </Form.Item>
           </Col>
@@ -226,6 +262,7 @@ const EditArticle = () => {
                 <Button
                   htmlType="button"
                   onClick={() => {
+                    window.open('', '_self', '');
                     window.close();
                   }}
                 >
@@ -237,6 +274,32 @@ const EditArticle = () => {
           <Col span={1} />
         </Row>
       </Form>
+      <div style={{
+        display: successVisible ? 'block' : 'none',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        paddingTop: '10rem',
+        backgroundColor: '#fff',
+        zIndex: 100
+      }}>
+        <Success previewHandler={() => { }} />
+      </div>
+      <div style={{
+        display: errorVisible ? 'block' : 'none',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        paddingTop: '10rem',
+        backgroundColor: '#fff',
+        zIndex: 100
+      }}>
+        <Success previewHandler={() => { }} />
+      </div>
     </div>
   );
 };

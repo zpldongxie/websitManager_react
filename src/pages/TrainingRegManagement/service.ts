@@ -40,7 +40,7 @@ export async function queryList(params?: TableListParams) {
  * @returns
  */
 export async function removeTrainingReg(params: { ids: string[] }) {
-  return request('/api/trainingRegs', {
+  return request('/api/trainingregs', {
     method: 'DELETE',
     data: {
       ...params,
@@ -56,7 +56,7 @@ export async function removeTrainingReg(params: { ids: string[] }) {
  * @returns
  */
 export async function putTrainingReg(params: TableListItem) {
-  return request('/api/trainingReg', {
+  return request('/api/trainingreg', {
     method: 'PUT',
     data: {
       ...params,

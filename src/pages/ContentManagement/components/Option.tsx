@@ -6,40 +6,80 @@
  * @LastEditors: zpl
  */
 import React from 'react';
-import { Divider } from 'antd';
+import { Divider, Popconfirm, message } from 'antd';
 
-const InfoOpt = () => <a onClick={() => {}}>详情</a>;
+import { remove } from '../service'
 
-const EditOpt = () => <a onClick={() => {}}>编辑</a>;
+interface OptType {
+  id: string;
+  onSuccess: () => void;
+}
 
-const PubOpt = () => <a onClick={() => {}}>发布</a>;
+const EditOpt = ({ id, onSuccess }: OptType) => (
+  <a onClick={() => {
+    alert(id);
+  }}>编辑</a>
+);
 
-const UnPubOpt = () => <a onClick={() => {}}>撤稿</a>;
+const PubOpt = ({ id, onSuccess }: OptType) => (
+  <a onClick={() => {
+    alert(id);
+  }}>发布</a>
+);
 
-const DelOpt = () => <a onClick={() => {}}>删除</a>;
+const UnPubOpt = ({ id, onSuccess }: OptType) => (
+  <a onClick={() => {
+    alert(id);
+  }}>撤稿</a>
+);
+
+const DelOpt = ({ id, onSuccess }: OptType) => (
+  <Popconfirm
+    title="确定要删除吗?"
+    onConfirm={async () => {
+      try {
+        const result = await remove([id]);
+        if (result.status === 'ok') {
+          onSuccess();
+        } else {
+          message.error('删除失败，请联系管理员或稍后重试。');
+        }
+      } catch (err) {
+        message.error('删除失败，请联系管理员或稍后重试。');
+      }
+    }}
+    okText="Yes"
+    cancelText="No"
+    placement="topLeft"
+  >
+    <a href="#">删除</a>
+  </Popconfirm>
+);
 
 interface Props {
+  id: string;
   pubStatus: string;
+  onSuccess: () => void;
 }
 
 const Option: React.FC<Props> = (props) => {
-  const { pubStatus } = props;
+  const {
+    id,
+    pubStatus,
+    onSuccess
+  } = props;
   if (pubStatus === '已发布') {
     return (
-      <>
-        <InfoOpt />
-        <Divider type="vertical" />
-        <UnPubOpt />
-      </>
+      <UnPubOpt id={id} onSuccess={onSuccess} />
     );
   }
   return (
     <>
-      <EditOpt />
+      <EditOpt id={id} onSuccess={onSuccess} />
       <Divider type="vertical" />
-      <PubOpt />
+      <PubOpt id={id} onSuccess={onSuccess} />
       <Divider type="vertical" />
-      <DelOpt />
+      <DelOpt id={id} onSuccess={onSuccess} />
     </>
   );
 };

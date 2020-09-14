@@ -1,5 +1,5 @@
 import request from 'umi-request';
-import { TableListParams } from './data.d';
+import { TableListParams, UpsertParams } from './data.d';
 
 /**
  * 按条件查询文章列表
@@ -32,6 +32,12 @@ export async function queryList(params?: TableListParams) {
   };
 }
 
+/**
+ * 查询所有栏目
+ *
+ * @export
+ * @returns
+ */
 export async function queryChannels() {
   const result = await request('/api/channels');
 
@@ -39,4 +45,36 @@ export async function queryChannels() {
     return result.data;
   }
   return [];
+}
+
+/**
+ * 新增或修改文章
+ *
+ * @export
+ * @param {UpsertParams} params
+ * @returns
+ */
+export async function upsert(params: UpsertParams) {
+  return request('/api/article', {
+    method: 'PUT',
+    data: {
+      ...params,
+    },
+  });
+}
+
+/**
+ * 删除文章
+ *
+ * @export
+ * @param {string[]} ids
+ * @returns
+ */
+export async function remove(ids: string[]){
+  return request('/api/articles', {
+    method: 'DELETE',
+    data: {
+      ids
+    }
+  });
 }

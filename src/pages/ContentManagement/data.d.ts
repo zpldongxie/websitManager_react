@@ -179,7 +179,12 @@ export interface TableListData {
   pagination: Partial<TableListPagination>;
 }
 
-// 查询参数
+/**
+ * 查询参数
+ *
+ * @export
+ * @interface TableListParams
+ */
 export interface TableListParams {
   title?: string;
   pubStatus?: string;
@@ -190,4 +195,27 @@ export interface TableListParams {
   filter?: { [key: string]: any[] };
   sorter?: { [key: string]: any };
   channelId?: string;
+}
+
+/**
+ * 编辑文章参数
+ *
+ * @export
+ * @interface UpsertParams
+ */
+export interface UpsertParams {
+  title: string,
+  subtitle?: string,
+  keyWord?: string,
+  Channels: number[],
+  contentType: string,
+  orderIndex: number,
+  summary?: string,
+  thumbnail?: string,
+  auth?: '',
+  conDate: string,
+  source: string,
+  isHead: boolean,
+  isRecom: boolean,
+  mainCon: string,
 }
