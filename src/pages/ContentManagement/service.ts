@@ -47,6 +47,11 @@ export async function queryChannels() {
   return [];
 }
 
+export async function getById(id: string) {
+  const result = await request(`/api/article/${id}`);
+  return result;
+}
+
 /**
  * 新增或修改文章
  *
@@ -70,11 +75,11 @@ export async function upsert(params: UpsertParams) {
  * @param {string[]} ids
  * @returns
  */
-export async function remove(ids: string[]){
+export async function remove(ids: string[]) {
   return request('/api/articles', {
     method: 'DELETE',
     data: {
-      ids
-    }
+      ids,
+    },
   });
 }

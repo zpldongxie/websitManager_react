@@ -8,29 +8,44 @@
 import React from 'react';
 import { Divider, Popconfirm, message } from 'antd';
 
-import { remove } from '../service'
+import { remove } from '../service';
 
 interface OptType {
   id: string;
-  onSuccess: () => void;
+  // eslint-disable-next-line react/no-unused-prop-types
+  onSuccess?: () => void;
 }
 
-const EditOpt = ({ id, onSuccess }: OptType) => (
-  <a onClick={() => {
-    alert(id);
-  }}>编辑</a>
+const EditOpt = ({ id }: OptType) => (
+  <a
+    onClick={() => {
+      window.open(`/editArticle/edit?id=${id}`);
+    }}
+  >
+    编辑
+  </a>
 );
 
-const PubOpt = ({ id, onSuccess }: OptType) => (
-  <a onClick={() => {
-    alert(id);
-  }}>发布</a>
+const PubOpt = ({ id }: OptType) => (
+  <a
+    onClick={() => {
+      // eslint-disable-next-line no-alert
+      alert(id);
+    }}
+  >
+    发布
+  </a>
 );
 
-const UnPubOpt = ({ id, onSuccess }: OptType) => (
-  <a onClick={() => {
-    alert(id);
-  }}>撤稿</a>
+const UnPubOpt = ({ id }: OptType) => (
+  <a
+    onClick={() => {
+      // eslint-disable-next-line no-alert
+      alert(id);
+    }}
+  >
+    撤稿
+  </a>
 );
 
 const DelOpt = ({ id, onSuccess }: OptType) => (
@@ -39,7 +54,7 @@ const DelOpt = ({ id, onSuccess }: OptType) => (
     onConfirm={async () => {
       try {
         const result = await remove([id]);
-        if (result.status === 'ok') {
+        if (result.status === 'ok' && onSuccess) {
           onSuccess();
         } else {
           message.error('删除失败，请联系管理员或稍后重试。');
@@ -63,19 +78,13 @@ interface Props {
 }
 
 const Option: React.FC<Props> = (props) => {
-  const {
-    id,
-    pubStatus,
-    onSuccess
-  } = props;
+  const { id, pubStatus, onSuccess } = props;
   if (pubStatus === '已发布') {
-    return (
-      <UnPubOpt id={id} onSuccess={onSuccess} />
-    );
+    return <UnPubOpt id={id} onSuccess={onSuccess} />;
   }
   return (
     <>
-      <EditOpt id={id} onSuccess={onSuccess} />
+      <EditOpt id={id} />
       <Divider type="vertical" />
       <PubOpt id={id} onSuccess={onSuccess} />
       <Divider type="vertical" />
