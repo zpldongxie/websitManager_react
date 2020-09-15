@@ -4,6 +4,7 @@ export default {
   'menu.contentmanagement.list': 'Article List',
   'menu.contentmanagement.review': 'Manuscript Review',
   'menu.contentmanagement.recycle-bin': 'Recycle Bin',
+  'menu.resourcemanagement': 'Resource Management',
   'menu.membermanagement': 'Member Management',
   'menu.membermanagement.company': 'Member companies',
   'menu.membermanagement.indivic': 'individual member',

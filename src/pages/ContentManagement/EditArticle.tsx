@@ -1,20 +1,6 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
-import {
-  Row,
-  Col,
-  Divider,
-  Form,
-  Input,
-  Select,
-  TreeSelect,
-  Image,
-  Switch,
-  DatePicker,
-  Button,
-  Space,
-  message,
-} from 'antd';
+import { Row, Col, Divider, Form, Input, Select, TreeSelect, Image, Switch, DatePicker, Button, Space, message } from 'antd';
 // 引入编辑器组件
 import BraftEditor from 'braft-editor';
 import moment from 'moment';
@@ -47,6 +33,25 @@ const createOrUpdate = async (values: any) => {
   return result.status === 'ok';
 };
 
+/**
+   * 渲染栏目树节点
+   *
+   * @param {TreeNodeType[]} chs
+   * @return {*}
+   */
+  const renderTreeNode = (chs: TreeNodeType[]) => {
+    return chs.map((channel) => (
+      <TreeNode key={channel.value} value={channel.value!} title={channel.label}>
+        {channel.children && channel.children.length ? renderTreeNode(channel.children) : ''}
+      </TreeNode>
+    ));
+  };
+
+/**
+ * 主组件
+ *
+ * @returns
+ */
 const EditArticle = () => {
   const [channels, setChannels] = useState<TreeNodeType[]>([]);
   const [successVisible, setSuccessVisible] = useState(false);
@@ -60,6 +65,20 @@ const EditArticle = () => {
     isHead: false,
     isRecom: false,
   };
+
+  const submit = async (params: any) => {
+    try {
+      const result = await createOrUpdate(params);
+      if (result) {
+        setSuccessVisible(true);
+      } else {
+        message.error('保存失败，请联系管理员或稍后再试。');
+      }
+    } catch (err) {
+      console.log(err);
+      message.error('保存失败，请联系管理员或稍后再试。');
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -95,41 +114,13 @@ const EditArticle = () => {
     })();
   }, []);
 
-  /**
-   * 渲染栏目树节点
-   *
-   * @param {TreeNodeType[]} chs
-   * @return {*}
-   */
-  const renderTreeNode = (chs: TreeNodeType[]) => {
-    return chs.map((channel) => (
-      <TreeNode key={channel.value} value={channel.value!} title={channel.label}>
-        {channel.children && channel.children.length ? renderTreeNode(channel.children) : ''}
-      </TreeNode>
-    ));
-  };
-
   return (
     <div className={styles.container}>
       <Form
         {...formItemLayout}
         form={form}
         initialValues={initialValues}
-        onFinish={(params) => {
-          (async () => {
-            try {
-              const result = await createOrUpdate(params);
-              if (result) {
-                setSuccessVisible(true);
-              } else {
-                message.error('保存失败，请联系管理员或稍后再试。');
-              }
-            } catch (err) {
-              console.log(err);
-              message.error('保存失败，请联系管理员或稍后再试。');
-            }
-          })();
-        }}
+        onFinish={ submit }
       >
         <Divider orientation="left">文章属性</Divider>
         <Form.Item name="id" hidden>
@@ -329,7 +320,7 @@ const EditArticle = () => {
           zIndex: 100,
         }}
       >
-        <Success previewHandler={() => {}} />
+        <Success previewHandler={() => { }} backToEditHandler={() => setSuccessVisible(false)} />
       </div>
     </div>
   );

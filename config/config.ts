@@ -2,9 +2,7 @@
 import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
-
 const { REACT_APP_ENV } = process.env;
-
 export default defineConfig({
   hash: true,
   antd: {},
@@ -72,22 +70,6 @@ export default defineConfig({
               authority: ['admin', 'user'],
             },
             {
-              path: '/admin',
-              name: 'admin',
-              icon: 'crown',
-              component: './Admin',
-              authority: ['admin'],
-              routes: [
-                {
-                  path: '/admin/sub-page',
-                  name: 'sub-page',
-                  icon: 'smile',
-                  component: './Welcome',
-                  authority: ['admin'],
-                },
-              ],
-            },
-            {
               name: 'contentmanagement',
               path: '/contentmanagement',
               authority: ['admin', 'user'],
@@ -112,6 +94,12 @@ export default defineConfig({
                   authority: ['admin', 'user'],
                 },
               ],
+            },
+            {
+              name: 'resourcemanagement',
+              path: '/resourcemanagement',
+              component: './ResourceManagement',
+              authority: ['admin', 'user'],
             },
             {
               name: 'membermanagement',
@@ -158,11 +146,20 @@ export default defineConfig({
               ],
             },
             {
-              name: 'list.table-list',
-              icon: 'table',
-              path: '/list',
-              component: './ListTableList',
-              authority: ['admin', 'user'],
+              path: '/admin',
+              name: 'admin',
+              icon: 'crown',
+              component: './Admin',
+              authority: ['admin'],
+              routes: [
+                {
+                  path: '/admin/sub-page',
+                  name: 'sub-page',
+                  icon: 'smile',
+                  component: './Welcome',
+                  authority: ['admin'],
+                },
+              ],
             },
             {
               component: './404',
@@ -190,4 +187,6 @@ export default defineConfig({
   manifest: {
     basePath: '/',
   },
+  base: '/background/',
+  publicPath: '/background/',
 });

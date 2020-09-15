@@ -1,5 +1,5 @@
 import { DownOutlined, PlusOutlined, createFromIconfontCN, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Switch, Popover, Cascader, Modal } from 'antd';
+import { Button, Dropdown, Menu, Switch, Popover, Cascader, Modal, message } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -10,7 +10,7 @@ import { ChannelType } from '@/utils/data';
 import { TableListItem } from './data.d';
 import Option from './components/Option';
 
-import { queryList, queryChannels, remove } from './service';
+import { queryList, queryChannels, remove, setIsHead, setIsRecom } from './service';
 
 import styles from './index.module.less';
 
@@ -109,8 +109,21 @@ const TableList: React.FC<{}> = () => {
       sorter: true,
       hideInSearch: true,
       align: 'center',
-      render: (text) => {
-        return <Switch checked={!!text} size="small" />;
+      render: (text, record) => {
+        return <Switch 
+          defaultChecked={!!text} 
+          size="small" 
+          onChange={async (checked: boolean)=>{
+            try {
+              const result = await setIsHead([record.id], checked)
+              if (result.status !== 'ok') {
+                message.error('设置失败，请联系管理员或稍后再试。');
+              }
+            } catch (err) {
+              message.error('设置失败，请联系管理员或稍后再试。');
+            }
+          }}
+        />;
       },
     },
     {
@@ -119,8 +132,21 @@ const TableList: React.FC<{}> = () => {
       sorter: true,
       hideInSearch: true,
       align: 'center',
-      render: (text) => {
-        return <Switch defaultChecked={!!text} size="small" />;
+      render: (text, record) => {
+        return <Switch 
+          defaultChecked={!!text} 
+          size="small"
+          onChange={async (checked: boolean)=>{
+            try {
+              const result = await setIsRecom([record.id], checked)
+              if (result.status !== 'ok') {
+                message.error('设置失败，请联系管理员或稍后再试。');
+              }
+            } catch (err) {
+              message.error('设置失败，请联系管理员或稍后再试。');
+            }
+          }} 
+        />;
       },
     },
     {
@@ -158,7 +184,7 @@ const TableList: React.FC<{}> = () => {
       render: (_, record) => <Option
         id={record.id}
         pubStatus={record.pubStatus}
-        onSuccess={() => {
+        refreshHandler={() => {
           if (actionRef.current) {
             actionRef.current.reload();
           }

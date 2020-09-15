@@ -4,6 +4,7 @@ export default {
   'menu.contentmanagement.list': '文章列表',
   'menu.contentmanagement.review': '发稿审核',
   'menu.contentmanagement.recycle-bin': '回收站',
+  'menu.resourcemanagement': '资源管理',
   'menu.membermanagement': '会员管理',
   'menu.membermanagement.company': '企业会员',
   'menu.membermanagement.indivic': '个人会员',

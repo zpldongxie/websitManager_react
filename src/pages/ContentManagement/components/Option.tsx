@@ -8,15 +8,14 @@
 import React from 'react';
 import { Divider, Popconfirm, message } from 'antd';
 
-import { remove } from '../service';
+import { remove, setPub } from '../service';
 
 interface OptType {
   id: string;
-  // eslint-disable-next-line react/no-unused-prop-types
-  onSuccess?: () => void;
+  refreshHandler: () => void;
 }
 
-const EditOpt = ({ id }: OptType) => (
+const EditOpt = ({id}: {id: string}) => (
   <a
     onClick={() => {
       window.open(`/editArticle/edit?id=${id}`);
@@ -26,36 +25,75 @@ const EditOpt = ({ id }: OptType) => (
   </a>
 );
 
-const PubOpt = ({ id }: OptType) => (
+const PubOpt = ({ id, refreshHandler }: OptType) => (
   <a
-    onClick={() => {
-      // eslint-disable-next-line no-alert
-      alert(id);
+    onClick={async () => {
+      try {
+        const result = await setPub([id], '已发布');
+        if (result.status === 'ok') {
+          refreshHandler();
+        } else {
+          message.error('发布失败，请联系管理员或稍后重试。');
+        }
+      } catch (err) {
+        message.error('发布失败，请联系管理员或稍后重试。');
+      }
     }}
   >
     发布
   </a>
 );
 
-const UnPubOpt = ({ id }: OptType) => (
+const UnPubOpt = ({ id, refreshHandler }: OptType) => (
   <a
-    onClick={() => {
-      // eslint-disable-next-line no-alert
-      alert(id);
+    onClick={async () => {
+      try {
+        const result = await setPub([id], '草稿');
+        if (result.status === 'ok') {
+          refreshHandler();
+        } else {
+          message.error('撤稿失败，请联系管理员或稍后重试。');
+        }
+      } catch (err) {
+        message.error('撤稿失败，请联系管理员或稍后重试。');
+      }
     }}
   >
     撤稿
   </a>
 );
 
-const DelOpt = ({ id, onSuccess }: OptType) => (
+const DelOpt = ({ id, refreshHandler }: OptType) => (
   <Popconfirm
     title="确定要删除吗?"
     onConfirm={async () => {
       try {
+        const result = await setPub([id], '已删除');
+        if (result.status === 'ok') {
+          refreshHandler();
+        } else {
+          message.error('删除失败，请联系管理员或稍后重试。');
+        }
+      } catch (err) {
+        message.error('删除失败，请联系管理员或稍后重试。');
+      }
+    }}
+    okText="Yes"
+    cancelText="No"
+    placement="topLeft"
+  >
+    <a href="#">删除</a>
+  </Popconfirm>
+);
+
+const RealDelOpt = ({ id, refreshHandler }: OptType) => (
+  <Popconfirm
+    title="彻底删除后数据将不可恢复，是否确定?"
+    onConfirm={async () => {
+      try {
         const result = await remove([id]);
-        if (result.status === 'ok' && onSuccess) {
-          onSuccess();
+        if (result.status === 'ok') {
+          refreshHandler();
         } else {
           message.error('删除失败，请联系管理员或稍后重试。');
         }
@@ -74,23 +112,27 @@ const DelOpt = ({ id, onSuccess }: OptType) => (
 interface Props {
   id: string;
   pubStatus: string;
-  onSuccess: () => void;
+  refreshHandler: () => void;
 }
 
 const Option: React.FC<Props> = (props) => {
-  const { id, pubStatus, onSuccess } = props;
-  if (pubStatus === '已发布') {
-    return <UnPubOpt id={id} onSuccess={onSuccess} />;
+  const { id, pubStatus, refreshHandler } = props;
+  switch (pubStatus) {
+    case '已发布':
+      return <UnPubOpt id={id} refreshHandler={refreshHandler} />;
+    case '已删除':
+      return <RealDelOpt id={id} refreshHandler={refreshHandler} />
+    default:
+      return (
+        <>
+          <EditOpt id={id} />
+          <Divider type="vertical" />
+          <PubOpt id={id} refreshHandler={refreshHandler} />
+          <Divider type="vertical" />
+          <DelOpt id={id} refreshHandler={refreshHandler} />
+        </>
+      );
   }
-  return (
-    <>
-      <EditOpt id={id} />
-      <Divider type="vertical" />
-      <PubOpt id={id} onSuccess={onSuccess} />
-      <Divider type="vertical" />
-      <DelOpt id={id} onSuccess={onSuccess} />
-    </>
-  );
 };
 
 export default Option;

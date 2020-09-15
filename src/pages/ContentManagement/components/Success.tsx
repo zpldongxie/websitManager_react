@@ -3,16 +3,22 @@ import { Result, Button } from 'antd';
 
 interface SuccessProps {
   /**
-   * 预览
+   * 预览方法
    *
    * @memberof SuccessProps
    */
   previewHandler: () => void;
+  /**
+   * 继续编辑方法
+   *
+   * @memberof SuccessProps
+   */
+  backToEditHandler: () => void;
 }
 
 const Success: React.FC<SuccessProps> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { previewHandler } = props;
+  const { previewHandler, backToEditHandler } = props;
 
   return (
     <Result
@@ -23,7 +29,10 @@ const Success: React.FC<SuccessProps> = (props) => {
         <Button type="primary" key="preview">
           预览效果
         </Button>,
-        <Button key="edit">继续编辑</Button>,
+        <Button 
+          key="edit"
+          onClick={backToEditHandler}
+        >继续编辑</Button>,
         <Button
           key="close"
           onClick={() => {
