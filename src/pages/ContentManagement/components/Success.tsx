@@ -36,7 +36,6 @@ const Success: React.FC<SuccessProps> = (props) => {
         <Button
           key="close"
           onClick={() => {
-            window.open('', '_self', '');
             window.close();
           }}
         >

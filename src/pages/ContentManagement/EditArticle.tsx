@@ -30,7 +30,7 @@ const createOrUpdate = async (values: any) => {
     mainCon: values.mainCon.toHTML(),
   };
   const result = await upsert(params);
-  return result.status === 'ok';
+  return result;
 };
 
 /**
@@ -54,7 +54,7 @@ const createOrUpdate = async (values: any) => {
  */
 const EditArticle = () => {
   const [channels, setChannels] = useState<TreeNodeType[]>([]);
-  const [successVisible, setSuccessVisible] = useState(false);
+  const [successVisible, setSuccessVisible] = useState(window.location.hash === '#success');
 
   const [form] = Form.useForm();
   const initialValues = {
@@ -69,7 +69,12 @@ const EditArticle = () => {
   const submit = async (params: any) => {
     try {
       const result = await createOrUpdate(params);
-      if (result) {
+      console.dir(result);
+      
+      if (result.status === 'ok') {
+        window.opener.history.go(0);
+        window.location.hash = '#success';
+        window.location.search = `id=${result.data.id}`;
         setSuccessVisible(true);
       } else {
         message.error('保存失败，请联系管理员或稍后再试。');
@@ -320,7 +325,7 @@ const EditArticle = () => {
           zIndex: 100,
         }}
       >
-        <Success previewHandler={() => { }} backToEditHandler={() => setSuccessVisible(false)} />
+        <Success previewHandler={() => { }} backToEditHandler={() => {setSuccessVisible(false); window.location.hash = '';}} />
       </div>
     </div>
   );
