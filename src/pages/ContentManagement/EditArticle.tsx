@@ -74,8 +74,11 @@ const EditArticle = () => {
       if (result.status === 'ok') {
         window.opener.history.go(0);
         window.location.hash = '#success';
-        window.location.search = `id=${result.data.id}`;
-        setSuccessVisible(true);
+        if (window.location.search) {
+          setSuccessVisible(true);
+        } else {
+          window.location.search = `id=${result.data.id}`;
+        }
       } else {
         message.error('保存失败，请联系管理员或稍后再试。');
       }
