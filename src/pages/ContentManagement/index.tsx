@@ -7,10 +7,10 @@ import { CascaderOptionType } from 'antd/lib/cascader';
 
 import { convertChannelsToTree } from '@/utils/utils';
 import { ChannelType } from '@/utils/data';
-import { TableListItem } from './data.d';
+import { TableListItem, TableListParams } from './data.d';
 import Option from './components/Option';
 
-import { queryList, queryChannels, remove, setIsHead, setIsRecom } from './service';
+import { queryList, queryChannels, remove, setIsHead, setIsRecom, setPub } from './service';
 
 import styles from './index.module.less';
 
@@ -18,14 +18,46 @@ const IconFont = createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2063431_zeaap9rtglr.js',
 });
 
-const removeHandler = (selectedRows: {id: string}[], action: any) => {
+const pubHandler = async (ids: string[], action: any) => {
+  try {
+    const result = await setPub(ids, '已发布');
+    if (result.status === 'ok') {
+      message.info('发布成功');
+      action.reload();
+    } else {
+      message.error('发布失败，请联系管理员或稍后重试。');
+    }
+  } catch (err) {
+    message.error('发布失败，请联系管理员或稍后重试。');
+  }
+}
+
+const unPubHandler = async (ids: string[], action: any) => {
+  try {
+    const result = await setPub(ids, '草稿');
+    if (result.status === 'ok') {
+      message.info('撤稿成功');
+      action.reload();
+    } else {
+      message.error('撤稿失败，请联系管理员或稍后重试。');
+    }
+  } catch (err) {
+    message.error('撤稿失败，请联系管理员或稍后重试。');
+  }
+}
+
+const delHandler = (ids: string[], action: any, isRecycleBin: boolean) => {
   Modal.confirm({
-    title: `确认删除选中的${selectedRows.length}条吗？`,
+    title: `确认删除选中的${ids.length}条吗？`,
+    content: <div style={{ color: 'red' }}>{isRecycleBin && '注意，删除后数据将无法恢复。'}</div>,
     icon: <ExclamationCircleOutlined />,
     onOk() {
       (async () => {
-        const result = await remove(selectedRows.map(row => row.id));
+        const result = isRecycleBin ?
+          await remove(ids) :
+          await setPub(ids, '已删除');
         if (result.status === 'ok') {
+          message.info('删除成功');
           action.reload();
         }
       })()
@@ -33,10 +65,25 @@ const removeHandler = (selectedRows: {id: string}[], action: any) => {
   });
 };
 
+const unDelHandler = async (ids: string[], action: any) => {
+  try {
+    const result = await setPub(ids, '草稿');
+    if (result.status === 'ok') {
+      message.info('恢复成功');
+      action.reload();
+    } else {
+      message.error('恢复失败，请联系管理员或稍后重试。');
+    }
+  } catch (err) {
+    message.error('恢复失败，请联系管理员或稍后重试。');
+  }
+}
+
 const TableList: React.FC<{}> = () => {
   const [channels, setChannels] = useState<CascaderOptionType[]>([]);
   const [hoverId, setHoverId] = useState('');
   const actionRef = useRef<ActionType>();
+  const isRecycleBin = window.location.pathname.includes('recycleBin');
 
   const filterChannels = (inputValue: string, path: CascaderOptionType[]) => {
     return path.some(
@@ -82,8 +129,9 @@ const TableList: React.FC<{}> = () => {
       valueEnum: {
         草稿: { text: '草稿', status: 'Default' },
         已发布: { text: '已发布', status: 'Success' },
+        已删除: { text: '已删除', status: 'Error' },
       },
-      filters: [
+      filters: isRecycleBin ? false : [
         {
           text: '已发布',
           value: '已发布',
@@ -93,6 +141,7 @@ const TableList: React.FC<{}> = () => {
           value: '草稿',
         },
       ],
+      hideInSearch: isRecycleBin
     },
     {
       title: '审核状态',
@@ -110,10 +159,11 @@ const TableList: React.FC<{}> = () => {
       hideInSearch: true,
       align: 'center',
       render: (text, record) => {
-        return <Switch 
-          defaultChecked={!!text} 
-          size="small" 
-          onChange={async (checked: boolean)=>{
+        return <Switch
+          defaultChecked={!!text}
+          size="small"
+          disabled={isRecycleBin}
+          onChange={async (checked: boolean) => {
             try {
               const result = await setIsHead([record.id], checked)
               if (result.status !== 'ok') {
@@ -133,10 +183,11 @@ const TableList: React.FC<{}> = () => {
       hideInSearch: true,
       align: 'center',
       render: (text, record) => {
-        return <Switch 
-          defaultChecked={!!text} 
+        return <Switch
+          defaultChecked={!!text}
           size="small"
-          onChange={async (checked: boolean)=>{
+          disabled={isRecycleBin}
+          onChange={async (checked: boolean) => {
             try {
               const result = await setIsRecom([record.id], checked)
               if (result.status !== 'ok') {
@@ -145,7 +196,7 @@ const TableList: React.FC<{}> = () => {
             } catch (err) {
               message.error('设置失败，请联系管理员或稍后再试。');
             }
-          }} 
+          }}
         />;
       },
     },
@@ -212,28 +263,49 @@ const TableList: React.FC<{}> = () => {
         actionRef={actionRef}
         rowKey="id"
         toolBarRender={(action, { selectedRows }) => [
-          <Button
-            type="primary"
-            onClick={() => {
-              window.open('/editArticle/edit');
-            }}
-          >
-            <PlusOutlined /> 新建
-          </Button>,
+          <>
+            {
+              !isRecycleBin && <Button
+                type="primary"
+                onClick={() => {
+                  window.open('/editArticle/edit');
+                }}
+              >
+                <PlusOutlined /> 新建
+              </Button>
+            }
+          </>,
           selectedRows && selectedRows.length > 0 && (
             <Dropdown
               overlay={
                 <Menu
                   onClick={async (e) => {
-                    if (e.key === 'del') {
-                      removeHandler(selectedRows, action);                      
+                    const ids = selectedRows.map(row => row.id);
+                    switch (e.key) {
+                      case 'pub':
+                        pubHandler(ids, action);
+                        break;
+                      case 'unPub':
+                        unPubHandler(ids, action);
+                        break;
+                      case 'moveTo':
+                        break;
+                      case 'del':
+                        delHandler(ids, action, isRecycleBin);
+                        break;
+                      case 'unDel':
+                        unDelHandler(ids, action);
+                        break;
+                      default:
+                        // do nothing
                     }
                   }}
                   selectedKeys={[]}
                 >
-                  <Menu.Item key="pub">批量发布</Menu.Item>
-                  <Menu.Item key="unPub">批量撤稿</Menu.Item>
-                  <Menu.Item key="moveTo">批量移动</Menu.Item>
+                  {!isRecycleBin && <Menu.Item key="pub">批量发布</Menu.Item>}
+                  {!isRecycleBin && <Menu.Item key="unPub">批量撤稿</Menu.Item>}
+                  {!isRecycleBin && <Menu.Item key="moveTo">批量移动</Menu.Item>}
+                  {isRecycleBin && <Menu.Item key="unDel">批量恢复</Menu.Item>}
                   <Menu.Item key="del">批量删除</Menu.Item>
                 </Menu>
               }
@@ -244,17 +316,21 @@ const TableList: React.FC<{}> = () => {
             </Dropdown>
           ),
         ]}
-        tableAlertRender={({ selectedRowKeys }) => (
-          <div>
-            已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项&nbsp;&nbsp;
-          </div>
-        )}
-        request={(params, sorter, filter) =>
-          queryList({
+        tableAlertRender={false}
+        // tableAlertRender={({ selectedRowKeys }) => (
+        //   <div>
+        //     已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项&nbsp;&nbsp;
+        //   </div>
+        // )}
+        request={(params, sorter, filter) => {
+          const opts: TableListParams = {
             ...params,
             sorter: Object.keys(sorter).length ? sorter : { isHead: 'descend' },
             filter,
-          })
+          };
+          if (isRecycleBin) opts.pubStatus = '已删除';
+          return queryList(opts);
+        }
         }
         beforeSearchSubmit={(params: any) => {
           const { Channels = [] } = params;

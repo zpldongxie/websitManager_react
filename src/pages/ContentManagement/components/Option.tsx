@@ -15,7 +15,7 @@ interface OptType {
   refreshHandler: () => void;
 }
 
-const EditOpt = ({id}: {id: string}) => (
+const EditOpt = ({ id }: { id: string }) => (
   <a
     onClick={() => {
       window.open(`/editArticle/edit?id=${id}`);
@@ -31,6 +31,7 @@ const PubOpt = ({ id, refreshHandler }: OptType) => (
       try {
         const result = await setPub([id], '已发布');
         if (result.status === 'ok') {
+          message.info('发布成功');
           refreshHandler();
         } else {
           message.error('发布失败，请联系管理员或稍后重试。');
@@ -50,6 +51,7 @@ const UnPubOpt = ({ id, refreshHandler }: OptType) => (
       try {
         const result = await setPub([id], '草稿');
         if (result.status === 'ok') {
+          message.info('撤稿成功');
           refreshHandler();
         } else {
           message.error('撤稿失败，请联系管理员或稍后重试。');
@@ -63,6 +65,25 @@ const UnPubOpt = ({ id, refreshHandler }: OptType) => (
   </a>
 );
 
+const UnDelOpt = ({ id, refreshHandler }: OptType) => (
+  <a
+    href="#"
+    onClick={async () => {
+      try {
+        const result = await setPub([id], '草稿');
+        if (result.status === 'ok') {
+          message.info('恢复成功');
+          refreshHandler();
+        } else {
+          message.error('恢复失败，请联系管理员或稍后重试。');
+        }
+      } catch (err) {
+        message.error('恢复失败，请联系管理员或稍后重试。');
+      }
+    }}
+  >恢复</a>
+);
+
 const DelOpt = ({ id, refreshHandler }: OptType) => (
   <Popconfirm
     title="确定要删除吗?"
@@ -70,6 +91,7 @@ const DelOpt = ({ id, refreshHandler }: OptType) => (
       try {
         const result = await setPub([id], '已删除');
         if (result.status === 'ok') {
+          message.info('删除成功');
           refreshHandler();
         } else {
           message.error('删除失败，请联系管理员或稍后重试。');
@@ -93,6 +115,7 @@ const RealDelOpt = ({ id, refreshHandler }: OptType) => (
       try {
         const result = await remove([id]);
         if (result.status === 'ok') {
+          message.info('删除成功');
           refreshHandler();
         } else {
           message.error('删除失败，请联系管理员或稍后重试。');
@@ -105,7 +128,7 @@ const RealDelOpt = ({ id, refreshHandler }: OptType) => (
     cancelText="No"
     placement="topLeft"
   >
-    <a href="#">删除</a>
+    <a href="#">彻底删除</a>
   </Popconfirm>
 );
 
@@ -121,7 +144,13 @@ const Option: React.FC<Props> = (props) => {
     case '已发布':
       return <UnPubOpt id={id} refreshHandler={refreshHandler} />;
     case '已删除':
-      return <RealDelOpt id={id} refreshHandler={refreshHandler} />
+      return (
+        <>
+          <UnDelOpt id={id} refreshHandler={refreshHandler} />
+          <Divider type="vertical" />
+          <RealDelOpt id={id} refreshHandler={refreshHandler} />
+        </>
+      )
     default:
       return (
         <>
