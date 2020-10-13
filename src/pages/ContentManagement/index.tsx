@@ -203,6 +203,7 @@ const TableList: React.FC<{}> = () => {
     {
       title: '所属栏目',
       dataIndex: 'Channels',
+      ellipsis: true,
       render: (_, record) => {
         const { Channels = [] } = record;
         const names: string[] = [];
@@ -212,9 +213,9 @@ const TableList: React.FC<{}> = () => {
           ids.push(c.id);
         });
         return (
-          <div title={ids.join(',')} style={{ cursor: 'default' }}>
+          <Popover className={styles.channelCol} content={names.join(', ')}>
             {names.join(',')}
-          </div>
+          </Popover>
         );
       },
       order: 1,
@@ -232,15 +233,19 @@ const TableList: React.FC<{}> = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => <Option
-        id={record.id}
-        pubStatus={record.pubStatus}
-        refreshHandler={() => {
-          if (actionRef.current) {
-            actionRef.current.reload();
-          }
-        }}
-      />,
+      render: (_, record) => (
+        <div className={styles.optionCol}>
+          <Option
+            id={record.id}
+            pubStatus={record.pubStatus}
+            refreshHandler={() => {
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
+            }}
+          />
+        </div>
+      ),
       align: 'center',
     },
   ];
