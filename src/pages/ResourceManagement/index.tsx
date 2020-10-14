@@ -1,3 +1,5 @@
+/* eslint-disable no-shadow */
+/* eslint-disable no-param-reassign */
 import { PageContainer } from '@ant-design/pro-layout';
 import React, { useState } from 'react';
 import { Upload, Modal } from 'antd';
@@ -51,22 +53,6 @@ export default () => {
       size: 100,
       type: '',
     },
-    {
-      uid: '-xxx',
-      percent: 50,
-      name: 'image.png',
-      status: 'uploading',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      size: 100,
-      type: '',
-    },
-    {
-      uid: '-5',
-      name: 'image.png',
-      status: 'error',
-      size: 100,
-      type: '',
-    },
   ]);
 
   const handleCancel = () => setPreviewVisible(false);
@@ -86,15 +72,16 @@ export default () => {
   const uploadButton = (
     <div>
       <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
+      <div style={{ marginTop: 8 }}>上传</div>
     </div>
   );
 
   return (
-    <PageContainer className={styles.main}>
+    <PageContainer className={styles.main} title={false}>
       <Upload
-        action="/api/uploadSchema"
-        listType="picture-card"
+        name='avatar'
+        action='/api/upload'
+        listType='picture-card'
         fileList={fileList}
         onPreview={handlePreview}
         onChange={handleChange}
