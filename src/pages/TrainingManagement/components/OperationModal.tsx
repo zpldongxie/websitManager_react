@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 import { Modal, Result, Button } from 'antd';
 import CustomForm from '@/components/CustomForm';
 import { TrainingDataType } from '../data.d';
-import styles from '../style.less';
+import styles from '../style.module.less';
 
 interface OperationModalProps {
   done: boolean;

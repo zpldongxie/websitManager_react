@@ -19,7 +19,7 @@ import { PaginationConfig } from 'antd/lib/pagination/Pagination';
 import OperationModal from './components/OperationModal';
 import { StateType } from './model';
 import { TrainingDataType } from './data.d';
-import styles from './style.less';
+import styles from './style.module.less';
 
 const { Search } = Input;
 
