@@ -262,7 +262,7 @@ const TableList: React.FC<{}> = () => {
   }, []);
 
   return (
-    <PageHeaderWrapper className={styles.contentListWrapper}>
+    <PageHeaderWrapper className={styles.contentListWrapper}  title={false}>
       <ProTable<TableListItem>
         headerTitle="文章管理"
         actionRef={actionRef}

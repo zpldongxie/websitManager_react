@@ -259,8 +259,8 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   };
 
   return (
-    <div>
-      <PageHeaderWrapper>
+    <>
+      <PageHeaderWrapper title={false}>
         <div className={styles.standardList}>
           <Card
             className={styles.listCard}
@@ -322,7 +322,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
         onCancel={handleCancel}
         onSubmit={handleSubmit}
       />
-    </div>
+    </>
   );
 };
 

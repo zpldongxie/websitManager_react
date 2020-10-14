@@ -149,7 +149,7 @@ const TableList: React.FC<{}> = () => {
   ];
 
   return (
-    <PageHeaderWrapper>
+    <PageHeaderWrapper title={false}>
       <ProTable<TableListItem>
         headerTitle="查询表格"
         actionRef={actionRef}
