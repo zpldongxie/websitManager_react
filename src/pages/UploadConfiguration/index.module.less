@@ -1,10 +1,37 @@
 .con {
   background-color: #fff;
   padding: 1rem;
-  form {
+  & > div {
     max-width: 40em;
-    .subCon {
-      text-align: center;
+    min-width: auto;
+    .labelCol {
+      text-align: right;
+      line-height: 32px;
+    }
+    .valueCol {
+      display: flex;
+      :global {
+        .ant-input, .ant-input-number {
+          margin-right: .5rem;
+          &.error + .anticon-exclamation-circle {
+            display: block;
+          }
+        }
+        .anticon-exclamation-circle {
+          margin-right: .5rem;
+          line-height: 32px;
+          display: none;
+        }
+        .ant-input {
+          width: 30em;
+        }
+      }
+    }
+  }
+  .secondRow {
+    margin-top: 1rem;
+    .sizeAfter {
+      line-height: 30px;
     }
   }
 }
