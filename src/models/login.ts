@@ -33,12 +33,12 @@ const Model: LoginModelType = {
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(fakeAccountLogin, payload);
-      
+
       yield put({
         type: 'changeLoginStatus',
         payload: {
           ...response,
-          type: payload.type
+          type: payload.type,
         },
       });
       // Login successfully
@@ -53,6 +53,7 @@ const Model: LoginModelType = {
           const redirectUrlParams = new URL(redirect);
           if (redirectUrlParams.origin === urlParams.origin) {
             redirect = redirect.substr(urlParams.origin.length);
+            redirect = redirect.replace('background/', '');
             if (redirect.match(/^\/.*#/)) {
               redirect = redirect.substr(redirect.indexOf('#') + 1);
             }
@@ -61,6 +62,7 @@ const Model: LoginModelType = {
             return;
           }
         }
+
         history.replace(redirect || '/');
       }
     },
