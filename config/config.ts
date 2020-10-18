@@ -185,6 +185,6 @@ export default defineConfig({
   manifest: {
     basePath: '/',
   },
-  base: '/background/',
-  publicPath: '/background/',
+  // base: '/background/',
+  // publicPath: '/background/',
 });

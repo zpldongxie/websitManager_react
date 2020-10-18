@@ -53,7 +53,7 @@ const Model: LoginModelType = {
           const redirectUrlParams = new URL(redirect);
           if (redirectUrlParams.origin === urlParams.origin) {
             redirect = redirect.substr(urlParams.origin.length);
-            redirect = redirect.replace('background/', '');
+            // redirect = redirect.replace('background/', '');
             if (redirect.match(/^\/.*#/)) {
               redirect = redirect.substr(redirect.indexOf('#') + 1);
             }
