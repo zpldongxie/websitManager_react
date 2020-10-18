@@ -1,14 +1,32 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Divider, Form, Input, Select, TreeSelect, Image, Switch, DatePicker, Button, Space, message } from 'antd';
+import {
+  Row,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Select,
+  TreeSelect,
+  Image,
+  Switch,
+  DatePicker,
+  Button,
+  Space,
+  message,
+  Upload,
+} from 'antd';
+import dayjs from 'dayjs';
 // 引入编辑器组件
-import BraftEditor from 'braft-editor';
-import moment from 'moment';
+import BraftEditor, { ExtendControlType } from 'braft-editor';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ContentUtils } from 'braft-utils';
 // 引入编辑器样式
 import 'braft-editor/dist/index.css';
 
 import { convertChannelsToTree } from '@/utils/utils';
 import { TreeNodeType, ChannelType } from '@/utils/data';
+import { UploadFile } from 'antd/lib/upload/interface';
 import styles from './index.module.less';
 import { queryChannels, upsert, getById } from './service';
 import Success from './components/Success';
@@ -34,18 +52,58 @@ const createOrUpdate = async (values: any) => {
 };
 
 /**
-   * 渲染栏目树节点
-   *
-   * @param {TreeNodeType[]} chs
-   * @return {*}
-   */
-  const renderTreeNode = (chs: TreeNodeType[]) => {
-    return chs.map((channel) => (
-      <TreeNode key={channel.value} value={channel.value!} title={channel.label}>
-        {channel.children && channel.children.length ? renderTreeNode(channel.children) : ''}
-      </TreeNode>
-    ));
+ * 渲染栏目树节点
+ *
+ * @param {TreeNodeType[]} chs
+ * @return {*}
+ */
+const renderTreeNode = (chs: TreeNodeType[]) => {
+  return chs.map((channel) => (
+    <TreeNode key={channel.value} value={channel.value!} title={channel.label}>
+      {channel.children && channel.children.length ? renderTreeNode(channel.children) : ''}
+    </TreeNode>
+  ));
+};
+
+const MyUpload = ({
+  checkFun,
+  setEditorState,
+}: {
+  checkFun: () => boolean;
+  setEditorState: (state: unknown) => void;
+}) => {
+  const handleChange = ({ file }: { file: UploadFile }) => {
+    if (file.status === 'error') {
+      message.error(file.response.message);
+    }
+    if (file.status === 'done') {
+      console.log(file);
+      message.success('上传成功');
+      setEditorState([
+        {
+          type: 'IMAGE',
+          url: file.response,
+        },
+      ]);
+    }
   };
+
+  return (
+    <Upload
+      name="image"
+      action="/api/upload"
+      accept="image/*"
+      showUploadList={false}
+      beforeUpload={checkFun}
+      onChange={handleChange}
+    >
+      {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
+      <button type="button" className="control-item button upload-button" data-title="插入">
+        插入图片
+      </button>
+    </Upload>
+  );
+};
 
 /**
  * 主组件
@@ -60,7 +118,7 @@ const EditArticle = () => {
   const initialValues = {
     contentType: '文章',
     orderIndex: 10,
-    conDate: moment(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+    conDate: dayjs(),
     source: '本站原创',
     isHead: false,
     isRecom: false,
@@ -70,7 +128,7 @@ const EditArticle = () => {
     try {
       const result = await createOrUpdate(params);
       console.dir(result);
-      
+
       if (result.status === 'ok') {
         window.opener.history.go(0);
         window.location.hash = '#success';
@@ -86,7 +144,7 @@ const EditArticle = () => {
       console.log(err);
       message.error('保存失败，请联系管理员或稍后再试。');
     }
-  }
+  };
 
   useEffect(() => {
     (async () => {
@@ -108,7 +166,7 @@ const EditArticle = () => {
             const { data } = result;
             const initData = { ...data };
             initData.Channels = data.Channels.map((c: ChannelType) => c.id);
-            initData.conDate = moment(data.conDate);
+            initData.conDate = dayjs(data.conDate);
             initData.mainCon = BraftEditor.createEditorState(data.mainCon);
             form.setFieldsValue(initData);
           } else {
@@ -122,14 +180,34 @@ const EditArticle = () => {
     })();
   }, []);
 
+  const extendControls: ExtendControlType[] = [
+    {
+      key: 'antd-uploader',
+      type: 'component',
+      component: (
+        <MyUpload
+          checkFun={() => {
+            const befoEditorState = form.getFieldValue('mainCon');
+            if (!befoEditorState) {
+              message.info('请选择插入位置');
+              return false;
+            }
+            return true;
+          }}
+          setEditorState={(state) => {
+            const befoEditorState = form.getFieldValue('mainCon');
+            form.setFieldsValue({
+              mainCon: ContentUtils.insertMedias(befoEditorState, state),
+            });
+          }}
+        />
+      ),
+    },
+  ];
+
   return (
     <div className={styles.container}>
-      <Form
-        {...formItemLayout}
-        form={form}
-        initialValues={initialValues}
-        onFinish={ submit }
-      >
+      <Form {...formItemLayout} form={form} initialValues={initialValues} onFinish={submit}>
         <Divider orientation="left">文章属性</Divider>
         <Form.Item name="id" hidden>
           <Input disabled />
@@ -291,7 +369,11 @@ const EditArticle = () => {
             },
           ]}
         >
-          <BraftEditor className="my-editor" placeholder="请输入正文内容" />
+          <BraftEditor
+            className="my-editor"
+            placeholder="请输入正文内容"
+            extendControls={extendControls}
+          />
         </Form.Item>
         <Row justify="end">
           <Col>
@@ -328,7 +410,13 @@ const EditArticle = () => {
           zIndex: 100,
         }}
       >
-        <Success previewHandler={() => { }} backToEditHandler={() => {setSuccessVisible(false); window.location.hash = '';}} />
+        <Success
+          previewHandler={() => {}}
+          backToEditHandler={() => {
+            setSuccessVisible(false);
+            window.location.hash = '';
+          }}
+        />
       </div>
     </div>
   );
