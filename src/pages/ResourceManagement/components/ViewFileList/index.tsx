@@ -5,10 +5,13 @@
  * @LastEditTime: 2020-10-18 14:52:49
  * @LastEditors: zpl
  */
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Upload, Modal, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { UploadFile } from 'antd/lib/upload/interface';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
+
+import styles from './index.module.less';
 
 const getBase64 = (file: any) => {
   return new Promise((resolve, reject) => {
@@ -19,18 +22,48 @@ const getBase64 = (file: any) => {
   });
 };
 
-interface PropsType {
-  currentFileList: UploadFile<any>[];
-  setCurrentFileList: React.Dispatch<React.SetStateAction<UploadFile<any>[]>>;
+interface PreviewType {
+  type: string;
+  name: string;
+  url: string;
 }
 
-const ViewFileList = ({ currentFileList, setCurrentFileList }: PropsType) => {
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
-  const [previewTitle, setPreviewTitle] = useState('');
+const Preview = ({ type, name, url }: PreviewType) => {
+  switch (type) {
+    case 'image': 
+      return <img alt={name} src={url} className={styles.preview} />;
+    case 'video':
+      return <video src={url} controls className={styles.preview}><track kind="captions" /></video>;
+    case 'audio':
+      return <audio src={url} controls className={styles.preview}><track kind="captions" /></audio>
+    default:
+  return <div />
+  }
+}
 
+interface PropsType {
+  type: string;
+  currentFileList: UploadFile<any>[];
+  setCurrentFileList: React.Dispatch<React.SetStateAction<UploadFile<any>[]>>;
+  onRemove: (fileName: string) => Promise<boolean>;
+}
+
+const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList, onRemove }: PropsType) => {
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState('');
+  const [previewUrl, setPreviewUrl] = useState('');
+
+  /**
+   * 取消预览
+   *
+   */
   const handleCancel = () => setPreviewVisible(false);
 
+  /**
+   * 预览
+   *
+   * @param {*} file
+   */
   const handlePreview = async (file: any) => {
     const currentFile = { ...file };
     if (!currentFile.url && !currentFile.preview) {
@@ -41,9 +74,14 @@ const ViewFileList = ({ currentFileList, setCurrentFileList }: PropsType) => {
     setPreviewTitle(
       currentFile.name || currentFile.url.substring(currentFile.url.lastIndexOf('/') + 1),
     );
-    setPreviewImage(currentFile.url || currentFile.preview);
+    setPreviewUrl(currentFile.url);
   };
 
+  /**
+   * 上传状态变更回调
+   *
+   * @param {{ file: UploadFile; fileList: Array<UploadFile> }} { file, fileList }
+   */
   const handleChange = ({ file, fileList }: { file: UploadFile; fileList: Array<UploadFile> }) => {
     if (file.status === 'error') {
       message.error(file.response.message);
@@ -54,24 +92,74 @@ const ViewFileList = ({ currentFileList, setCurrentFileList }: PropsType) => {
     setCurrentFileList(fileList);
   };
 
+  /**
+   * 删除文件方法
+   *
+   * @param {UploadFile<any>} file
+   * @returns {(boolean | void | Promise<boolean | void>)}
+   */
+  const handleRemove = (file: UploadFile<any>): boolean | void | Promise<boolean | void> => { 
+    if(file.status === 'error') {
+      return true;
+    }
+    return new Promise((resolve) => {
+      Modal.confirm({
+        icon: <ExclamationCircleOutlined />,
+        content: '确认删除吗？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk() {
+          (async () => {
+            resolve(await onRemove(file.name));
+          })()
+        },
+        onCancel() {
+          resolve(false);
+        }
+      });
+    } )      
+  }
+
+  let accept: string = '*/*';
+  let listType: "text" | "picture" | "picture-card" = 'text';
+  if (type === 'image') {accept = "image/*"; listType = "picture-card";}
+  if (type === 'video') {accept = "video/*"; listType = 'picture';}
+  if (type === 'audio') {accept = "audio/*";}
+
   return (
     <div>
       <Upload
-        name="image"
+        name={type}
         action="/api/upload"
-        accept="image/*"
-        listType="picture-card"
+        accept={accept}
+        listType={listType}
         fileList={currentFileList}
         onPreview={handlePreview}
         onChange={handleChange}
+        onRemove={handleRemove}
       >
-        <div>
+        <div className={type === 'image' ? styles.blockBtn : styles.flexBtn}>
           <PlusOutlined />
-          <div style={{ marginTop: 8 }}>上传</div>
+          <div className={styles.uploadText}>上传</div>
         </div>
       </Upload>
-      <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
-        <img alt="example" style={{ width: '100%' }} src={previewImage} />
+      <Modal 
+        visible={previewVisible}
+        title={previewTitle}
+        footer={
+          <div className={styles.previewFooter}>
+            <CopyToClipboard text={previewUrl}
+              onCopy={() => message.info('链接已复制到剪贴板')}>
+              <a>复制链接</a>
+            </CopyToClipboard>
+            {type !== 'image' && <a href={previewUrl} download={previewUrl}>下载文件</a>}
+          </div>
+        } 
+        onCancel={handleCancel}
+        okText={false}
+        cancelText={false}
+      >
+        <Preview type={type} name={previewTitle} url={previewUrl} />
       </Modal>
     </div>
   );

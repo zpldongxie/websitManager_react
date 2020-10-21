@@ -25,3 +25,21 @@ export async function showFileList(params: { currentPath: string }) {
   }
   return [];
 }
+
+/**
+ * 删除文件
+ *
+ * @export
+ * @param {string} filePath 文件相对路径
+ * @param {string} fileName 文件名
+ * @returns
+ */
+export async function remove(filePath: string, fileName: string) {
+  return request('/api/file', {
+    method: 'DELETE',
+    data: {
+      filePath,
+      fileName
+    },
+  });
+}

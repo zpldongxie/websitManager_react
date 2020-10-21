@@ -1,19 +1,33 @@
-.fileItem {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  div {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    img {
-      position: static;
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+.blockBtn {
+ .uploadText {
+   margin-top: 8px;
+ }
+}
+.flexBtn {
+  display: flex;
+  padding: .5em;
+  border: 1px dashed #d9d9d9;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  &:hover {
+    border-color: rgba(24, 144, 255, 1);
+  }
+  & > * {
+    line-height: 30px;
+  }
+  .uploadText {
+    line-height: 26px;
+    margin-left: .5em;
+  }
+}
+
+.preview {
+  width: 100%;
+  max-height: calc(100vh - 20em);
+}
+.previewFooter {
+  a {
+    margin: 0 1em;
   }
 }

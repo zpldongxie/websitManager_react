@@ -1,13 +1,17 @@
 @import '~antd/es/style/themes/default.less';
 
 .main {
-  width: 100%;
-  background: @component-background;
+  // width: 100%;
+  .row {
+    background: @component-background;
+    flex-wrap: nowrap;
+  }
   .content {
+    min-height: calc(100vh - 20em);
     padding: 10px;
   }
   .slider {
-    background: @background-color-base;
+    background: @component-background;
     border-left: 2px solid @border-color-base;
   }
 }
