@@ -28,7 +28,7 @@ import { convertChannelsToTree } from '@/utils/utils';
 import { TreeNodeType, ChannelType } from '@/utils/data';
 import { UploadFile } from 'antd/lib/upload/interface';
 import styles from './index.module.less';
-import { queryChannels, upsert, getById } from './service';
+import { queryChannels, upsert, getById, upload } from './service';
 import Success from './components/Success';
 
 const { TreeNode } = TreeSelect;
@@ -79,27 +79,22 @@ const MyUpload = ({
     if (file.status === 'done') {
       console.log(file);
       message.success('上传成功');
-      setEditorState([
-        {
-          type: 'IMAGE',
-          url: file.response,
-        },
-      ]);
+      setEditorState(`<a href=${file.response} download=${file.response}>${file.name}</a>`);
     }
   };
 
   return (
     <Upload
-      name="image"
+      name="other"
       action="/api/upload"
-      accept="image/*"
-      showUploadList={false}
+      accept="*/*"
+      showUploadList
       beforeUpload={checkFun}
       onChange={handleChange}
     >
       {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
-      <button type="button" className="control-item button upload-button" data-title="插入">
-        插入图片
+      <button type="button" className="control-item button upload-button" data-title="插入附件">
+        插入附件
       </button>
     </Upload>
   );
@@ -197,7 +192,7 @@ const EditArticle = () => {
           setEditorState={(state) => {
             const befoEditorState = form.getFieldValue('mainCon');
             form.setFieldsValue({
-              mainCon: ContentUtils.insertMedias(befoEditorState, state),
+              mainCon: ContentUtils.insertHTML(befoEditorState, state),
             });
           }}
         />
@@ -372,6 +367,9 @@ const EditArticle = () => {
           <BraftEditor
             className="my-editor"
             placeholder="请输入正文内容"
+            media={{
+              uploadFn: upload
+            }}
             extendControls={extendControls}
           />
         </Form.Item>
@@ -411,7 +409,7 @@ const EditArticle = () => {
         }}
       >
         <Success
-          previewHandler={() => {}}
+          previewHandler={() => { }}
           backToEditHandler={() => {
             setSuccessVisible(false);
             window.location.hash = '';

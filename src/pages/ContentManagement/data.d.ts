@@ -219,3 +219,33 @@ export interface UpsertParams {
   isRecom: boolean,
   mainCon: string,
 }
+
+/**
+ * 富文本组件上传文件信息
+ *
+ * @interface BraftUploadFile
+ */
+export interface BraftUploadFile {
+  file: File;
+  progress: (progress: number) => void;
+  libraryId: string;
+  success: (
+    res: {
+      url: string;
+      meta: {
+        id: string;
+        title: string;
+        alt: string;
+        loop: boolean;
+        autoPlay: boolean;
+        controls: boolean;
+        poster: string;
+      };
+    }
+  ) => void;
+  error: (
+    err: {
+      msg: string;
+    }
+  ) => void;
+}

@@ -1,5 +1,6 @@
+/* eslint-disable no-console */
 import request from 'umi-request';
-import { TableListParams, UpsertParams } from './data.d';
+import { BraftUploadFile, TableListParams, UpsertParams } from './data.d';
 
 /**
  * 按条件查询文章列表
@@ -136,4 +137,81 @@ export async function setIsRecom(ids: string[], isRecom: boolean) {
       attr: { isRecom }
     },
   });
+}
+
+function getBody(xhr: XMLHttpRequest) {
+  const text = xhr.responseText || xhr.response;
+
+  if (!text) {
+    return text;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return text;
+  }
+}
+
+/**
+ * 配合BraftEditor组件做文件上传
+ *
+ * @export
+ * @param {BraftUploadFile} param
+ */
+export function upload(param: BraftUploadFile) {
+  const serverURL = '/api/upload'
+  const xhr = new XMLHttpRequest();
+
+  if (xhr.upload) {
+    xhr.upload.onprogress = function progress(e) {
+      if (e.total > 0) {
+        param.progress(e.loaded / e.total * 100);
+      }
+    };
+  }
+
+  const formData = new FormData();
+  console.log(param.file);
+  
+  formData.append(param.file.type.split('/')[0], param.file);
+
+  xhr.onerror = function error(e) {
+    // 上传发生错误时调用param.error
+    console.log(`------xhr.onerror------`);
+    console.dir(e);
+    console.log(`------xhr.onerror------`);
+    param.error({
+      msg: 'unable to upload.'
+    })
+  };
+
+  xhr.onload = () => {
+    // allow success when 2xx status
+    // see https://github.com/react-component/upload/issues/34
+    if (xhr.status < 200 || xhr.status >= 300) {
+      param.error({
+        msg: 'unable to upload.'
+      })
+    }
+
+    const res = getBody(xhr);
+    param.success({
+      url: res,
+      meta: {
+        id: '',
+        title: param.file.name,
+        alt: param.file.name,
+        loop: false,
+        autoPlay: false,
+        controls: true,
+        poster: '',
+      }
+    })
+  };
+
+  xhr.open('POST', serverURL, true);
+  // xhr.withCredentials = true;
+
+  xhr.send(formData);
 }
