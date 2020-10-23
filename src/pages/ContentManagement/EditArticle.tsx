@@ -27,6 +27,7 @@ import 'braft-editor/dist/index.css';
 import { convertChannelsToTree } from '@/utils/utils';
 import { TreeNodeType, ChannelType } from '@/utils/data';
 import { UploadFile } from 'antd/lib/upload/interface';
+import ContentPreview from '@/components/ContentPreview';
 import styles from './index.module.less';
 import { queryChannels, upsert, getById, upload } from './service';
 import Success from './components/Success';
@@ -202,6 +203,7 @@ const EditArticle = () => {
 
   return (
     <div className={styles.container}>
+      <ContentPreview id={id} visiable={previewVisible} hiddenHandler={()=>{setPreviewVisible(false)}} />
       <Form {...formItemLayout} form={form} initialValues={initialValues} onFinish={submit}>
         <Divider orientation="left">文章属性</Divider>
         <Form.Item name="id" hidden>

@@ -26,7 +26,11 @@ const Success: React.FC<SuccessProps> = (props) => {
       title="操作成功!"
       subTitle="操作成功，你可以继续进行以下操作。"
       extra={[
-        <Button type="primary" key="preview">
+        <Button 
+          type="primary" 
+          key="preview"
+          onClick={previewHandler}
+        >
           预览效果
         </Button>,
         <Button 
