@@ -7,6 +7,7 @@ import { CascaderOptionType } from 'antd/lib/cascader';
 
 import { convertChannelsToTree } from '@/utils/utils';
 import { ChannelType } from '@/utils/data';
+import ContentPreview from '@/components/ContentPreview';
 import { TableListItem, TableListParams } from './data.d';
 import Option from './components/Option';
 
@@ -81,9 +82,11 @@ const unDelHandler = async (ids: string[], action: any) => {
 
 const TableList: React.FC<{}> = () => {
   const [channels, setChannels] = useState<CascaderOptionType[]>([]);
-  const [hoverId, setHoverId] = useState('');
+  const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的文章ID
+  const [previewId, setPreviewId] = useState('');
+  const [previewVisible, setPreviewVisible] = useState(false);
   const actionRef = useRef<ActionType>();
-  const isRecycleBin = window.location.pathname.includes('recycleBin');
+  const isRecycleBin = window.location.pathname.includes('recycleBin'); // 回收站
 
   const filterChannels = (inputValue: string, path: CascaderOptionType[]) => {
     return path.some(
@@ -114,6 +117,9 @@ const TableList: React.FC<{}> = () => {
       title: '标题',
       dataIndex: 'title',
       ellipsis: true,
+      render: (text, record) => (
+        <a onClick={() => {setPreviewId(record.id); setPreviewVisible(true);}}>{text}</a>
+      )
     },
     {
       title: '发布时间',
@@ -263,6 +269,7 @@ const TableList: React.FC<{}> = () => {
 
   return (
     <PageHeaderWrapper className={styles.contentListWrapper}  title={false}>
+      <ContentPreview id={previewId} visiable={previewVisible} hiddenHandler={()=>{setPreviewVisible(false)}} />
       <ProTable<TableListItem>
         headerTitle="文章管理"
         actionRef={actionRef}
