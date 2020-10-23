@@ -14,23 +14,24 @@ import {
   Button,
   Space,
   message,
-  Upload,
 } from 'antd';
 import dayjs from 'dayjs';
 // 引入编辑器组件
 import BraftEditor, { ExtendControlType } from 'braft-editor';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { ContentUtils } from 'braft-utils';
+import { defImg } from '@/constant';
 // 引入编辑器样式
 import 'braft-editor/dist/index.css';
 
 import { convertChannelsToTree } from '@/utils/utils';
 import { TreeNodeType, ChannelType } from '@/utils/data';
-import { UploadFile } from 'antd/lib/upload/interface';
 import ContentPreview from '@/components/ContentPreview';
 import styles from './index.module.less';
 import { queryChannels, upsert, getById, upload } from './service';
 import Success from './components/Success';
+import MyUpload from './components/MyUpload';
+import SelectImage from './components/SelectImage';
 
 const { TreeNode } = TreeSelect;
 const { Option } = Select;
@@ -66,49 +67,17 @@ const renderTreeNode = (chs: TreeNodeType[]) => {
   ));
 };
 
-const MyUpload = ({
-  checkFun,
-  setEditorState,
-}: {
-  checkFun: () => boolean;
-  setEditorState: (state: unknown) => void;
-}) => {
-  const handleChange = ({ file }: { file: UploadFile }) => {
-    if (file.status === 'error') {
-      message.error(file.response.message);
-    }
-    if (file.status === 'done') {
-      console.log(file);
-      message.success('上传成功');
-      setEditorState(`<a href=${file.response} download=${file.response}>${file.name}</a>`);
-    }
-  };
-
-  return (
-    <Upload
-      name="other"
-      action="/api/upload"
-      accept="*/*"
-      showUploadList
-      beforeUpload={checkFun}
-      onChange={handleChange}
-    >
-      {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
-      <button type="button" className="control-item button upload-button" data-title="插入附件">
-        插入附件
-      </button>
-    </Upload>
-  );
-};
-
 /**
  * 主组件
  *
  * @returns
  */
 const EditArticle = () => {
-  const [channels, setChannels] = useState<TreeNodeType[]>([]);
-  const [successVisible, setSuccessVisible] = useState(window.location.hash === '#success');
+  const [channels, setChannels] = useState<TreeNodeType[]>([]); // 栏目信息
+  const [id, setId] = useState<string | undefined>(); // 文章ID
+  const [selectImageVisible, setSelectImageVisible] = useState(false);  // 选择缩略图对话框
+  const [successVisible, setSuccessVisible] = useState(window.location.hash === '#success');  // 操作成功对话框
+  const [previewVisible, setPreviewVisible] = useState(false);  // 文章预览
 
   const [form] = Form.useForm();
   const initialValues = {
@@ -122,7 +91,13 @@ const EditArticle = () => {
 
   const submit = async (params: any) => {
     try {
-      const result = await createOrUpdate(params);
+      const {thumbnail, mainCon} = params;
+      const data = {
+        ...params,
+        thumbnail: thumbnail === defImg ? '' : thumbnail,
+        mainCon: mainCon.toHTML(),
+      }
+      const result = await createOrUpdate(data);
       console.dir(result);
 
       if (result.status === 'ok') {
@@ -132,6 +107,7 @@ const EditArticle = () => {
           setSuccessVisible(true);
         } else {
           window.location.search = `id=${result.data.id}`;
+          setId(result.data.id);
         }
       } else {
         message.error('保存失败，请联系管理员或稍后再试。');
@@ -151,19 +127,29 @@ const EditArticle = () => {
       convertChannelsToTree(channelList, cns, null);
       setChannels(cns);
     })();
+    // 判断url中是否有id
+    const url = new URL(window.location.href);
+    const editId = url.searchParams.get('id');
+    if (editId && !id) {
+      setId(editId);
+    }
+  }, []);
+
+  // 如果有id参数，说明是编辑文章，需要回填信息
+  useEffect(() => {
     (async () => {
-      // 如果有id参数，说明是编辑文章，需要回填信息
       try {
-        const url = new URL(window.location.href);
-        const editId = url.searchParams.get('id');
-        if (editId) {
-          const result = await getById(editId);
+        if (id) {
+          const result = await getById(id);
           if (result.status === 'ok') {
             const { data } = result;
-            const initData = { ...data };
-            initData.Channels = data.Channels.map((c: ChannelType) => c.id);
-            initData.conDate = dayjs(data.conDate);
-            initData.mainCon = BraftEditor.createEditorState(data.mainCon);
+            const initData = { 
+              ...data,
+              Channels: data.Channels.map((c: ChannelType) => c.id),
+              conDate: dayjs(data.conDate),
+              thumbnail: data.thumbnail === '' ? defImg : data.thumbnail,
+              mainCon: BraftEditor.createEditorState(data.mainCon)
+            };
             form.setFieldsValue(initData);
           } else {
             message.error('获取文章内容失败，请联系管理员或稍后再试。');
@@ -174,7 +160,7 @@ const EditArticle = () => {
         message.error('获取文章内容失败，请联系管理员或稍后再试。');
       }
     })();
-  }, []);
+  }, [id]);
 
   const extendControls: ExtendControlType[] = [
     {
@@ -294,13 +280,10 @@ const EditArticle = () => {
           <Col className="gutter-row" sm={12} xs={24}>
             <Form.Item name="thumbnail" label="标题图片：" valuePropName="src">
               <Image
-                width={100}
-                height={100}
+                className={styles.thumbnail}
                 preview={false}
-                src="error"
-                fallback="data:image/png;base64,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"
                 onClick={() => {
-                  message.info('设置标题图片');
+                  setSelectImageVisible(true);
                 }}
               />
             </Form.Item>
@@ -344,7 +327,6 @@ const EditArticle = () => {
               <Switch />
             </Form.Item>
           </Col>
-          {/* canComment */}
           <Col className="gutter-row" sm={3} xs={6}>
             <Form.Item
               name="isRecom"
@@ -411,13 +393,24 @@ const EditArticle = () => {
         }}
       >
         <Success
-          previewHandler={() => { }}
+          previewHandler={() => { setPreviewVisible(true) }}
           backToEditHandler={() => {
             setSuccessVisible(false);
             window.location.hash = '';
           }}
         />
       </div>
+      <SelectImage 
+        title='选择图片'
+        visible={selectImageVisible}
+        contentHtml={form.getFieldValue('mainCon') ? form.getFieldValue('mainCon').toHTML() : ''}
+        defaultImg={form.getFieldValue('thumbnail')}
+        onOk={(url: string) => {
+          console.log(url);          
+          form.setFieldsValue({thumbnail: url === '' ? defImg : url })
+        }}
+        onCancel={() => {setSelectImageVisible(false)}}
+      />
     </div>
   );
 };
