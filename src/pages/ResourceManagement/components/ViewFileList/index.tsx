@@ -87,6 +87,8 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
       message.error(file.response.message);
     }
     if (file.status === 'done') {
+      // eslint-disable-next-line no-param-reassign
+      fileList.filter((f: UploadFile<any>) => !!f.xhr).forEach((f: UploadFile<any>) => {f.thumbUrl = ''; f.url = f.xhr.response});
       message.success('上传成功');
     }
     setCurrentFileList(fileList);
