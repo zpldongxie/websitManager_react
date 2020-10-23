@@ -43,16 +43,6 @@ const formItemLayout = {
   },
 };
 
-const createOrUpdate = async (values: any) => {
-  const params = {
-    ...values,
-    conDate: values.conDate.format('YYYY-MM-DD HH:mm:ss'),
-    mainCon: values.mainCon.toHTML(),
-  };
-  const result = await upsert(params);
-  return result;
-};
-
 /**
  * 渲染栏目树节点
  *
@@ -91,13 +81,14 @@ const EditArticle = () => {
 
   const submit = async (params: any) => {
     try {
-      const {thumbnail, mainCon} = params;
+      const {thumbnail, mainCon, conDate} = params;
       const data = {
         ...params,
         thumbnail: thumbnail === defImg ? '' : thumbnail,
+        conDate: conDate.format('YYYY-MM-DD HH:mm:ss'),
         mainCon: mainCon.toHTML(),
       }
-      const result = await createOrUpdate(data);
+      const result = await upsert(data);
       console.dir(result);
 
       if (result.status === 'ok') {
