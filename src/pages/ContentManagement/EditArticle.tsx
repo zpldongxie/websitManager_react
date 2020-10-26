@@ -28,7 +28,7 @@ import { convertChannelsToTree } from '@/utils/utils';
 import { TreeNodeType, ChannelType } from '@/utils/data';
 import ContentPreview from '@/components/ContentPreview';
 import styles from './index.module.less';
-import { queryChannels, upsert, getById, upload } from './service';
+import { queryChannels, upsert, getById, upload, setPub } from './service';
 import Success from './components/Success';
 import MyUpload from './components/MyUpload';
 import SelectImage from './components/SelectImage';
@@ -58,6 +58,46 @@ const renderTreeNode = (chs: TreeNodeType[]) => {
 };
 
 /**
+ * 发布文章方法
+ *
+ * @param {TreeNodeType[]} chs
+ * @return {*}
+ */
+const pubHandler = async (ids: string[], cb: () => void) => {
+  try {
+    const result = await setPub(ids, '已发布');
+    if (result.status === 'ok') {
+      message.info('发布成功');
+      cb();
+    } else {
+      message.error('发布失败，请联系管理员或稍后重试。');
+    }
+  } catch (err) {
+    message.error('发布失败，请联系管理员或稍后重试。');
+  }
+};
+
+/**
+ * 撤消发布文章方法
+ *
+ * @param {TreeNodeType[]} chs
+ * @return {*}
+ */
+const unPubHandler = async (ids: string[], cb: () => void) => {
+  try {
+    const result = await setPub(ids, '草稿');
+    if (result.status === 'ok') {
+      message.info('撤稿成功');
+      cb();
+    } else {
+      message.error('撤稿失败，请联系管理员或稍后重试。');
+    }
+  } catch (err) {
+    message.error('撤稿失败，请联系管理员或稍后重试。');
+  }
+};
+
+/**
  * 主组件
  *
  * @returns
@@ -65,9 +105,10 @@ const renderTreeNode = (chs: TreeNodeType[]) => {
 const EditArticle = () => {
   const [channels, setChannels] = useState<TreeNodeType[]>([]); // 栏目信息
   const [id, setId] = useState<string | undefined>(); // 文章ID
-  const [selectImageVisible, setSelectImageVisible] = useState(false);  // 选择缩略图对话框
-  const [successVisible, setSuccessVisible] = useState(window.location.hash === '#success');  // 操作成功对话框
-  const [previewVisible, setPreviewVisible] = useState(false);  // 文章预览
+  const [pubStatus, setPubStatus] = useState<'草稿' | '已发布' | '已删除'>('草稿'); // 发布状态，用于控制表单是否可提交
+  const [selectImageVisible, setSelectImageVisible] = useState(false); // 选择缩略图对话框
+  const [successVisible, setSuccessVisible] = useState(window.location.hash === '#success'); // 操作成功对话框
+  const [previewVisible, setPreviewVisible] = useState(false); // 文章预览
 
   const [form] = Form.useForm();
   const initialValues = {
@@ -81,18 +122,18 @@ const EditArticle = () => {
 
   const submit = async (params: any) => {
     try {
-      const {thumbnail, mainCon, conDate} = params;
+      const { thumbnail, mainCon, conDate } = params;
       const data = {
         ...params,
         thumbnail: thumbnail === defImg ? '' : thumbnail,
         conDate: conDate.format('YYYY-MM-DD HH:mm:ss'),
         mainCon: mainCon.toHTML(),
-      }
+      };
       const result = await upsert(data);
       console.dir(result);
 
       if (result.status === 'ok') {
-        window.opener.history.go(0);
+        // window.opener.history.go(0);
         window.location.hash = '#success';
         if (window.location.search) {
           setSuccessVisible(true);
@@ -134,14 +175,15 @@ const EditArticle = () => {
           const result = await getById(id);
           if (result.status === 'ok') {
             const { data } = result;
-            const initData = { 
+            const initData = {
               ...data,
               Channels: data.Channels.map((c: ChannelType) => c.id),
               conDate: dayjs(data.conDate),
               thumbnail: data.thumbnail === '' ? defImg : data.thumbnail,
-              mainCon: BraftEditor.createEditorState(data.mainCon)
+              mainCon: BraftEditor.createEditorState(data.mainCon),
             };
             form.setFieldsValue(initData);
+            setPubStatus(data.pubStatus);
           } else {
             message.error('获取文章内容失败，请联系管理员或稍后再试。');
           }
@@ -178,9 +220,16 @@ const EditArticle = () => {
     },
   ];
 
+  const disabled = pubStatus !== '草稿';
   return (
     <div className={styles.container}>
-      <ContentPreview id={id} visiable={previewVisible} hiddenHandler={()=>{setPreviewVisible(false)}} />
+      <ContentPreview
+        id={id}
+        visiable={previewVisible}
+        hiddenHandler={() => {
+          setPreviewVisible(false);
+        }}
+      />
       <Form {...formItemLayout} form={form} initialValues={initialValues} onFinish={submit}>
         <Divider orientation="left">文章属性</Divider>
         <Form.Item name="id" hidden>
@@ -198,26 +247,52 @@ const EditArticle = () => {
                 },
               ]}
             >
-              <Input placeholder="请输入" />
+              <Input placeholder="请输入" disabled={disabled} />
             </Form.Item>
           </Col>
           <Col className="gutter-row" sm={12} xs={24}>
             <Form.Item name="subtitle" label="副标题：">
-              <Input />
+              <Input disabled={disabled} />
             </Form.Item>
           </Col>
         </Row>
         <Row>
+          <Col className="gutter-row" sm={12} xs={24}>
+            <Form.Item name="keyWord" label="关键词：">
+              <Input disabled={disabled} />
+            </Form.Item>
+          </Col>
+
           <Col className="gutter-row" sm={6} xs={12}>
-            <Form.Item name="keyWord" label="关键词：" labelCol={{ sm: { span: 8 } }}>
-              <Input />
+            <Form.Item
+              name="contentType"
+              label="文章类型："
+              labelCol={{ sm: { span: 8 } }}
+              rules={[
+                {
+                  required: true,
+                  message: '请选择文章类型！',
+                },
+              ]}
+            >
+              <Select disabled={disabled}>
+                <Option value="文章">文章</Option>
+                <Option value="链接">链接</Option>
+              </Select>
             </Form.Item>
           </Col>
           <Col className="gutter-row" sm={6} xs={12}>
+            <Form.Item name="orderIndex" label="排序值：" labelCol={{ sm: { span: 8 } }}>
+              <Input disabled={disabled} />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col className="gutter-row" sm={24} xs={24}>
             <Form.Item
               name="Channels"
               label="所属栏目："
-              labelCol={{ sm: { span: 8 } }}
+              labelCol={{ sm: { span: 2 } }}
               rules={[
                 {
                   required: true,
@@ -233,39 +308,17 @@ const EditArticle = () => {
                 allowClear
                 multiple
                 treeDefaultExpandAll
+                disabled={disabled}
               >
                 {renderTreeNode(channels)}
               </TreeSelect>
-            </Form.Item>
-          </Col>
-          <Col className="gutter-row" sm={6} xs={12}>
-            <Form.Item
-              name="contentType"
-              label="文章类型："
-              labelCol={{ sm: { span: 8 } }}
-              rules={[
-                {
-                  required: true,
-                  message: '请选择文章类型！',
-                },
-              ]}
-            >
-              <Select>
-                <Option value="文章">文章</Option>
-                <Option value="链接">链接</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col className="gutter-row" sm={6} xs={12}>
-            <Form.Item name="orderIndex" label="排序值：" labelCol={{ sm: { span: 8 } }}>
-              <Input />
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col className="gutter-row" sm={12} xs={24}>
             <Form.Item name="summary" label="文章摘要：">
-              <Input.TextArea placeholder="说点什么..." rows={4} />
+              <Input.TextArea placeholder="说点什么..." rows={4} disabled={disabled} />
             </Form.Item>
           </Col>
           <Col className="gutter-row" sm={12} xs={24}>
@@ -274,7 +327,7 @@ const EditArticle = () => {
                 className={styles.thumbnail}
                 preview={false}
                 onClick={() => {
-                  setSelectImageVisible(true);
+                  if (!disabled) setSelectImageVisible(true);
                 }}
               />
             </Form.Item>
@@ -283,7 +336,7 @@ const EditArticle = () => {
         <Row>
           <Col className="gutter-row" sm={6} xs={12}>
             <Form.Item name="auth" label="作者：" labelCol={{ sm: { span: 8 } }}>
-              <Input />
+              <Input disabled={disabled} />
             </Form.Item>
           </Col>
           <Col className="gutter-row" sm={6} xs={12}>
@@ -298,12 +351,12 @@ const EditArticle = () => {
                 },
               ]}
             >
-              <DatePicker showTime />
+              <DatePicker showTime disabled={disabled} />
             </Form.Item>
           </Col>
           <Col className="gutter-row" sm={6} xs={12}>
             <Form.Item name="source" label="来源：" labelCol={{ sm: { span: 8 } }}>
-              <Input />
+              <Input disabled={disabled} />
             </Form.Item>
           </Col>
         </Row>
@@ -315,7 +368,7 @@ const EditArticle = () => {
               valuePropName="checked"
               labelCol={{ sm: { span: 16 } }}
             >
-              <Switch />
+              <Switch disabled={disabled} />
             </Form.Item>
           </Col>
           <Col className="gutter-row" sm={3} xs={6}>
@@ -325,7 +378,7 @@ const EditArticle = () => {
               valuePropName="checked"
               labelCol={{ sm: { span: 16 } }}
             >
-              <Switch />
+              <Switch disabled={disabled} />
             </Form.Item>
           </Col>
         </Row>
@@ -343,7 +396,7 @@ const EditArticle = () => {
             className="my-editor"
             placeholder="请输入正文内容"
             media={{
-              uploadFn: upload
+              uploadFn: upload,
             }}
             extendControls={extendControls}
           />
@@ -352,9 +405,22 @@ const EditArticle = () => {
           <Col>
             <Form.Item>
               <Space>
-                <Button type="primary" htmlType="submit">
-                  提交
-                </Button>
+                {pubStatus === '草稿' ? (
+                  <Button type="primary" htmlType="submit">
+                    提交
+                  </Button>
+                ) : (
+                  <Button
+                    type="primary"
+                    onClick={() =>
+                      unPubHandler([id || ''], () => {
+                        setPubStatus('草稿');
+                      })
+                    }
+                  >
+                    撤稿并编辑
+                  </Button>
+                )}
                 <Button
                   htmlType="button"
                   onClick={() => {
@@ -384,23 +450,38 @@ const EditArticle = () => {
         }}
       >
         <Success
-          previewHandler={() => { setPreviewVisible(true) }}
+          pubStatus={pubStatus}
+          previewHandler={() => {
+            setPreviewVisible(true);
+          }}
           backToEditHandler={() => {
             setSuccessVisible(false);
             window.location.hash = '';
           }}
+          pubHandler={() => {
+            pubHandler([id || ''], () => {
+              setPubStatus('已发布');
+            });
+          }}
+          unPubHandler={() => {
+            unPubHandler([id || ''], () => {
+              setPubStatus('草稿');
+            });
+          }}
         />
       </div>
-      <SelectImage 
-        title='选择图片'
+      <SelectImage
+        title="选择图片"
         visible={selectImageVisible}
         contentHtml={form.getFieldValue('mainCon') ? form.getFieldValue('mainCon').toHTML() : ''}
         defaultImg={form.getFieldValue('thumbnail')}
         onOk={(url: string) => {
-          console.log(url);          
-          form.setFieldsValue({thumbnail: url === '' ? defImg : url })
+          console.log(url);
+          form.setFieldsValue({ thumbnail: url === '' ? defImg : url });
         }}
-        onCancel={() => {setSelectImageVisible(false)}}
+        onCancel={() => {
+          setSelectImageVisible(false);
+        }}
       />
     </div>
   );

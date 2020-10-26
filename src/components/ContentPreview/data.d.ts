@@ -19,12 +19,13 @@ interface ContentType {
   canComment: number;
   commentStartTime: string;
   commentEndTime: string;
-  contentType: '文章';
+  contentType: string;
   mainCon: string;
   mainPic: string;
   mainVideo: string;
   mainUrl: string;
   createdAt: string;
   updatedAt: string;
-  Channels: ChannelType[]
+  pubStatus: '草稿' | '已发布' | '已删除';
+  Channels: ChannelType[];
 }
