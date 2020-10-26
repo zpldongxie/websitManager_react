@@ -14,6 +14,8 @@ export default {
   'menu.trainingmanagement.regmanagement': '报名审批',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
+  'menu.websiteConf': '网站设置',
+  'menu.websiteConf.base': '基本设置',
   'menu.conf': '系统配置',
   'menu.conf.upload': '上传配置',
   'menu.login': '登录',
