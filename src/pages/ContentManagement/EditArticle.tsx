@@ -7,7 +7,6 @@ import {
   Form,
   Input,
   Select,
-  TreeSelect,
   Image,
   Switch,
   DatePicker,
@@ -24,16 +23,15 @@ import { defImg } from '@/constant';
 // 引入编辑器样式
 import 'braft-editor/dist/index.css';
 
-import { convertChannelsToTree } from '@/utils/utils';
-import { TreeNodeType, ChannelType } from '@/utils/data';
+import { ChannelType } from '@/utils/data';
 import ContentPreview from '@/components/ContentPreview';
+import ChannelSelector from '@/components/ChannelSelector';
 import styles from './index.module.less';
-import { queryChannels, upsert, getById, upload, setPub } from './service';
+import { upsert, getById, upload, setPub } from './service';
 import Success from './components/Success';
 import MyUpload from './components/MyUpload';
 import SelectImage from './components/SelectImage';
 
-const { TreeNode } = TreeSelect;
 const { Option } = Select;
 
 const formItemLayout = {
@@ -41,20 +39,6 @@ const formItemLayout = {
     xs: { span: 24 },
     sm: { span: 4 },
   },
-};
-
-/**
- * 渲染栏目树节点
- *
- * @param {TreeNodeType[]} chs
- * @return {*}
- */
-const renderTreeNode = (chs: TreeNodeType[]) => {
-  return chs.map((channel) => (
-    <TreeNode key={channel.value} value={channel.value!} title={channel.label}>
-      {channel.children && channel.children.length ? renderTreeNode(channel.children) : ''}
-    </TreeNode>
-  ));
 };
 
 /**
@@ -103,7 +87,6 @@ const unPubHandler = async (ids: string[], cb: () => void) => {
  * @returns
  */
 const EditArticle = () => {
-  const [channels, setChannels] = useState<TreeNodeType[]>([]); // 栏目信息
   const [id, setId] = useState<string | undefined>(); // 文章ID
   const [pubStatus, setPubStatus] = useState<'草稿' | '已发布' | '已删除'>('草稿'); // 发布状态，用于控制表单是否可提交
   const [selectImageVisible, setSelectImageVisible] = useState(false); // 选择缩略图对话框
@@ -151,14 +134,6 @@ const EditArticle = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      // 组件加载完成立即获取栏目信息
-      const channelList: ChannelType[] = await queryChannels();
-      // 更新栏目组件
-      const cns: TreeNodeType[] = [];
-      convertChannelsToTree(channelList, cns, null);
-      setChannels(cns);
-    })();
     // 判断url中是否有id
     const url = new URL(window.location.href);
     const editId = url.searchParams.get('id');
@@ -300,18 +275,7 @@ const EditArticle = () => {
                 },
               ]}
             >
-              <TreeSelect
-                showSearch
-                style={{ width: '100%' }}
-                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                placeholder="请选择"
-                allowClear
-                multiple
-                treeDefaultExpandAll
-                disabled={disabled}
-              >
-                {renderTreeNode(channels)}
-              </TreeSelect>
+              <ChannelSelector />
             </Form.Item>
           </Col>
         </Row>

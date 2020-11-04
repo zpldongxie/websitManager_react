@@ -1,17 +1,17 @@
+import React, { useState, useRef } from 'react';
 import { DownOutlined, PlusOutlined, createFromIconfontCN, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Switch, Popover, Cascader, Modal, message } from 'antd';
-import React, { useState, useRef, useEffect } from 'react';
+import { Button, Dropdown, Menu, Switch, Popover, Modal, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
-import { CascaderOptionType } from 'antd/lib/cascader';
 
-import { convertChannelsToTree } from '@/utils/utils';
-import { ChannelType } from '@/utils/data';
 import ContentPreview from '@/components/ContentPreview';
+import ChannelSelector from '@/components/ChannelSelector';
+import { values } from 'lodash';
+import { FormInstance } from 'antd/lib/form';
 import { TableListItem, TableListParams } from './data.d';
 import Option from './components/Option';
 
-import { queryList, queryChannels, remove, setIsHead, setIsRecom, setPub } from './service';
+import { queryList, remove, setIsHead, setIsRecom, setPub } from './service';
 
 import styles from './index.module.less';
 
@@ -81,24 +81,17 @@ const unDelHandler = async (ids: string[], action: any) => {
 }
 
 const TableList: React.FC<{}> = () => {
-  const [channels, setChannels] = useState<CascaderOptionType[]>([]);
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的文章ID
   const [previewId, setPreviewId] = useState('');
   const [previewVisible, setPreviewVisible] = useState(false);
   const actionRef = useRef<ActionType>();
   const isRecycleBin = window.location.pathname.includes('recycleBin'); // 回收站
 
-  const filterChannels = (inputValue: string, path: CascaderOptionType[]) => {
-    return path.some(
-      (option) => (option?.label as string).toLowerCase().indexOf(inputValue.toLowerCase()) > -1,
-    );
-  };
-
   const columns: ProColumns<TableListItem>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
-      hideInSearch: true,
+      search: false,
       render: (id) => (
         <Popover content={id} title="id">
           <IconFont
@@ -127,7 +120,7 @@ const TableList: React.FC<{}> = () => {
       sorter: true,
       valueType: 'dateTime',
       hideInForm: true,
-      hideInSearch: true,
+      search: false,
     },
     {
       title: '发布状态',
@@ -147,14 +140,14 @@ const TableList: React.FC<{}> = () => {
           value: '草稿',
         },
       ],
-      hideInSearch: isRecycleBin
+      search: !isRecycleBin
     },
     {
       title: '审核状态',
       dataIndex: 'approvalStatus',
       sorter: true,
       hideInForm: true,
-      hideInSearch: true,
+      search: false,
       hideInTable: true,
     },
     {
@@ -162,7 +155,7 @@ const TableList: React.FC<{}> = () => {
       dataIndex: 'isHead',
       defaultSortOrder: 'descend',
       sorter: true,
-      hideInSearch: true,
+      search: false,
       align: 'center',
       render: (text, record) => {
         return <Switch
@@ -186,7 +179,7 @@ const TableList: React.FC<{}> = () => {
       title: '推荐',
       dataIndex: 'isRecom',
       sorter: true,
-      hideInSearch: true,
+      search: false,
       align: 'center',
       render: (text, record) => {
         return <Switch
@@ -227,11 +220,7 @@ const TableList: React.FC<{}> = () => {
       order: 1,
       renderFormItem: () => {
         return (
-          <Cascader
-            options={channels}
-            showSearch={{ filter: filterChannels }}
-            placeholder="请选择"
-          />
+          <ChannelSelector multiple={false} />
         );
       },
     },
@@ -255,17 +244,6 @@ const TableList: React.FC<{}> = () => {
       align: 'center',
     },
   ];
-
-  useEffect(() => {
-    (async () => {
-      // 组件加载完成立即获取栏目信息
-      const channelList: ChannelType[] = await queryChannels();
-      // 更新栏目组件
-      const cns: CascaderOptionType[] = [];
-      convertChannelsToTree(channelList, cns, null);
-      setChannels(cns);
-    })();
-  }, []);
 
   return (
     <PageHeaderWrapper className={styles.contentListWrapper}  title={false}>
@@ -345,8 +323,8 @@ const TableList: React.FC<{}> = () => {
         }
         }
         beforeSearchSubmit={(params: any) => {
-          const { Channels = [] } = params;
-          const channelId = Channels.length ? Channels[Channels.length - 1] : null;
+          const { Channels = null } = params;
+          const channelId = Channels;
           const newParams = { ...params, channelId };
           delete newParams.Channels;
           return newParams;

@@ -134,14 +134,14 @@ const TableList: React.FC = () => {
       dataIndex: 'Training',
       hideInTable: !!trainingId, // 过滤条件trainingId存在时，不显示此列
       hideInForm: true,
-      hideInSearch: true,
+      search: false,
       renderText: (training: { id: string; title: string; }) => training?.title,
     },
     {
       title: '培训类型',
       dataIndex: 'Training',
       hideInForm: true,
-      hideInSearch: true,
+      search: false,
       hideInTable: !!trainingId, // 过滤条件trainingId存在时，不显示此列
       renderText: (training: {
         id: string;
@@ -204,7 +204,7 @@ const TableList: React.FC = () => {
       sorter: true,
       valueType: 'dateTime',
       hideInForm: true,
-      hideInSearch: true,
+      search: false,
     },
     {
       title: '审批',
@@ -237,7 +237,7 @@ const TableList: React.FC = () => {
       sorter: true,
       valueType: 'dateTime',
       hideInForm: true,
-      hideInSearch: true,
+      search: false,
     },
     {
       title: '操作',
