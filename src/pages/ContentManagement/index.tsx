@@ -6,12 +6,10 @@ import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
 import ContentPreview from '@/components/ContentPreview';
 import ChannelSelector from '@/components/ChannelSelector';
-import { values } from 'lodash';
-import { FormInstance } from 'antd/lib/form';
 import { TableListItem, TableListParams } from './data.d';
 import Option from './components/Option';
 
-import { queryList, remove, setIsHead, setIsRecom, setPub } from './service';
+import { queryList, remove, moveTo, setIsHead, setIsRecom, setPub } from './service';
 
 import styles from './index.module.less';
 
@@ -44,6 +42,20 @@ const unPubHandler = async (ids: string[], action: any) => {
     }
   } catch (err) {
     message.error('撤稿失败，请联系管理员或稍后重试。');
+  }
+}
+
+const moveToHandler = async (ids: string[], action: any) => {
+  try {
+    const result = await moveTo(ids, [24]);
+    if (result.status === 'ok') {
+      message.info('移动成功');
+      action.reload();
+    } else {
+      message.error('移动失败，请联系管理员或稍后重试。');
+    }
+  } catch (err) {
+    message.error('移动失败，请联系管理员或稍后重试。');
   }
 }
 
@@ -279,6 +291,7 @@ const TableList: React.FC<{}> = () => {
                         unPubHandler(ids, action);
                         break;
                       case 'moveTo':
+                        moveToHandler(ids, action);
                         break;
                       case 'del':
                         delHandler(ids, action, isRecycleBin);

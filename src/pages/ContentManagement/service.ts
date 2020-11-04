@@ -86,6 +86,24 @@ export async function remove(ids: string[]) {
 }
 
 /**
+ * 批量移动文章
+ *
+ * @export
+ * @param {string[]} ids
+ * @param {number[]} cIds
+ * @returns
+ */
+export async function moveTo(ids: string[], cIds: number[]) {
+  return request('/api/article/moveTo', {
+    method: 'PUT',
+    data: {
+      ids,
+      cIds
+    },
+  });
+}
+
+/**
  * 设置发发布属性
  *
  * @export
@@ -173,7 +191,7 @@ export function upload(param: BraftUploadFile) {
 
   const formData = new FormData();
   console.log(param.file);
-  
+
   formData.append(param.file.type.split('/')[0], param.file);
 
   xhr.onerror = function error(e) {
