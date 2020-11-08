@@ -275,14 +275,20 @@ const EditArticle = () => {
                 },
               ]}
             >
-              <ChannelSelector />
+              <ChannelSelector disabled={disabled} />
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col className="gutter-row" sm={12} xs={24}>
             <Form.Item name="summary" label="文章摘要：">
-              <Input.TextArea placeholder="说点什么..." showCount maxLength={200} rows={4} disabled={disabled} />
+              <Input.TextArea
+                placeholder="说点什么..."
+                showCount
+                maxLength={200}
+                rows={4}
+                disabled={disabled}
+              />
             </Form.Item>
           </Col>
           <Col className="gutter-row" sm={12} xs={24}>
