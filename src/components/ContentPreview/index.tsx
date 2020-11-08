@@ -1,61 +1,57 @@
-import React, { useEffect, useState } from 'react'
-import { Col, Menu, Row } from 'antd'
-import Interweave from 'interweave'
+import React, { useEffect, useState } from 'react';
+import { Col, Menu, Row } from 'antd';
+import Interweave from 'interweave';
 
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons'
-import { getContent } from './service'
-import styles from './index.module.less'
+import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import { getContent } from './service';
+import styles from './index.module.less';
 
 const { SubMenu } = Menu;
 const TestSecondMenu = () => {
   return (
-    <Menu
-        defaultSelectedKeys={['1']}
-        defaultOpenKeys={['sub1']}
-        mode="inline"
+    <Menu defaultSelectedKeys={['1']} defaultOpenKeys={['sub1']} mode="inline">
+      <SubMenu
+        key="sub1"
+        title={
+          <span>
+            <MailOutlined />
+            <span>Navigation One</span>
+          </span>
+        }
       >
-        <SubMenu
-          key="sub1"
-          title={
-            <span>
-              <MailOutlined />
-              <span>Navigation One</span>
-            </span>
-          }
-        >
-          <Menu.ItemGroup key="g1" title="Item 1">
-            <Menu.Item key="1">Option 1</Menu.Item>
-            <Menu.Item key="2">Option 2</Menu.Item>
-          </Menu.ItemGroup>
-          <Menu.ItemGroup key="g2" title="Item 2">
-            <Menu.Item key="3">Option 3</Menu.Item>
-            <Menu.Item key="4">Option 4</Menu.Item>
-          </Menu.ItemGroup>
+        <Menu.ItemGroup key="g1" title="Item 1">
+          <Menu.Item key="1">Option 1</Menu.Item>
+          <Menu.Item key="2">Option 2</Menu.Item>
+        </Menu.ItemGroup>
+        <Menu.ItemGroup key="g2" title="Item 2">
+          <Menu.Item key="3">Option 3</Menu.Item>
+          <Menu.Item key="4">Option 4</Menu.Item>
+        </Menu.ItemGroup>
+      </SubMenu>
+      <SubMenu key="sub2" icon={<AppstoreOutlined />} title="Navigation Two">
+        <Menu.Item key="5">Option 5</Menu.Item>
+        <Menu.Item key="6">Option 6</Menu.Item>
+        <SubMenu key="sub3" title="Submenu">
+          <Menu.Item key="7">Option 7</Menu.Item>
+          <Menu.Item key="8">Option 8</Menu.Item>
         </SubMenu>
-        <SubMenu key="sub2" icon={<AppstoreOutlined />} title="Navigation Two">
-          <Menu.Item key="5">Option 5</Menu.Item>
-          <Menu.Item key="6">Option 6</Menu.Item>
-          <SubMenu key="sub3" title="Submenu">
-            <Menu.Item key="7">Option 7</Menu.Item>
-            <Menu.Item key="8">Option 8</Menu.Item>
-          </SubMenu>
-        </SubMenu>
-        <SubMenu
-          key="sub4"
-          title={
-            <span>
-              <SettingOutlined />
-              <span>Navigation Three</span>
-            </span>
-          }
-        >
-          <Menu.Item key="9">Option 9</Menu.Item>
-          <Menu.Item key="10">Option 10</Menu.Item>
-          <Menu.Item key="11">Option 11</Menu.Item>
-          <Menu.Item key="12">Option 12</Menu.Item>
-        </SubMenu>
-      </Menu>
-  )
+      </SubMenu>
+      <SubMenu
+        key="sub4"
+        title={
+          <span>
+            <SettingOutlined />
+            <span>Navigation Three</span>
+          </span>
+        }
+      >
+        <Menu.Item key="9">Option 9</Menu.Item>
+        <Menu.Item key="10">Option 10</Menu.Item>
+        <Menu.Item key="11">Option 11</Menu.Item>
+        <Menu.Item key="12">Option 12</Menu.Item>
+      </SubMenu>
+    </Menu>
+  );
 };
 
 interface PropsType {
@@ -63,31 +59,31 @@ interface PropsType {
   id?: string;
   hiddenHandler: () => void;
 }
-const ContentPreview = ({ visiable=false, id, hiddenHandler }: PropsType) => {
+const ContentPreview = ({ visiable = false, id, hiddenHandler }: PropsType) => {
   const [content, setContent] = useState<ContentType | null>(null);
   useEffect(() => {
     (async () => {
-      if (id) {
+      if (visiable && id) {
         const res = await getContent(id);
         if (res.status === 'ok') {
           setContent(res.data);
         }
       }
     })();
-  }, [id]);
+  }, [visiable, id]);
   return (
-    <div className={styles.articleCon} style={{left: visiable ? '0' : '-100vw'}}>
+    <div className={styles.articleCon} style={{ left: visiable ? '0' : '-100vw' }}>
       <div className={styles.header}>
-        <button type='button' onClick={hiddenHandler} className={styles.back}>返回</button>
+        <button type="button" onClick={hiddenHandler} className={styles.back}>
+          返回
+        </button>
         网页头部
       </div>
       <div className={styles.body}>
         <Row gutter={30}>
           <Col flex="320px">
             <TestSecondMenu />
-            <div className="left-bottom">
-              {/* <QuickEntry settings={settings} column={2} /> */}
-            </div>
+            <div className="left-bottom">{/* <QuickEntry settings={settings} column={2} /> */}</div>
           </Col>
           <Col flex="auto">
             <div className="topTitle">
@@ -95,7 +91,9 @@ const ContentPreview = ({ visiable=false, id, hiddenHandler }: PropsType) => {
             </div>
             <div className="contentCon">
               <div className="content-title">{content ? content.title : ''}</div>
-              <div className="content-time">{`时间： ${content ? content.conDate.replace('T', '') : ''}`}</div>
+              <div className="content-time">{`时间： ${
+                content ? content.conDate.replace('T', '') : ''
+              }`}</div>
               <div className="content-mainCon">
                 <Interweave content={content ? content.mainCon : ''} />
               </div>
@@ -103,11 +101,9 @@ const ContentPreview = ({ visiable=false, id, hiddenHandler }: PropsType) => {
           </Col>
         </Row>
       </div>
-      <div className={styles.footer}>
-        网页页脚
-      </div>
+      <div className={styles.footer}>网页页脚</div>
     </div>
-  )
-}
+  );
+};
 
-export default ContentPreview
+export default ContentPreview;
