@@ -180,6 +180,12 @@ const EditArticle = () => {
             const befoEditorState = form.getFieldValue('mainCon');
             if (!befoEditorState) {
               message.info('请选择插入位置');
+              setTimeout(() => {
+                const listDom = window.document.body.querySelector(
+                  '.bf-controlbar .ant-upload-list',
+                );
+                if (listDom) listDom.innerHTML = '';
+              }, 200);
               return false;
             }
             return true;
