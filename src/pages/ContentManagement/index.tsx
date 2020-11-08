@@ -1,5 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { DownOutlined, PlusOutlined, createFromIconfontCN, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  PlusOutlined,
+  createFromIconfontCN,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import { Button, Dropdown, Menu, Switch, Popover, Modal, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -29,7 +34,7 @@ const pubHandler = async (ids: string[], action: any) => {
   } catch (err) {
     message.error('发布失败，请联系管理员或稍后重试。');
   }
-}
+};
 
 const unPubHandler = async (ids: string[], action: any) => {
   try {
@@ -43,7 +48,7 @@ const unPubHandler = async (ids: string[], action: any) => {
   } catch (err) {
     message.error('撤稿失败，请联系管理员或稍后重试。');
   }
-}
+};
 
 const moveToHandler = async (ids: string[], action: any) => {
   try {
@@ -57,7 +62,7 @@ const moveToHandler = async (ids: string[], action: any) => {
   } catch (err) {
     message.error('移动失败，请联系管理员或稍后重试。');
   }
-}
+};
 
 const delHandler = (ids: string[], action: any, isRecycleBin: boolean) => {
   Modal.confirm({
@@ -66,15 +71,13 @@ const delHandler = (ids: string[], action: any, isRecycleBin: boolean) => {
     icon: <ExclamationCircleOutlined />,
     onOk() {
       (async () => {
-        const result = isRecycleBin ?
-          await remove(ids) :
-          await setPub(ids, '已删除');
+        const result = isRecycleBin ? await remove(ids) : await setPub(ids, '已删除');
         if (result.status === 'ok') {
           message.info('删除成功');
           action.reload();
         }
-      })()
-    }
+      })();
+    },
   });
 };
 
@@ -90,7 +93,7 @@ const unDelHandler = async (ids: string[], action: any) => {
   } catch (err) {
     message.error('恢复失败，请联系管理员或稍后重试。');
   }
-}
+};
 
 const TableList: React.FC<{}> = () => {
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的文章ID
@@ -104,6 +107,7 @@ const TableList: React.FC<{}> = () => {
       title: 'ID',
       dataIndex: 'id',
       search: false,
+      width: '3em',
       render: (id) => (
         <Popover content={id} title="id">
           <IconFont
@@ -123,8 +127,15 @@ const TableList: React.FC<{}> = () => {
       dataIndex: 'title',
       ellipsis: true,
       render: (text, record) => (
-        <a onClick={() => {setPreviewId(record.id); setPreviewVisible(true);}}>{text}</a>
-      )
+        <a
+          onClick={() => {
+            setPreviewId(record.id);
+            setPreviewVisible(true);
+          }}
+        >
+          {text}
+        </a>
+      ),
     },
     {
       title: '发布时间',
@@ -133,26 +144,30 @@ const TableList: React.FC<{}> = () => {
       valueType: 'dateTime',
       hideInForm: true,
       search: false,
+      width: '15em',
     },
     {
       title: '发布状态',
       dataIndex: 'pubStatus',
+      width: '7em',
       valueEnum: {
         草稿: { text: '草稿', status: 'Default' },
         已发布: { text: '已发布', status: 'Success' },
         已删除: { text: '已删除', status: 'Error' },
       },
-      filters: isRecycleBin ? false : [
-        {
-          text: '已发布',
-          value: '已发布',
-        },
-        {
-          text: '草稿',
-          value: '草稿',
-        },
-      ],
-      search: !isRecycleBin
+      filters: isRecycleBin
+        ? false
+        : [
+            {
+              text: '已发布',
+              value: '已发布',
+            },
+            {
+              text: '草稿',
+              value: '草稿',
+            },
+          ],
+      search: isRecycleBin ? false : { transform: (_: any, __: string, object: any) => object },
     },
     {
       title: '审核状态',
@@ -169,22 +184,25 @@ const TableList: React.FC<{}> = () => {
       sorter: true,
       search: false,
       align: 'center',
+      width: '5em',
       render: (text, record) => {
-        return <Switch
-          defaultChecked={!!text}
-          size="small"
-          disabled={isRecycleBin}
-          onChange={async (checked: boolean) => {
-            try {
-              const result = await setIsHead([record.id], checked)
-              if (result.status !== 'ok') {
+        return (
+          <Switch
+            defaultChecked={!!text}
+            size="small"
+            disabled={isRecycleBin}
+            onChange={async (checked: boolean) => {
+              try {
+                const result = await setIsHead([record.id], checked);
+                if (result.status !== 'ok') {
+                  message.error('设置失败，请联系管理员或稍后再试。');
+                }
+              } catch (err) {
                 message.error('设置失败，请联系管理员或稍后再试。');
               }
-            } catch (err) {
-              message.error('设置失败，请联系管理员或稍后再试。');
-            }
-          }}
-        />;
+            }}
+          />
+        );
       },
     },
     {
@@ -193,28 +211,32 @@ const TableList: React.FC<{}> = () => {
       sorter: true,
       search: false,
       align: 'center',
+      width: '5em',
       render: (text, record) => {
-        return <Switch
-          defaultChecked={!!text}
-          size="small"
-          disabled={isRecycleBin}
-          onChange={async (checked: boolean) => {
-            try {
-              const result = await setIsRecom([record.id], checked)
-              if (result.status !== 'ok') {
+        return (
+          <Switch
+            defaultChecked={!!text}
+            size="small"
+            disabled={isRecycleBin}
+            onChange={async (checked: boolean) => {
+              try {
+                const result = await setIsRecom([record.id], checked);
+                if (result.status !== 'ok') {
+                  message.error('设置失败，请联系管理员或稍后再试。');
+                }
+              } catch (err) {
                 message.error('设置失败，请联系管理员或稍后再试。');
               }
-            } catch (err) {
-              message.error('设置失败，请联系管理员或稍后再试。');
-            }
-          }}
-        />;
+            }}
+          />
+        );
       },
     },
     {
       title: '所属栏目',
       dataIndex: 'Channels',
       ellipsis: true,
+      width: '15em',
       render: (_, record) => {
         const { Channels = [] } = record;
         const names: string[] = [];
@@ -231,15 +253,14 @@ const TableList: React.FC<{}> = () => {
       },
       order: 1,
       renderFormItem: () => {
-        return (
-          <ChannelSelector multiple={false} />
-        );
+        return <ChannelSelector multiple={false} />;
       },
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
+      width: '15em',
       render: (_, record) => (
         <div className={styles.optionCol}>
           <Option
@@ -258,16 +279,22 @@ const TableList: React.FC<{}> = () => {
   ];
 
   return (
-    <PageHeaderWrapper className={styles.contentListWrapper}  title={false}>
-      <ContentPreview id={previewId} visiable={previewVisible} hiddenHandler={()=>{setPreviewVisible(false)}} />
+    <PageHeaderWrapper className={styles.contentListWrapper} title={false}>
+      <ContentPreview
+        id={previewId}
+        visiable={previewVisible}
+        hiddenHandler={() => {
+          setPreviewVisible(false);
+        }}
+      />
       <ProTable<TableListItem>
         headerTitle="文章管理"
         actionRef={actionRef}
         rowKey="id"
         toolBarRender={(action, { selectedRows }) => [
           <>
-            {
-              !isRecycleBin && <Button
+            {!isRecycleBin && (
+              <Button
                 type="primary"
                 onClick={() => {
                   window.open('/editArticle/edit');
@@ -275,14 +302,14 @@ const TableList: React.FC<{}> = () => {
               >
                 <PlusOutlined /> 新建
               </Button>
-            }
+            )}
           </>,
           selectedRows && selectedRows.length > 0 && (
             <Dropdown
               overlay={
                 <Menu
                   onClick={async (e) => {
-                    const ids = selectedRows.map(row => row.id);
+                    const ids = selectedRows.map((row) => row.id);
                     switch (e.key) {
                       case 'pub':
                         pubHandler(ids, action);
@@ -300,7 +327,7 @@ const TableList: React.FC<{}> = () => {
                         unDelHandler(ids, action);
                         break;
                       default:
-                        // do nothing
+                      // do nothing
                     }
                   }}
                   selectedKeys={[]}
@@ -333,8 +360,7 @@ const TableList: React.FC<{}> = () => {
           };
           if (isRecycleBin) opts.pubStatus = '已删除';
           return queryList(opts);
-        }
-        }
+        }}
         beforeSearchSubmit={(params: any) => {
           const { Channels = null } = params;
           const channelId = Channels;
