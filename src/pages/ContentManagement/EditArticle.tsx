@@ -31,6 +31,7 @@ import { upsert, getById, upload, setPub } from './service';
 import Success from './components/Success';
 import MyUpload from './components/MyUpload';
 import SelectImage from './components/SelectImage';
+import Extension from './components/Extension';
 
 const { Option } = Select;
 
@@ -377,6 +378,10 @@ const EditArticle = () => {
             extendControls={extendControls}
           />
         </Form.Item>
+        <Form.Item name="ArticleExtensions">
+          <Extension disabled={disabled} form={form} />
+        </Form.Item>
+        <Divider />
         <Row justify="end">
           <Col>
             <Form.Item>

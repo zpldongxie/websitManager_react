@@ -204,20 +204,26 @@ export interface TableListParams {
  * @interface UpsertParams
  */
 export interface UpsertParams {
-  title: string,
-  subtitle?: string,
-  keyWord?: string,
-  Channels: number[],
-  contentType: string,
-  orderIndex: number,
-  summary?: string,
-  thumbnail?: string,
-  auth?: '',
-  conDate: string,
-  source: string,
-  isHead: boolean,
-  isRecom: boolean,
-  mainCon: string,
+  title: string;
+  subtitle?: string;
+  keyWord?: string;
+  Channels: number[];
+  contentType: string;
+  orderIndex: number;
+  summary?: string;
+  thumbnail?: string;
+  auth?: '';
+  conDate: string;
+  source: string;
+  isHead: boolean;
+  isRecom: boolean;
+  mainCon: string;
+  ArticleExtensions?: {
+    id?: string;
+    title: string;
+    info: string;
+    remark: string;
+  }[];
 }
 
 /**
@@ -229,23 +235,17 @@ export interface BraftUploadFile {
   file: File;
   progress: (progress: number) => void;
   libraryId: string;
-  success: (
-    res: {
-      url: string;
-      meta: {
-        id: string;
-        title: string;
-        alt: string;
-        loop: boolean;
-        autoPlay: boolean;
-        controls: boolean;
-        poster: string;
-      };
-    }
-  ) => void;
-  error: (
-    err: {
-      msg: string;
-    }
-  ) => void;
+  success: (res: {
+    url: string;
+    meta: {
+      id: string;
+      title: string;
+      alt: string;
+      loop: boolean;
+      autoPlay: boolean;
+      controls: boolean;
+      poster: string;
+    };
+  }) => void;
+  error: (err: { msg: string }) => void;
 }
