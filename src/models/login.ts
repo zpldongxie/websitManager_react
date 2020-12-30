@@ -64,6 +64,7 @@ const Model: LoginModelType = {
         }
 
         history.replace(redirect || '/');
+        window.location.href = redirect || '/';
       }
     },
 
