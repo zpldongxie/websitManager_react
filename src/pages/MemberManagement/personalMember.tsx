@@ -9,11 +9,11 @@ import { Button, Dropdown, Menu, Popover, Modal, message, } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import type { TableListItem, TableListParams } from './data.d';
+import type { PersonalTableListItem, TableListParams } from './data.d';
 import Option from './components/Option';
 import OperationModal from './components/OperationModal';
 
-import { queryCompanyMemberList, removeCompanyMember, upsertCompanyMember } from './service';
+import { queryPersonalMemberList, removePersonalMember, upsertPersonalMember } from './service';
 
 import styles from './index.module.less';
 
@@ -27,7 +27,7 @@ const delHandler = (ids: string[], action: any) => {
     icon: <ExclamationCircleOutlined />,
     onOk() {
       (async () => {
-        const result = await removeCompanyMember(ids);
+        const result = await removePersonalMember(ids);
         if (result.status === 'ok') {
           message.info('删除成功');
           action.reload();
@@ -42,14 +42,14 @@ const TableList: React.FC = () => {
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的会员ID
   const [visible, setVisible] = useState<boolean>(false);
   const [done, setDone] = useState<boolean>(false);
-  const [current, setCurrent] = useState<Partial<TableListItem> | undefined>(undefined);
+  const [current, setCurrent] = useState<Partial<PersonalTableListItem> | undefined>(undefined);
   const actionRef = useRef<ActionType>();
 
   const showModal = () => {
     setVisible(true);
     setCurrent(undefined);
   };
-  const showEditModal = (item: TableListItem) => {
+  const showEditModal = (item: PersonalTableListItem) => {
     const currentItem = { ...item };
     setVisible(true);
     setCurrent(currentItem);
@@ -64,23 +64,23 @@ const TableList: React.FC = () => {
     setVisible(false);
   };
 
-  const handleSubmit = async (values: TableListItem) => {
+  const handleSubmit = async (values: PersonalTableListItem) => {
     const pram = { ...values };
-    const result = await upsertCompanyMember(pram);
+    const result = await upsertPersonalMember(pram);
     if (result.status === "ok") {
       setVisible(false);
       const action = actionRef.current;
       action?.reload();
       if (current) {
-        message.info('企业会员修改成功');
+        message.info('个人会员修改成功');
       } else {
-        message.info('企业会员添加成功');
+        message.info('个人会员添加成功');
       }
     } else {
       message.error(result.msg);
     }
   };
-  const columns: ProColumns<TableListItem>[] = [
+  const columns: ProColumns<PersonalTableListItem>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -103,10 +103,10 @@ const TableList: React.FC = () => {
       ),
     },
     {
-      title: '公司名称',
-      dataIndex: 'corporateName',
+      title: '姓名',
+      dataIndex: 'name',
       ellipsis: true,
-      width: '7em',
+      width: '5em',
       render: (text, record) => (
         <a onClick={() => {
           setDone(true);
@@ -118,41 +118,25 @@ const TableList: React.FC = () => {
       ),
     },
     {
-      title: '联系人',
-      dataIndex: 'contacts',
-      sorter: true,
-      hideInForm: true,
-      search: false,
-      hideInTable: true,
-      width: '5em',
+      title: '联系电话',
+      dataIndex: 'mobile',
+      width: '7em',
     },
     {
-      title: '联系人手机',
-      dataIndex: 'contactsMobile',
-      defaultSortOrder: 'descend',
-      align: 'center',
-      width: '7em'
-    },
-    {
-      title: '所属行业',
-      dataIndex: 'industry',
-      sorter: true,
-      search: false,
-      align: 'center',
+      title: '身份证号',
+      dataIndex: 'idNumber',
       width: '10em',
     },
     {
-      title: '座机',
-      dataIndex: 'tel',
-      search: false,
+      title: '职业',
+      dataIndex: 'profession',
       width: '7em',
     },
     {
       title: '邮箱',
       search: false,
       dataIndex: 'email',
-      width: '7em',
-      ellipsis: true,
+      width: '9em',
     },
     {
       title: '注册日期',
@@ -161,13 +145,23 @@ const TableList: React.FC = () => {
       sorter: true,
       ellipsis: true,
       width: '8em',
+      render: (text) => (
+        <span onClick={() => {
+        }}>{text && text.props.title && text.props.title.split(/T/g)[0]}</span>
+      )
     },
     {
       title: '状态',
       dataIndex: 'status',
       search: false,
       width: '5em',
-      sorter: true,
+    },
+    {
+      title: '备注',
+      search: false,
+      dataIndex: 'intro',
+      ellipsis: true,
+      width: '7em',
     },
     {
       title: '操作',
@@ -179,6 +173,7 @@ const TableList: React.FC = () => {
           <Option
             id={record.id}
             status={record.status}
+            type="personal"
             refreshHandler={() => {
               if (actionRef.current) {
                 actionRef.current.reload();
@@ -198,7 +193,7 @@ const TableList: React.FC = () => {
     <>
       <PageHeaderWrapper className={styles.contentListWrapper} title={false}>
 
-        <ProTable<TableListItem>
+        <ProTable<PersonalTableListItem>
           actionRef={actionRef}
           rowKey="id"
           toolbar={{
@@ -206,7 +201,7 @@ const TableList: React.FC = () => {
               type: 'tab',
               items: [
                 {
-                  label: '企业列表',
+                  label: '个人列表',
                   key: 'official',
                 },
                 {
@@ -271,19 +266,20 @@ const TableList: React.FC = () => {
               filter,
               status: currentStatus
             };
-            return queryCompanyMemberList(opts);
+            return queryPersonalMemberList(opts);
           }}
           columns={columns}
           rowSelection={{}}
         />
       </PageHeaderWrapper>
       <OperationModal
+        type="personal"
         visible={visible}
-        current={current}
+        currentPersonal={current}
         done={done}
         onDone={handleDone}
         onCancel={handleCancel}
-        onSubmit={handleSubmit}
+        onSubmitPersonal={handleSubmit}
       />
     </>
   );

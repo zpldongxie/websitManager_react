@@ -118,7 +118,7 @@ export default defineConfig({
                 {
                   name: 'indivic',
                   path: '/membermanagement/indivic',
-                  component: './MemberManagement',
+                  component: './MemberManagement/personalMember',
                   authority: ['admin', 'user'],
                 },
                 {
