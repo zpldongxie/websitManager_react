@@ -1,4 +1,3 @@
-// https://umijs.org/config/
 import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
@@ -70,7 +69,7 @@ export default defineConfig({
               authority: ['admin', 'user'],
             },
             {
-              name: 'contentmanagement',              
+              name: 'contentmanagement',
               icon: 'ReadOutlined',
               path: '/contentmanagement',
               authority: ['admin', 'user'],
@@ -97,14 +96,14 @@ export default defineConfig({
               ],
             },
             {
-              name: 'resourcemanagement',             
+              name: 'resourcemanagement',
               icon: 'CloudServerOutlined',
               path: '/resourcemanagement',
               component: './ResourceManagement',
               authority: ['admin', 'user'],
             },
             {
-              name: 'membermanagement',            
+              name: 'membermanagement',
               icon: 'TeamOutlined',
               path: '/membermanagement',
               authority: ['admin', 'user'],
@@ -130,7 +129,39 @@ export default defineConfig({
               ],
             },
             {
-              name: 'trainingmanagement',            
+              name: 'serviceRequestManagement',
+              icon: 'TeamOutlined',
+              path: '/serviceRequestManagement',
+              authority: ['admin', 'user'],
+              routes: [
+                {
+                  name: 'schemeConsultation',
+                  path: '/serviceRequestManagement/schemeConsultation',
+                  component: './ServiceRequestManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'schemeDemonstration',
+                  path: '/serviceRequestManagement/schemeDemonstration',
+                  component: './ServiceRequestManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'schemeDesign',
+                  path: '/serviceRequestManagement/schemeDesign',
+                  component: './ServiceRequestManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'safetyAssessment',
+                  path: '/serviceRequestManagement/safetyAssessment',
+                  component: './ServiceRequestManagement',
+                  authority: ['admin', 'user'],
+                },
+              ],
+            },
+            {
+              name: 'trainingmanagement',
               icon: 'ScheduleOutlined',
               path: '/trainingmanagement',
               authority: ['admin', 'user'],
@@ -150,7 +181,47 @@ export default defineConfig({
               ],
             },
             {
-              name: 'websiteConf',            
+              name: 'manufacturer',
+              icon: 'TeamOutlined',
+              path: '/manufacturer',
+              authority: ['admin', 'user'],
+              routes: [
+                {
+                  name: 'list',
+                  path: '/manufacturer/list',
+                  component: './MemberManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'regmanagement',
+                  path: '/manufacturer/regmanagement',
+                  component: './MemberManagement',
+                  authority: ['admin', 'user'],
+                },
+              ],
+            },
+            {
+              name: 'product',
+              icon: 'TeamOutlined',
+              path: '/product',
+              authority: ['admin', 'user'],
+              routes: [
+                {
+                  name: 'list',
+                  path: '/product/list',
+                  component: './MemberManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'regmanagement',
+                  path: '/product/regmanagement',
+                  component: './MemberManagement',
+                  authority: ['admin', 'user'],
+                },
+              ],
+            },
+            {
+              name: 'websiteConf',
               icon: 'SettingOutlined',
               path: '/websiteConf',
               authority: ['admin', 'user'],
@@ -165,7 +236,7 @@ export default defineConfig({
             },
             {
               path: '/admin',
-              name: 'conf',            
+              name: 'conf',
               icon: 'ControlOutlined',
               authority: ['admin'],
               routes: [

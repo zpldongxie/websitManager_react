@@ -1,26 +1,27 @@
 .con {
-  background-color: #fff;
   padding: 1rem;
+  background-color: #fff;
   & > div {
-    max-width: 40em;
     min-width: auto;
+    max-width: 40em;
     .labelCol {
-      text-align: right;
       line-height: 32px;
+      text-align: right;
     }
     .valueCol {
       display: flex;
       :global {
-        .ant-input, .ant-input-number {
-          margin-right: .5rem;
+        .ant-input,
+        .ant-input-number {
+          margin-right: 0.5rem;
           &.error + .anticon-exclamation-circle {
             display: block;
           }
         }
         .anticon-exclamation-circle {
-          margin-right: .5rem;
-          line-height: 32px;
           display: none;
+          margin-right: 0.5rem;
+          line-height: 32px;
         }
         .ant-input {
           width: 30em;

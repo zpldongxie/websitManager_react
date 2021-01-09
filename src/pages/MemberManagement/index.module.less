@@ -1,11 +1,11 @@
 .contentListWrapper {
   .channelCol {
     display: block;
-    cursor: default;
     max-width: 10em;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: default;
   }
 
   .optionCol {
@@ -19,10 +19,10 @@
   padding: 1rem;
 
   .thumbnail {
+    width: 100px;
+    height: 100px;
     padding: 5px;
     border: 1px solid #aaa;
-    height: 100px;
-    width: 100px;
 
     img {
       width: 100%;
@@ -37,10 +37,10 @@
 
 div[class*='standardListForm'] {
   :global {
-    .ant-modal-body{
+    .ant-modal-body {
+      position: relative;
       height: calc(~'100vh - 335px');
       overflow-y: auto;
-      position: relative;
       .ant-form-item {
         margin-bottom: 12px;
         &:last-child {
