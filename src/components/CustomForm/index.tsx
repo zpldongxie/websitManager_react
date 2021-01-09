@@ -5,25 +5,21 @@ import { FormInput, FormSelect, FormTimeRange, FormTextArea } from './CustomForm
 
 const renderFormItems = (formItems: FormItemType[]) => {
   return formItems.map((formItem) => {
-    const { type, groupItems, span, flex, ...currentProps } = formItem;
+    const { type, key, groupItems, span, flex, ...currentProps } = formItem;
+    const currentKey = key || formItem.label;
     switch (type) {
       case 'input':
-        return <FormInput {...currentProps} key={formItem.label || new Date().getTime()} />;
+        return <FormInput {...currentProps} key={currentKey} />;
       case 'select':
-        return (
-          <FormSelect
-            {...(currentProps as FormSelectProps)}
-            key={formItem.label || new Date().getTime()}
-          />
-        );
+        return <FormSelect {...(currentProps as FormSelectProps)} key={currentKey} />;
       case 'timeRange':
-        return <FormTimeRange {...currentProps} key={formItem.label || new Date().getTime()} />;
+        return <FormTimeRange {...currentProps} key={currentKey} />;
       case 'textArae':
-        return <FormTextArea {...currentProps} key={formItem.label || new Date().getTime()} />;
+        return <FormTextArea {...currentProps} key={currentKey} />;
       case 'group': {
         const colW = 24 / (groupItems ? groupItems.length : 1);
         return (
-          <Row gutter={10} key={formItem.label || new Date().getTime()}>
+          <Row gutter={10} key={currentKey}>
             {groupItems?.map((item) => {
               const wInfo: {
                 span?: number | string;
@@ -36,8 +32,9 @@ const renderFormItems = (formItems: FormItemType[]) => {
               } else {
                 wInfo.span = colW;
               }
+              const colKey = `Col${item.key || item.label}`;
               return (
-                <Col {...wInfo} key={item.label || new Date().getTime()}>
+                <Col {...wInfo} key={colKey}>
                   {renderFormItems([item])}
                 </Col>
               );

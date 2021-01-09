@@ -2,7 +2,7 @@
  * @description:
  * @author: zpl
  * @Date: 2020-07-30 10:21:18
- * @LastEditTime: 2021-01-09 23:10:19
+ * @LastEditTime: 2021-01-10 00:23:13
  * @LastEditors: zpl
  */
 import { FormItemProps } from 'antd/lib/form/FormItem.d';
@@ -33,6 +33,7 @@ export interface FormTextAreaProps extends FormItemProps {
 }
 
 export interface FormItemType extends FormItemProps {
+  key?: string | number;
   type: 'input' | 'select' | 'timeRange' | 'textArae' | 'group' | 'empty';
   label?: string;
   placeholder?: string;
