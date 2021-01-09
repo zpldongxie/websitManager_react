@@ -1,10 +1,10 @@
 /*
-* @description: 
-* @author: zpl
-* @Date: 2020-07-30 10:21:18
- * @LastEditTime: 2020-08-06 14:05:27
+ * @description:
+ * @author: zpl
+ * @Date: 2020-07-30 10:21:18
+ * @LastEditTime: 2021-01-09 23:10:19
  * @LastEditors: zpl
-*/ 
+ */
 import { FormItemProps } from 'antd/lib/form/FormItem.d';
 
 export interface FormInputProps extends FormItemProps {
@@ -33,8 +33,8 @@ export interface FormTextAreaProps extends FormItemProps {
 }
 
 export interface FormItemType extends FormItemProps {
-  type: string;
-  label: string;
+  type: 'input' | 'select' | 'timeRange' | 'textArae' | 'group' | 'empty';
+  label?: string;
   placeholder?: string;
   disabled?: boolean;
   items?: {
@@ -42,4 +42,25 @@ export interface FormItemType extends FormItemProps {
     text: string;
   }[];
   onChange?: (_: any, formatString: [string, string]) => void;
+  /**
+   * 类型为group横向排列时，需要设置子数组
+   *
+   * @type {FormItemType[]}
+   * @memberof FormItemType
+   */
+  groupItems?: FormItemType[];
+  /**
+   * 类型为group横向排列时，可设置宽度，不设置时为平均分配
+   *
+   * @type {(number | string)}
+   * @memberof FormItemType
+   */
+  span?: number | string;
+  /**
+   * 类型为group横向排列时，可设置宽度，不设置时为平均分配
+   *
+   * @type {(number | 'none' | 'auto' | string)}
+   * @memberof FormItemType
+   */
+  flex?: number | 'none' | 'auto' | string;
 }
