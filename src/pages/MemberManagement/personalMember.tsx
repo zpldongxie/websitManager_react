@@ -9,11 +9,12 @@ import { Button, Dropdown, Menu, Popover, Modal, message, } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import type { PersonalTableListItem, TableListParams } from './data.d';
+import type { PersonalTableListItem, TableListParams, AuditMemberParams, TableListItem } from './data.d';
 import Option from './components/Option';
 import OperationModal from './components/OperationModal';
+import AuditModal from './components/AuditModal';
 
-import { queryPersonalMemberList, removePersonalMember, upsertPersonalMember } from './service';
+import { queryPersonalMemberList, removePersonalMember, upsertPersonalMember, auditPersonalMember } from './service';
 
 import styles from './index.module.less';
 
@@ -40,46 +41,72 @@ const delHandler = (ids: string[], action: any) => {
 const TableList: React.FC = () => {
   const [currentStatus, setCurrentStatus] = useState<string[] | undefined>(['正式会员', '禁用']);
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的会员ID
-  const [visible, setVisible] = useState<boolean>(false);
+  const [opVisible, setOpVisible] = useState<boolean>(false);
+  const [auditVisible, setAuditVisible] = useState<boolean>(false);
   const [done, setDone] = useState<boolean>(false);
-  const [current, setCurrent] = useState<Partial<PersonalTableListItem> | undefined>(undefined);
+  const [currentOp, setCurrentOp] = useState<Partial<TableListItem> | undefined>(undefined);
+  const [currentAudit, setCurrentAudit] = useState<AuditMemberParams | undefined>(undefined);
   const actionRef = useRef<ActionType>();
 
   const showModal = () => {
-    setVisible(true);
-    setCurrent(undefined);
+    setOpVisible(true);
+    setCurrentOp(undefined);
+  };
+  const showCheckModal = (item: PersonalTableListItem) => {
+    const currentItem = { ...item };
+    setDone(true);
+    setOpVisible(true);
+    setCurrentOp(currentItem);
   };
   const showEditModal = (item: PersonalTableListItem) => {
     const currentItem = { ...item };
-    setVisible(true);
-    setCurrent(currentItem);
+    setOpVisible(true);
+    setCurrentOp(currentItem);
   };
-
+  const showAuditModal = (item: PersonalTableListItem) => {
+    const currentItem = { ...item };
+    setAuditVisible(true);
+    setCurrentAudit({ id: currentItem.id, status: currentItem.status });
+  };
   const handleDone = () => {
     setDone(false);
-    setVisible(false);
+    setOpVisible(false);
   };
 
   const handleCancel = () => {
-    setVisible(false);
+    setOpVisible(false);
+    setAuditVisible(false);
   };
 
-  const handleSubmit = async (values: PersonalTableListItem) => {
+  const handleOperationSubmit = async (values: PersonalTableListItem) => {
     const pram = { ...values };
     const result = await upsertPersonalMember(pram);
     if (result.status === "ok") {
-      setVisible(false);
+      setOpVisible(false);
       const action = actionRef.current;
       action?.reload();
-      if (current) {
+      if (currentOp) {
         message.info('个人会员修改成功');
       } else {
         message.info('个人会员添加成功');
       }
     } else {
-      message.error(result.msg);
+      message.error(result.message);
     }
   };
+  const handleAuditSubmit = async (values: AuditMemberParams) => {
+
+    const pram = { ...values };
+    const result = await auditPersonalMember(pram);
+    if (result.status === "ok") {
+      setAuditVisible(false);
+      const action = actionRef.current;
+      action?.reload();
+      message.info('审核成功');
+    } else {
+      message.error('审核失败，请联系管理员或稍后重试。');
+    }
+  }
   const columns: ProColumns<PersonalTableListItem>[] = [
     {
       title: 'ID',
@@ -109,9 +136,7 @@ const TableList: React.FC = () => {
       width: '5em',
       render: (text, record) => (
         <a onClick={() => {
-          setDone(true);
-          setVisible(true);
-          setCurrent(record);
+          showCheckModal(record)
         }}>
           {text}
         </a>
@@ -125,29 +150,31 @@ const TableList: React.FC = () => {
     {
       title: '身份证号',
       dataIndex: 'idNumber',
+      search: false,
       width: '10em',
     },
     {
       title: '职业',
       dataIndex: 'profession',
       width: '7em',
+      search: false,
     },
     {
       title: '邮箱',
       search: false,
+      ellipsis: true,
       dataIndex: 'email',
       width: '9em',
     },
     {
       title: '注册日期',
-      dataIndex: 'logonData',
+      dataIndex: 'logonDate',
       search: false,
       sorter: true,
       ellipsis: true,
       width: '8em',
-      render: (text) => (
-        <span onClick={() => {
-        }}>{text && text.props.title && text.props.title.split(/T/g)[0]}</span>
+      render: (_, record) => (
+        <span>{record && record.logonDate && record.logonDate.split(/T/g)[0]}</span>
       )
     },
     {
@@ -157,7 +184,7 @@ const TableList: React.FC = () => {
       width: '5em',
     },
     {
-      title: '备注',
+      title: '个人简介',
       search: false,
       dataIndex: 'intro',
       ellipsis: true,
@@ -181,6 +208,12 @@ const TableList: React.FC = () => {
             }}
             editHandler={() => {
               showEditModal(record);
+            }}
+            auditHandler={() => {
+              showAuditModal(record);
+            }}
+            checkHandler={() => {
+              showCheckModal(record);
             }}
           />
         </div>
@@ -274,12 +307,19 @@ const TableList: React.FC = () => {
       </PageHeaderWrapper>
       <OperationModal
         type="personal"
-        visible={visible}
-        currentPersonal={current}
+        visible={opVisible}
+        current={currentOp}
         done={done}
         onDone={handleDone}
         onCancel={handleCancel}
-        onSubmitPersonal={handleSubmit}
+        onSubmitPersonal={handleOperationSubmit}
+      />
+      <AuditModal
+        type="personal"
+        visible={auditVisible}
+        current={currentAudit}
+        onCancel={handleCancel}
+        onSubmit={handleAuditSubmit}
       />
     </>
   );

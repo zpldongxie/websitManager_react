@@ -1,8 +1,9 @@
 import React from 'react'
-import { Form, Input, Select, DatePicker } from 'antd';
-import moment, { Moment } from 'moment';
+import { Form, Input, Select, DatePicker, Radio } from 'antd';
+import type { Moment } from 'moment';
+import moment from 'moment';
 
-import { FormInputProps, FormSelectProps, FormTimeRangeProps, FormTextAreaProps } from './interfice';
+import type { FormInputProps, FormSelectProps, FormRadioProps, FormTimeRangeProps, FormTextAreaProps } from './interfice';
 
 const { TextArea } = Input;
 
@@ -39,15 +40,16 @@ const FormSelect = (props: FormSelectProps) => {
     disabled,
     placeholder,
     items,
+    onChange,
     ...formProps
   } = props;
   return (
     <Form.Item {...formProps}  >
-      <Select 
+      <Select
         disabled={disabled}
-        showSearch
         placeholder={placeholder || '请选择'}
         optionFilterProp='children'
+        onChange={onChange}
         filterOption={(inputValue: string, option: any) =>
           option.children.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0
         }
@@ -56,6 +58,32 @@ const FormSelect = (props: FormSelectProps) => {
           items.map(item => <Select.Option key={item.value} value={item.value}>{item.text}</Select.Option>)
         }
       </Select>
+    </Form.Item>
+  )
+}
+
+// -----------------------------FormRadio------------------------------------
+/**
+ * 表单radio选择框
+ *
+ * @param {FormRadioProps} props
+ * @returns
+ */
+const FormRadio = (props: FormRadioProps) => {
+  const {
+    disabled,
+    items,
+    defaultValue,
+    ...formProps
+  } = props;
+
+  return (
+    <Form.Item {...formProps}  >
+      <Radio.Group disabled={disabled} defaultValue={defaultValue}>
+        {
+          items.map(item => <Radio key={item.value} value={item.value}>{item.text}</Radio>)
+        }
+      </Radio.Group>
     </Form.Item>
   )
 }
@@ -93,7 +121,7 @@ const FormTimeRange = (props: FormTimeRangeProps) => {
   return (
     <Form.Item {...formProps}  >
       <DatePicker.RangePicker
-         disabled={disabled}
+        disabled={disabled}
         showTime={{
           hideDisabledOptions: true,
           defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
@@ -122,4 +150,4 @@ const FormTextArea = (props: FormTextAreaProps) => {
   )
 }
 
-export { FormInput, FormSelect, FormTimeRange, FormTextArea };
+export { FormInput, FormSelect, FormRadio, FormTimeRange, FormTextArea };

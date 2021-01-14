@@ -85,7 +85,7 @@ export type TableListItem = {
    * @type {string}
    * @memberof TableListItem
    */
-  logonData: string;
+  logonDate: string;
   /**
    * 状态
    *
@@ -203,7 +203,7 @@ export type PersonalTableListItem = {
    * @type {string}
    * @memberof TableListItem
    */
-  logonData: string;
+  logonDate: string;
   /**
    * 状态
    *
@@ -283,7 +283,7 @@ export type PersonalUpsertParams = {
   mobile: string;
   email: string;
   enName?: string;
-  sex: 0;
+  sex: string;
   maritalStatus?: string;
   website?: string;
   homeAddress?: string;
@@ -292,6 +292,18 @@ export type PersonalUpsertParams = {
   birthday?: string;
   intro: string;
   zipCode?: string;
-  logonData?: string;
+  logonDate?: string;
   status?: string;
+}
+
+/**
+ * 审批会员参数
+ *
+ * @export
+ * @interface AuditMemberParams
+ */
+export type AuditMemberParams = {
+  id: string;
+  status: string;
+  rejectDesc?: string;
 }

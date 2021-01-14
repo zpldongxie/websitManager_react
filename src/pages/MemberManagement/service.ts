@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import request from 'umi-request';
-import type { TableListParams, UpsertParams } from './data.d';
+import type { PersonalUpsertParams, TableListParams, UpsertParams, AuditMemberParams } from './data.d';
 
 /**
  * 按条件查询企业会员列表
@@ -15,7 +15,6 @@ export async function queryCompanyMemberList(params?: TableListParams) {
     data: { ...params },
   });
   if (result.status === 'ok') {
-    console.log("inin-------list.total",result.data.total);
     return {
       data: result.data.list,
       total: result.data.total,
@@ -73,7 +72,21 @@ export async function upsertCompanyMember(params: UpsertParams) {
     },
   });
 }
-
+/**
+ * 审核企业会员
+ *
+ * @export
+ * @param {AuditMemberParams} params
+ * @returns
+ */
+export async function auditCompanyMember(params: AuditMemberParams) {
+  return request('/api/membercompany/audit', {
+    method: 'PUT',
+    data: {
+      ...params,
+    },
+  });
+}
 /**
  * 删除企业会员
  *
@@ -152,7 +165,7 @@ export async function getPersonalMemberById(id: string) {
  * @param {UpsertParams} params
  * @returns
  */
-export async function upsertPersonalMember(params: UpsertParams) {
+export async function upsertPersonalMember(params: PersonalUpsertParams) {
   return request('/api/memberindivic', {
     method: 'PUT',
     data: {
@@ -161,6 +174,21 @@ export async function upsertPersonalMember(params: UpsertParams) {
   });
 }
 
+/**
+ * 审核个人会员
+ *
+ * @export
+ * @param {AuditMemberParams} params
+ * @returns
+ */
+export async function auditPersonalMember(params: AuditMemberParams) {
+  return request('/api/memberindivic/audit', {
+    method: 'PUT',
+    data: {
+      ...params,
+    },
+  });
+}
 /**
  * 删除企业会员
  *

@@ -9,11 +9,12 @@ import { Button, Dropdown, Menu, Popover, Modal, message, } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import type { TableListItem, TableListParams } from './data.d';
+import type { TableListItem, TableListParams, AuditMemberParams } from './data.d';
 import Option from './components/Option';
 import OperationModal from './components/OperationModal';
+import AuditModal from './components/AuditModal';
 
-import { queryCompanyMemberList, removeCompanyMember, upsertCompanyMember } from './service';
+import { queryCompanyMemberList, removeCompanyMember, upsertCompanyMember, auditCompanyMember } from './service';
 
 import styles from './index.module.less';
 
@@ -40,53 +41,79 @@ const delHandler = (ids: string[], action: any) => {
 const TableList: React.FC = () => {
   const [currentStatus, setCurrentStatus] = useState<string[] | undefined>(['正式会员', '禁用']);
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的会员ID
-  const [visible, setVisible] = useState<boolean>(false);
+  const [opVisible, setOpVisible] = useState<boolean>(false);
+  const [auditVisible, setAuditVisible] = useState<boolean>(false);
   const [done, setDone] = useState<boolean>(false);
-  const [current, setCurrent] = useState<Partial<TableListItem> | undefined>(undefined);
+  const [currentOp, setCurrentOp] = useState<Partial<TableListItem> | undefined>(undefined);
+  const [currentAudit, setCurrentAudit] = useState<AuditMemberParams | undefined>(undefined);
   const actionRef = useRef<ActionType>();
 
   const showModal = () => {
-    setVisible(true);
-    setCurrent(undefined);
+    setOpVisible(true);
+    setCurrentOp(undefined);
+  };
+  const showCheckModal = (item: TableListItem) => {
+    const currentItem = { ...item };
+    setDone(true);
+    setOpVisible(true);
+    setCurrentOp(currentItem);
   };
   const showEditModal = (item: TableListItem) => {
     const currentItem = { ...item };
-    setVisible(true);
-    setCurrent(currentItem);
+    setOpVisible(true);
+    setCurrentOp(currentItem);
   };
-
+  const showAuditModal = (item: TableListItem) => {
+    const currentItem = { ...item };
+    setAuditVisible(true);
+    setCurrentAudit({ id: currentItem.id, status: currentItem.status });
+  };
   const handleDone = () => {
     setDone(false);
-    setVisible(false);
+    setOpVisible(false);
   };
 
   const handleCancel = () => {
-    setVisible(false);
+    setOpVisible(false);
+    setAuditVisible(false);
   };
 
-  const handleSubmit = async (values: TableListItem) => {
+  const handleOperationSubmit = async (values: TableListItem) => {
     const pram = { ...values };
     const result = await upsertCompanyMember(pram);
     if (result.status === "ok") {
-      setVisible(false);
+      setOpVisible(false);
       const action = actionRef.current;
       action?.reload();
-      if (current) {
+      if (currentOp) {
         message.info('企业会员修改成功');
       } else {
         message.info('企业会员添加成功');
       }
     } else {
-      message.error(result.msg);
+      message.error(result.message);
     }
   };
+  const handleAuditSubmit = async (values: AuditMemberParams) => {
+
+    const pram = { ...values };
+    const result = await auditCompanyMember(pram);
+    if (result.status === "ok") {
+      setAuditVisible(false);
+      const action = actionRef.current;
+      action?.reload();
+      message.info('审核成功');
+    } else {
+      message.error('审核失败，请联系管理员或稍后重试。');
+    }
+  }
   const columns: ProColumns<TableListItem>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
       search: false,
       hideInForm: true,
-      hideInTable:true,
+      hideInTable: true,
       width: '3em',
       render: (id) => (
         <Popover content={id} title="id">
@@ -109,9 +136,7 @@ const TableList: React.FC = () => {
       width: '7em',
       render: (text, record) => (
         <a onClick={() => {
-          setDone(true);
-          setVisible(true);
-          setCurrent(record);
+          showCheckModal(record)
         }}>
           {text}
         </a>
@@ -156,11 +181,14 @@ const TableList: React.FC = () => {
     },
     {
       title: '注册日期',
-      dataIndex: 'logonData',
+      dataIndex: 'logonDate',
       search: false,
       sorter: true,
       ellipsis: true,
       width: '8em',
+      render: (_, record) => (
+        <span>{record && record.logonDate && record.logonDate.split(/T/g)[0]}</span>
+      )
     },
     {
       title: '状态',
@@ -186,6 +214,12 @@ const TableList: React.FC = () => {
             }}
             editHandler={() => {
               showEditModal(record);
+            }}
+            auditHandler={() => {
+              showAuditModal(record);
+            }}
+            checkHandler={() => {
+              showCheckModal(record);
             }}
           />
         </div>
@@ -278,12 +312,18 @@ const TableList: React.FC = () => {
         />
       </PageHeaderWrapper>
       <OperationModal
-        visible={visible}
-        current={current}
+        visible={opVisible}
+        current={currentOp}
         done={done}
         onDone={handleDone}
         onCancel={handleCancel}
-        onSubmit={handleSubmit}
+        onSubmit={handleOperationSubmit}
+      />
+      <AuditModal
+        visible={auditVisible}
+        current={currentAudit}
+        onCancel={handleCancel}
+        onSubmit={handleAuditSubmit}
       />
     </>
   );

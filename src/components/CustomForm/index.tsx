@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Col, Form, Row } from 'antd';
-import { FormItemType, FormSelectProps } from './interfice';
-import { FormInput, FormSelect, FormTimeRange, FormTextArea } from './CustomFormItem';
+import type { FormItemType, FormSelectProps } from './interfice';
+import { FormInput, FormSelect, FormTimeRange, FormTextArea, FormRadio } from './CustomFormItem';
 
 const renderFormItems = (formItems: FormItemType[]) => {
   return formItems.map((formItem) => {
@@ -16,6 +16,8 @@ const renderFormItems = (formItems: FormItemType[]) => {
         return <FormTimeRange {...currentProps} key={currentKey} />;
       case 'textArae':
         return <FormTextArea {...currentProps} key={currentKey} />;
+      case 'radio':
+        return <FormRadio {...(currentProps as FormSelectProps)} key={currentKey} />;
       case 'group': {
         const colW = 24 / (groupItems ? groupItems.length : 1);
         return (
@@ -49,7 +51,7 @@ const renderFormItems = (formItems: FormItemType[]) => {
   });
 };
 
-interface Props {
+type Props = {
   formLayout: {
     labelCol: {
       span?: number | string;

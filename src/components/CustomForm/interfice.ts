@@ -5,39 +5,57 @@
  * @LastEditTime: 2021-01-10 00:23:13
  * @LastEditors: zpl
  */
-import { FormItemProps } from 'antd/lib/form/FormItem.d';
+import type { FormItemProps } from 'antd/lib/form/FormItem.d';
 
-export interface FormInputProps extends FormItemProps {
+export type FormInputProps = {
   disabled?: boolean;
   placeholder?: string;
-}
+} & FormItemProps
 
-export interface FormSelectProps extends FormItemProps {
+export type FormSelectProps = {
   disabled?: boolean;
   placeholder?: string;
   items: {
     value: string | number;
     text: string;
   }[];
+  onChange?: (value: string) => void;
   defaultValue?: string | number;
-}
+} & FormItemProps
 
-export interface FormTimeRangeProps extends FormItemProps {
+export type FormRadioProps = {
+  disabled?: boolean;
+  items: {
+    value: string | number;
+    text: string;
+  }[];
+  defaultValue?: string | number;
+} & FormItemProps
+
+export type FormTimeRangeProps = {
   disabled?: boolean;
   onChange?: (_: any, formatString: [string, string]) => void;
-}
+} & FormItemProps
 
-export interface FormTextAreaProps extends FormItemProps {
+export type FormTextAreaProps = {
   disabled?: boolean;
   placeholder?: string;
-}
+} & FormItemProps
 
-export interface FormItemType extends FormItemProps {
+export type FormItemType = {
   key?: string | number;
-  type: 'input' | 'select' | 'timeRange' | 'textArae' | 'group' | 'empty';
+  type?: 'input' | 'select' | 'timeRange' | 'textArae' | 'radio' | 'group' | 'empty';
+  name: string;
   label?: string;
   placeholder?: string;
   disabled?: boolean;
+  hidden?: boolean;
+  defaultValue?: string | number;
+  rules?: {
+    required?: boolean;
+    value?: string | number;
+    message: string;
+  }[];
   items?: {
     value: string | number;
     text: string;
@@ -64,4 +82,4 @@ export interface FormItemType extends FormItemProps {
    * @memberof FormItemType
    */
   flex?: number | 'none' | 'auto' | string;
-}
+} & FormItemProps
