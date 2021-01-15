@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React, { useState, useEffect } from 'react';
-import { Modal } from 'antd';
+import { Modal, Spin } from 'antd';
 import CustomForm from '@/components/CustomForm';
 import type { TableListItem, PersonalTableListItem } from '../data';
 import type { FormItemType } from '@/components/CustomForm/interfice';
@@ -9,6 +9,7 @@ type OperationModalProps = {
   type?: string;
   done: boolean;
   visible: boolean;
+  loading: boolean;
   current?: Partial<TableListItem> | undefined;
   currentPersonal?: Partial<PersonalTableListItem> | undefined;
   onDone: () => void;
@@ -25,9 +26,10 @@ const formLayout = {
 let submitFun: () => void;
 
 const OperationModal: FC<OperationModalProps> = (props) => {
-  const { type, done, visible, current, currentPersonal, onDone, onCancel, onSubmit, onSubmitPersonal } = props;
+  const { type, done, visible, loading, current, currentPersonal, onDone, onCancel, onSubmit, onSubmitPersonal } = props;
 
-  const [expand, setExpand] = useState({})
+  const [expand, setExpand] = useState({});
+  const [loadingSpin, setLoadingSpin] = useState<boolean>(false);
 
   useEffect(() => {
     if (!props.visible) {
@@ -179,7 +181,9 @@ const OperationModal: FC<OperationModalProps> = (props) => {
       visible={visible}
       {...modalFooter}
     >
-      {getModalContent()}
+      <Spin spinning={loading} tip="数据提交中...">
+        {getModalContent()}
+      </Spin>
     </Modal>
   );
 };

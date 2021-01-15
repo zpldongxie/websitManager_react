@@ -44,6 +44,7 @@ const TableList: React.FC = () => {
   const [opVisible, setOpVisible] = useState<boolean>(false);
   const [auditVisible, setAuditVisible] = useState<boolean>(false);
   const [done, setDone] = useState<boolean>(false);
+  const [loadingSpin, setLoadingSpin] = useState<boolean>(false);
   const [currentOp, setCurrentOp] = useState<Partial<TableListItem> | undefined>(undefined);
   const [currentAudit, setCurrentAudit] = useState<AuditMemberParams | undefined>(undefined);
   const actionRef = useRef<ActionType>();
@@ -95,15 +96,18 @@ const TableList: React.FC = () => {
     }
   };
   const handleAuditSubmit = async (values: AuditMemberParams) => {
-
     const pram = { ...values };
+    setLoadingSpin(true);
     const result = await auditPersonalMember(pram);
     if (result.status === "ok") {
       setAuditVisible(false);
+      setLoadingSpin(false);
       const action = actionRef.current;
       action?.reload();
       message.info('审核成功');
     } else {
+      setAuditVisible(false);
+      setLoadingSpin(false);
       message.error('审核失败，请联系管理员或稍后重试。');
     }
   }
@@ -113,7 +117,7 @@ const TableList: React.FC = () => {
       dataIndex: 'id',
       search: false,
       hideInForm: true,
-      hideInTable:true,
+      hideInTable: true,
       width: '3em',
       render: (id) => (
         <Popover content={id} title="id">
@@ -310,6 +314,7 @@ const TableList: React.FC = () => {
         visible={opVisible}
         current={currentOp}
         done={done}
+        loading={loadingSpin}
         onDone={handleDone}
         onCancel={handleCancel}
         onSubmitPersonal={handleOperationSubmit}

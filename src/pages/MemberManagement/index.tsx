@@ -5,7 +5,7 @@ import {
   createFromIconfontCN,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Popover, Modal, message, } from 'antd';
+import { Button, Dropdown, Menu, Popover, Modal, message} from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -44,10 +44,11 @@ const TableList: React.FC = () => {
   const [opVisible, setOpVisible] = useState<boolean>(false);
   const [auditVisible, setAuditVisible] = useState<boolean>(false);
   const [done, setDone] = useState<boolean>(false);
+  const [loadingSpin, setLoadingSpin] = useState<boolean>(false);
   const [currentOp, setCurrentOp] = useState<Partial<TableListItem> | undefined>(undefined);
   const [currentAudit, setCurrentAudit] = useState<AuditMemberParams | undefined>(undefined);
   const actionRef = useRef<ActionType>();
-
+  
   const showModal = () => {
     setOpVisible(true);
     setCurrentOp(undefined);
@@ -80,9 +81,11 @@ const TableList: React.FC = () => {
 
   const handleOperationSubmit = async (values: TableListItem) => {
     const pram = { ...values };
+    setLoadingSpin(true);
     const result = await upsertCompanyMember(pram);
     if (result.status === "ok") {
       setOpVisible(false);
+      setLoadingSpin(false);
       const action = actionRef.current;
       action?.reload();
       if (currentOp) {
@@ -91,6 +94,8 @@ const TableList: React.FC = () => {
         message.info('企业会员添加成功');
       }
     } else {
+      setOpVisible(false);
+      setLoadingSpin(false);
       message.error(result.message);
     }
   };
@@ -311,14 +316,16 @@ const TableList: React.FC = () => {
           rowSelection={{}}
         />
       </PageHeaderWrapper>
-      <OperationModal
-        visible={opVisible}
-        current={currentOp}
-        done={done}
-        onDone={handleDone}
-        onCancel={handleCancel}
-        onSubmit={handleOperationSubmit}
-      />
+      
+        <OperationModal
+          visible={opVisible}
+          current={currentOp}
+          done={done}
+          loading={loadingSpin}
+          onDone={handleDone}
+          onCancel={handleCancel}
+          onSubmit={handleOperationSubmit}
+        />
       <AuditModal
         visible={auditVisible}
         current={currentAudit}
