@@ -1,4 +1,5 @@
-import React, { FC, useRef, useState, useEffect } from 'react';
+import type { FC} from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -13,17 +14,18 @@ import {
 
 import { findDOMNode } from 'react-dom';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { connect, Dispatch } from 'umi';
+import type { Dispatch } from 'umi';
+import { connect } from 'umi';
 import moment from 'moment';
-import { PaginationConfig } from 'antd/lib/pagination/Pagination';
+import type { PaginationConfig } from 'antd/lib/pagination/Pagination';
 import OperationModal from './components/OperationModal';
-import { StateType } from './model';
-import { TrainingDataType } from './data.d';
+import type { StateType } from './model';
+import type { TrainingDataType } from './data.d';
 import styles from './style.module.less';
 
 const { Search } = Input;
 
-interface TrainingManagementProps {
+type TrainingManagementProps = {
   trainingManagement: StateType;
   dispatch: Dispatch;
   loading: boolean;
@@ -257,7 +259,6 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
       payload: pram,
     });
   };
-
   return (
     <>
       <PageHeaderWrapper title={false}>
