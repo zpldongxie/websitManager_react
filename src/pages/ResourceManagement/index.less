@@ -7,11 +7,16 @@
     background: @component-background;
   }
   .content {
-    min-height: calc(100vh - 20em);
+    height: calc(~'100vh - 20em');
     padding: 10px;
+    overflow-y: auto;
   }
   .slider {
     background: @component-background;
     border-left: 2px solid @border-color-base;
+    :global(.ant-collapse-content-active) {
+      max-height: calc(~'100vh - 32.8em');
+      overflow-y: auto;
+    }
   }
 }

@@ -4,12 +4,12 @@ import { PageContainer } from '@ant-design/pro-layout';
 import React, { useEffect, useState } from 'react';
 import { Col, Collapse, message, Row, Tree } from 'antd';
 
-import { DataNode, EventDataNode } from 'antd/lib/tree';
-import { UploadFile } from 'antd/lib/upload/interface';
+import type { DataNode, EventDataNode } from 'antd/lib/tree';
+import type { UploadFile } from 'antd/lib/upload/interface';
+import type { FileItemType } from './data';
 import { showFileList, remove } from './service';
 import ViewFileList from './components/ViewFileList';
 import styles from './index.less';
-import { FileItemType } from './data';
 
 const { Panel } = Collapse;
 
@@ -50,7 +50,8 @@ export default () => {
           .map((f: FileItemType) => ({
             title: f.name,
             key: `/${f.name}`,
-          }));
+          }))
+          .reverse();
         setMethod(dirList);
         const newPath = `${type}${dirList.length ? dirList[0].key : ''}`;
         setPath(newPath);
@@ -88,7 +89,7 @@ export default () => {
     }
     message.error(typeof res.message === 'string' ? res.message : JSON.stringify(res.message));
     return false;
-  }
+  };
 
   /**
    * 展开折叠面板时，刷新目录，并自动显示第一个子目录下的文件
@@ -167,20 +168,16 @@ export default () => {
   return (
     <PageContainer className={styles.main} title={false}>
       <Row className={styles.row}>
-        <Col className={styles.content} flex='auto'>
-          <ViewFileList 
+        <Col className={styles.content} flex="auto">
+          <ViewFileList
             type={type}
-            currentFileList={currentFileList} 
-            setCurrentFileList={setCurrentFileList} 
+            currentFileList={currentFileList}
+            setCurrentFileList={setCurrentFileList}
             onRemove={removeFileHandler}
           />
         </Col>
-        <Col className={styles.slider} flex='15em'>
-          <Collapse
-            defaultActiveKey={['image']}
-            accordion
-            onChange={collapseChandHandler}
-          >
+        <Col className={styles.slider} flex="15em">
+          <Collapse defaultActiveKey={['image']} accordion onChange={collapseChandHandler}>
             <Panel header="图片" key="image">
               <Tree loadData={onLoadData} treeData={imageDirList} onSelect={onSelect} />
             </Panel>

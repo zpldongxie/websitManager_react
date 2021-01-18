@@ -120,12 +120,6 @@ export default defineConfig({
                   component: './MemberManagement/personalMember',
                   authority: ['admin', 'user'],
                 },
-                {
-                  name: 'regmanagement',
-                  path: '/membermanagement/regmanagement',
-                  component: './MemberManagement',
-                  authority: ['admin', 'user'],
-                },
               ],
             },
             {
