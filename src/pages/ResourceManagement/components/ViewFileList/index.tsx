@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /** !
  * @description: 文件展示列表
  * @author: zpl
@@ -5,11 +6,12 @@
  * @LastEditTime: 2020-10-18 14:52:49
  * @LastEditors: zpl
  */
-import React, { FC, useState } from 'react';
+import type { FC } from 'react';
+import React, { useState } from 'react';
 import { Upload, Modal, message } from 'antd';
 import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { UploadFile } from 'antd/lib/upload/interface';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import type { UploadFile } from 'antd/lib/upload/interface';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import styles from './index.module.less';
 
@@ -22,7 +24,7 @@ const getBase64 = (file: any) => {
   });
 };
 
-interface PreviewType {
+type PreviewType = {
   type: string;
   name: string;
   url: string;
@@ -30,18 +32,18 @@ interface PreviewType {
 
 const Preview = ({ type, name, url }: PreviewType) => {
   switch (type) {
-    case 'image': 
+    case 'image':
       return <img alt={name} src={url} className={styles.preview} />;
     case 'video':
       return <video src={url} controls className={styles.preview}><track kind="captions" /></video>;
     case 'audio':
       return <audio src={url} controls className={styles.preview}><track kind="captions" /></audio>
     default:
-  return <div />
+      return <div />
   }
 }
 
-interface PropsType {
+type PropsType = {
   type: string;
   currentFileList: UploadFile<any>[];
   setCurrentFileList: React.Dispatch<React.SetStateAction<UploadFile<any>[]>>;
@@ -82,13 +84,18 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
    *
    * @param {{ file: UploadFile; fileList: Array<UploadFile> }} { file, fileList }
    */
-  const handleChange = ({ file, fileList }: { file: UploadFile; fileList: Array<UploadFile> }) => {
+  const handleChange = ({ file, fileList }: { file: UploadFile; fileList: UploadFile[] }) => {
     if (file.status === 'error') {
       message.error(file.response.message);
     }
     if (file.status === 'done') {
       // eslint-disable-next-line no-param-reassign
-      fileList.filter((f: UploadFile<any>) => !!f.xhr).forEach((f: UploadFile<any>) => {f.thumbUrl = ''; f.url = f.xhr.response});
+      fileList.filter((f: UploadFile<any>) => !!f.xhr).forEach((f: UploadFile<any>) => {
+        f.thumbUrl = '';
+        f.url = f.xhr.response;
+        const urlArr = f.xhr.response.split(/\//g);
+        f.name = urlArr[urlArr.length - 1];
+      });
       message.success('上传成功');
     }
     setCurrentFileList(fileList);
@@ -100,8 +107,8 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
    * @param {UploadFile<any>} file
    * @returns {(boolean | void | Promise<boolean | void>)}
    */
-  const handleRemove = (file: UploadFile<any>): boolean | void | Promise<boolean | void> => { 
-    if(file.status === 'error') {
+  const handleRemove = (file: UploadFile<any>): boolean | void | Promise<boolean | void> => {
+    if (file.status === 'error') {
       return true;
     }
     return new Promise((resolve) => {
@@ -119,14 +126,14 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
           resolve(false);
         }
       });
-    } )      
+    })
   }
 
   let accept: string = '*/*';
   let listType: "text" | "picture" | "picture-card" = 'text';
-  if (type === 'image') {accept = "image/*"; listType = "picture-card";}
-  if (type === 'video') {accept = "video/*"; listType = 'picture';}
-  if (type === 'audio') {accept = "audio/*";}
+  if (type === 'image') { accept = "image/*"; listType = "picture-card"; }
+  if (type === 'video') { accept = "video/*"; listType = 'picture'; }
+  if (type === 'audio') { accept = "audio/*"; }
 
   return (
     <div>
@@ -145,7 +152,7 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
           <div className={styles.uploadText}>上传</div>
         </div>
       </Upload>
-      <Modal 
+      <Modal
         visible={previewVisible}
         title={previewTitle}
         footer={
@@ -156,7 +163,7 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
             </CopyToClipboard>
             {type !== 'image' && <a href={previewUrl} download={previewUrl}>下载文件</a>}
           </div>
-        } 
+        }
         onCancel={handleCancel}
         okText={false}
         cancelText={false}

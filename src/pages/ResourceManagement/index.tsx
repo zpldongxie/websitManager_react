@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 import { PageContainer } from '@ant-design/pro-layout';
 import React, { useEffect, useState } from 'react';
-import { Col, Collapse, message, Row, Tree } from 'antd';
+import { Col, Collapse, message, Row, Tree, Spin } from 'antd';
 
 import type { DataNode, EventDataNode } from 'antd/lib/tree';
 import type { UploadFile } from 'antd/lib/upload/interface';
@@ -20,6 +20,7 @@ export default () => {
   const [videoDirList, setVideoDirList] = useState<DataNode[]>([]);
   const [audioDirList, setAudioDirList] = useState<DataNode[]>([]);
   const [otherDirList, setOtherDirList] = useState<DataNode[]>([]);
+  const [loadingSpin, setLoadingSpin] = useState<boolean>(false);
   const [currentFileList, setCurrentFileList] = useState<UploadFile<any>[]>([]);
 
   // 类型发生变化时，刷新子目录并自动加载第一个
@@ -44,6 +45,7 @@ export default () => {
       }
 
       if (setMethod) {
+        setLoadingSpin(true);
         const list = await showFileList({ currentPath: type });
         const dirList: DataNode[] = list
           .filter((f: FileItemType) => f.type === 'dir')
@@ -53,6 +55,7 @@ export default () => {
           }))
           .reverse();
         setMethod(dirList);
+        setLoadingSpin(false);
         const newPath = `${type}${dirList.length ? dirList[0].key : ''}`;
         setPath(newPath);
       }
@@ -62,6 +65,7 @@ export default () => {
   // 路径发生变化时，刷新展示区内容
   useEffect(() => {
     (async () => {
+      setLoadingSpin(true);
       const list = await showFileList({ currentPath: path });
       const fileList = list
         .filter((f: FileItemType) => f.type !== 'dir')
@@ -72,6 +76,8 @@ export default () => {
           size: 100,
           type: type === 'image' ? '' : type,
         }));
+
+      setLoadingSpin(false);
       setCurrentFileList(fileList);
     })();
   }, [path]);
@@ -167,32 +173,34 @@ export default () => {
 
   return (
     <PageContainer className={styles.main} title={false}>
-      <Row className={styles.row}>
-        <Col className={styles.content} flex="auto">
-          <ViewFileList
-            type={type}
-            currentFileList={currentFileList}
-            setCurrentFileList={setCurrentFileList}
-            onRemove={removeFileHandler}
-          />
-        </Col>
-        <Col className={styles.slider} flex="15em">
-          <Collapse defaultActiveKey={['image']} accordion onChange={collapseChandHandler}>
-            <Panel header="图片" key="image">
-              <Tree loadData={onLoadData} treeData={imageDirList} onSelect={onSelect} />
-            </Panel>
-            <Panel header="视频" key="video">
-              <Tree loadData={onLoadData} treeData={videoDirList} onSelect={onSelect} />
-            </Panel>
-            <Panel header="音频" key="audio">
-              <Tree loadData={onLoadData} treeData={audioDirList} onSelect={onSelect} />
-            </Panel>
-            <Panel header="其他" key="other">
-              <Tree loadData={onLoadData} treeData={otherDirList} onSelect={onSelect} />
-            </Panel>
-          </Collapse>
-        </Col>
-      </Row>
+      <Spin className={styles.resourceLoading} size="large" spinning={loadingSpin} tip="资源加载中...">
+        <Row className={styles.row}>
+          <Col className={styles.content} flex="auto">
+            <ViewFileList
+              type={type}
+              currentFileList={currentFileList}
+              setCurrentFileList={setCurrentFileList}
+              onRemove={removeFileHandler}
+            />
+          </Col>
+          <Col className={styles.slider} flex="15em">
+            <Collapse defaultActiveKey={['image']} accordion onChange={collapseChandHandler}>
+              <Panel header="图片" key="image">
+                <Tree loadData={onLoadData} treeData={imageDirList} onSelect={onSelect} />
+              </Panel>
+              <Panel header="视频" key="video">
+                <Tree loadData={onLoadData} treeData={videoDirList} onSelect={onSelect} />
+              </Panel>
+              <Panel header="音频" key="audio">
+                <Tree loadData={onLoadData} treeData={audioDirList} onSelect={onSelect} />
+              </Panel>
+              <Panel header="其他" key="other">
+                <Tree loadData={onLoadData} treeData={otherDirList} onSelect={onSelect} />
+              </Panel>
+            </Collapse>
+          </Col>
+        </Row>
+      </Spin>
     </PageContainer>
   );
 };
