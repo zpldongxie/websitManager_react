@@ -1,15 +1,16 @@
 import { Alert, Checkbox } from 'antd';
 import React, { useState } from 'react';
-import { Link, connect, Dispatch } from 'umi';
-import { StateType } from '@/models/login';
-import { LoginParamsType } from '@/services/login';
-import { ConnectState } from '@/models/connect';
+import type { Dispatch } from 'umi';
+import { connect } from 'umi';
+import type { StateType } from '@/models/login';
+import type { LoginParamsType } from '@/services/login';
+import type { ConnectState } from '@/models/connect';
 import LoginForm from './components/Login';
 
 import styles from './style.less';
 
 const { Tab, UserName, Password, Submit } = LoginForm;
-interface LoginProps {
+type LoginProps = {
   dispatch: Dispatch;
   userLogin: StateType;
   submitting?: boolean;
