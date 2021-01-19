@@ -1,4 +1,4 @@
-import { Effect, Reducer } from 'umi';
+import type { Effect, Reducer } from 'umi';
 import {
   getChannelList,
   addFakeList,
@@ -7,9 +7,9 @@ import {
   updateFakeList,
 } from './service';
 
-import { TrainingDataType } from './data.d';
+import type { TrainingDataType } from './data.d';
 
-export interface StateType {
+export type StateType = {
   filter: string;
   pageNum: number;
   pageSize: number;
@@ -17,9 +17,9 @@ export interface StateType {
   list: TrainingDataType[];
   channelList: { id: string; name: string }[];
   done: boolean;
-}
+};
 
-export interface ModelType {
+export type ModelType = {
   namespace: string;
   state: StateType;
   effects: {
@@ -34,7 +34,7 @@ export interface ModelType {
     queryList: Reducer<StateType>;
     setDone: Reducer<StateType>;
   };
-}
+};
 
 const Model: ModelType = {
   namespace: 'trainingManagement',
@@ -52,10 +52,12 @@ const Model: ModelType = {
   effects: {
     *getChannels({ payload }, { call, put }) {
       const response = yield call(getChannelList, payload);
-      yield put({
-        type: 'queryChannels',
-        payload: Array.isArray(response) ? response : [],
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'queryChannels',
+          payload: Array.isArray(response.data) ? response.data : [],
+        });
+      }
     },
     *fetch({ payload }, { call, put }) {
       const param = { ...payload, search: payload.filter };
@@ -75,6 +77,10 @@ const Model: ModelType = {
       yield put({
         type: 'setDone',
         payload: true,
+      });
+      yield put({
+        type: 'queryList',
+        payload: {},
       });
     },
     pageChange({ payload }, { put }) {

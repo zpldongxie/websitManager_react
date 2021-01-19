@@ -7,9 +7,9 @@
  */
 import React from 'react';
 import CustomForm from '@/components/CustomForm';
-import { FormItemType } from '@/components/CustomForm/interfice';
 import { Button, Col, Row, Space } from 'antd';
-import { TableListItem } from '../data';
+import type { FormItemType } from '@/components/CustomForm/interfice';
+import type { TableListItem } from '../data';
 
 const formLayout = {
   labelCol: { flex: '7em' },
@@ -123,11 +123,11 @@ const getFormItems = (): FormItemType[] => [
 
 let submitFun: () => void;
 
-interface PropsType {
+type PropsType = {
   current?: Partial<TableListItem> | null;
   onSubmit: (values: TableListItem) => void;
   onCancel?: () => void;
-}
+};
 
 const UpdateForm = (props: PropsType) => {
   const { current, onSubmit, onCancel } = props;
@@ -135,7 +135,7 @@ const UpdateForm = (props: PropsType) => {
   const handleSubmit = () => {
     if (typeof submitFun === 'function') submitFun();
   };
-  const handleFinish = (values: { [key: string]: any }) => {
+  const handleFinish = (values: Record<string, any>) => {
     // 创建时间和更新时间由接口自动维护
     const { createdAt, updatedAt, ...params } = values;
     if (onSubmit) {

@@ -1,16 +1,8 @@
-import type { FC} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import type { FC } from 'react';
 import React, { useRef, useState, useEffect } from 'react';
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Card,
-  Dropdown,
-  Input,
-  List,
-  Menu,
-  Modal,
-  Progress,
-} from 'antd';
+import { Button, Card, Dropdown, Input, List, Menu, Modal, Progress } from 'antd';
 
 import { findDOMNode } from 'react-dom';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -29,7 +21,7 @@ type TrainingManagementProps = {
   trainingManagement: StateType;
   dispatch: Dispatch;
   loading: boolean;
-}
+};
 
 /**
  * 配置列
@@ -41,52 +33,44 @@ type TrainingManagementProps = {
  * }
  */
 const ListContent = ({
-  data: { id, trainingMethod, Channel, startTime, endTime },
+  data: { id, trainingMethod, Channel = { name: '' }, startTime, endTime },
 }: {
   data: TrainingDataType;
 }) => (
-    <div className={styles.listContent}>
-      <div className={styles.listContentItem}>
-        <span>文章关键词</span>
-        <p>{id}</p>
-      </div>
-      <div className={styles.listContentItem}>
-        <span>培训方式</span>
-        <p>{trainingMethod}</p>
-      </div>
-      <div className={styles.listContentItem}>
-        <span>培训类型</span>
-        <p>{Channel.name}</p>
-      </div>
-      <div className={styles.listContentItem}>
-        <span>开始时间</span>
-        <p>{moment(startTime).format('YYYY-MM-DD HH:mm')}</p>
-      </div>
-      <div className={styles.listContentItem}>
-        <span>结束时间</span>
-        <p>{moment(endTime).format('YYYY-MM-DD HH:mm')}</p>
-      </div>
-      <div className={`${styles.listContentItem} ${styles.center}`}>
-        <Progress type="circle" percent={50} width={50} />
-        <div>签到百分比</div>
-      </div>
+  <div className={styles.listContent}>
+    <div className={styles.listContentItem}>
+      <span>文章关键词</span>
+      <p>{id}</p>
     </div>
-  );
+    <div className={styles.listContentItem}>
+      <span>培训方式</span>
+      <p>{trainingMethod}</p>
+    </div>
+    <div className={styles.listContentItem}>
+      <span>培训类型</span>
+      <p>{Channel.name}</p>
+    </div>
+    <div className={styles.listContentItem}>
+      <span>开始时间</span>
+      <p>{moment(startTime).format('YYYY-MM-DD HH:mm')}</p>
+    </div>
+    <div className={styles.listContentItem}>
+      <span>结束时间</span>
+      <p>{moment(endTime).format('YYYY-MM-DD HH:mm')}</p>
+    </div>
+    <div className={`${styles.listContentItem} ${styles.center}`}>
+      <Progress type="circle" percent={50} width={50} />
+      <div>签到百分比</div>
+    </div>
+  </div>
+);
 
 export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   const addBtn = useRef(null);
   const {
     loading,
     dispatch,
-    trainingManagement: {
-      pageNum,
-      pageSize,
-      total,
-      list,
-      filter,
-      channelList,
-      done
-    },
+    trainingManagement: { pageNum, pageSize, total, list, filter, channelList, done },
   } = props;
 
   // const [done, setDone] = useState<boolean>(false);
@@ -98,7 +82,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
    *
    * @param {{
    *     channel_id?: number; page_size: number, page_num: number, filter_str?: string
-   *   }} 
+   *   }}
    */
   type QueryPram = {
     channel_id?: number;
@@ -106,23 +90,22 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     page_num?: number;
     filter_str?: string;
   };
-  const queryList = (
-    {
-      channel_id,
-      page_size = pageSize,
-      page_num = pageNum,
-      filter_str = filter,
-    }: QueryPram) => {
+  const queryList = ({
+    channel_id,
+    page_size = pageSize,
+    page_num = pageNum,
+    filter_str = filter,
+  }: QueryPram) => {
     dispatch({
       type: 'trainingManagement/fetch',
       payload: {
         ChannelId: channel_id,
         pageNum: page_num,
         pageSize: page_size,
-        filter: filter_str
+        filter: filter_str,
       },
     });
-  }
+  };
 
   useEffect(() => {
     queryList({});
@@ -145,17 +128,17 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     pageSize,
     total,
     onChange: (page: number, size?: number) => {
-      queryList({ page_size: size || pageSize, page_num: page })
+      queryList({ page_size: size || pageSize, page_num: page });
     },
     onShowSizeChange: (page: number, size: number) => {
       dispatch({
         type: 'trainingManagement/pageChange',
         payload: {
           pageNum: page,
-          pageSize: size
+          pageSize: size,
         },
       });
-    }
+    },
   };
 
   const showModal = () => {
@@ -167,12 +150,12 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     const currentItem = { ...item };
     currentItem.registTimeRange = [
       moment(item.registStartTime, 'YYYY-MM-DD HH:mm'),
-      moment(item.registEndTime, 'YYYY-MM-DD HH:mm')
-    ]
+      moment(item.registEndTime, 'YYYY-MM-DD HH:mm'),
+    ];
     currentItem.timeRange = [
       moment(item.startTime, 'YYYY-MM-DD HH:mm'),
-      moment(item.endTime, 'YYYY-MM-DD HH:mm')
-    ]
+      moment(item.endTime, 'YYYY-MM-DD HH:mm'),
+    ];
     setVisible(true);
     setCurrent(currentItem);
   };
@@ -189,7 +172,11 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     else if (key === 'delete') {
       Modal.confirm({
         title: '删除培训',
-        content: <div><div>培训标题： {currentItem.title}</div>确定删除该培训吗？</div>,
+        content: (
+          <div>
+            <div>培训标题： {currentItem.title}</div>确定删除该培训吗？
+          </div>
+        ),
         okText: '确认',
         cancelText: '取消',
         onOk: () => deleteItem(currentItem.id || ''),
@@ -199,9 +186,13 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
 
   const extraContent = (
     <div className={styles.extraContent}>
-      <Search className={styles.extraContentSearch} placeholder="请输入" onSearch={(val: string) => {
-        queryList({ filter_str: val })
-      }} />
+      <Search
+        className={styles.extraContentSearch}
+        placeholder="请输入"
+        onSearch={(val: string) => {
+          queryList({ filter_str: val });
+        }}
+      />
     </div>
   );
 
@@ -302,10 +293,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
                     <MoreBtn key="more" item={item} />,
                   ]}
                 >
-                  <List.Item.Meta
-                    title={<a href=''>{item.title}</a>}
-                    description={item.subTitle}
-                  />
+                  <List.Item.Meta title={<a href="">{item.title}</a>} description={item.subTitle} />
                   <ListContent data={item} />
                 </List.Item>
               )}
@@ -334,7 +322,7 @@ export default connect(
   }: {
     trainingManagement: StateType;
     loading: {
-      models: { [key: string]: boolean };
+      models: Record<string, boolean>;
     };
   }) => ({
     trainingManagement,
