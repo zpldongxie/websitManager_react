@@ -61,7 +61,7 @@ const UserLayout: React.FC<UserLayoutProps> = (props) => {
                   <span className={styles.title}>云适配网站管理系统</span>
                 </Link>
               </div>
-              <div className={styles.desc}>欢迎登陆</div>
+              <div className={styles.desc}>欢迎登录</div>
             </div>
             {children}
             <div className={styles.tip}>温馨提示：推荐您使用Chrome浏览器访问本系统，享受更流畅的体验。</div>
