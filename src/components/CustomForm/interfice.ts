@@ -45,7 +45,7 @@ export type FormTextAreaProps = {
 export type FormItemType = {
   key?: string | number;
   type?: 'input' | 'select' | 'timeRange' | 'textArae' | 'radio' | 'group' | 'empty';
-  name: string;
+  name?: string;
   label?: string;
   placeholder?: string;
   disabled?: boolean;

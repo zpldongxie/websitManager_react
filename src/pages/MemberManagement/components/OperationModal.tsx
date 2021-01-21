@@ -19,9 +19,10 @@ type OperationModalProps = {
 }
 
 const formLayout = {
-  labelCol: { span: 7 },
-  wrapperCol: { span: 13 },
+  labelCol: { flex: '7em' },
+  wrapperCol: { flex: 'auto' },
 };
+
 
 let submitFun: () => void;
 
@@ -29,7 +30,6 @@ const OperationModal: FC<OperationModalProps> = (props) => {
   const { type, done, visible, loading, current, currentPersonal, onDone, onCancel, onSubmit, onSubmitPersonal } = props;
 
   const [expand, setExpand] = useState({});
-  const [loadingSpin, setLoadingSpin] = useState<boolean>(false);
 
   useEffect(() => {
     if (!props.visible) {
@@ -54,13 +54,6 @@ const OperationModal: FC<OperationModalProps> = (props) => {
     ? { footer: null, onCancel: onDone }
     : { okText: '保存', onOk: handleSubmit, onCancel };
   const disabled = !!done;
-  const memberStatusItems = [
-    { value: '申请中', text: '申请中' },
-    { value: '初审通过', text: '初审通过' },
-    { value: '正式会员', text: '正式会员' },
-    { value: '申请驳回', text: '申请驳回' },
-    { value: '禁用', text: '禁用' },
-  ];
   const idTypeItems = [
     { value: '身份证', text: '身份证' },
   ];
@@ -69,84 +62,132 @@ const OperationModal: FC<OperationModalProps> = (props) => {
       { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
       { type: 'input', name: 'corporateName', label: '单位名称', disabled, rules: [{ required: true, message: '请输入单位名称' }] },
       {
-        type: 'input', name: 'tel', label: '单位电话', disabled, rules: [
+        type: 'group',
+        key: 'group1',
+        groupItems: [
           {
-            pattern: new RegExp(/\d{3}-\d{8}|\d{4}-\d{7}/),
-            message: '电话格式有误',
-          }, { required: true, message: '请输入单位电话' }
-        ]
-      },
-      {
-        type: 'input', name: 'email', label: '联系邮箱', disabled, rules: [
+            type: 'input', name: 'tel', label: '单位电话', disabled, rules: [
+              {
+                pattern: new RegExp(/\d{3}-\d{8}|\d{4}-\d{7}/),
+                message: '电话格式有误',
+              }, { required: true, message: '请输入单位电话' }
+            ]
+          },
           {
-            type: 'email',
-            message: '邮箱格式有误',
-          }, { required: true, message: '请输入联系邮箱' }
-        ]
+            type: 'input', name: 'email', label: '联系邮箱', disabled, rules: [
+              {
+                type: 'email',
+                message: '邮箱格式有误',
+              }, { required: true, message: '请输入联系邮箱' }
+            ]
+          },
+        ],
       },
       { type: 'input', name: 'address', label: '联系地址', disabled, rules: [{ required: true, message: '请输入联系地址' }] },
-      { type: 'input', name: 'zipCode', label: '单位邮编', disabled, },
       {
-        type: 'input', name: 'website', label: '单位网站', disabled, rules: [
+        type: 'group',
+        key: 'group2',
+        groupItems: [
+          { type: 'input', name: 'zipCode', label: '单位邮编', disabled, },
           {
-            type: 'url',
-            message: '网站格式有误',
+            type: 'input', name: 'website', label: '单位网站', disabled, rules: [
+              {
+                type: 'url',
+                message: '网站格式有误',
+              },
+            ]
           },
-        ]
+        ],
       },
-      { type: 'input', name: 'legalPerson', label: '法人', disabled, },
-      { type: 'input', name: 'industry', label: '所属行业', disabled, },
-      { type: 'select', name: 'status', label: '当前状态', disabled, items: memberStatusItems },
-      { type: 'input', name: 'contacts', label: '联系人', disabled, rules: [{ required: true, message: '请输入联系人' }] },
       {
-        type: 'input', name: 'contactsMobile', label: '联系人手机号', disabled, rules: [
+        type: 'group',
+        key: 'group3',
+        groupItems: [
+          { type: 'input', name: 'legalPerson', label: '法人', disabled, },
+          { type: 'input', name: 'industry', label: '所属行业', disabled, },
+        ],
+      },
+      {
+        type: 'group',
+        key: 'group4',
+        groupItems: [
+          { type: 'input', name: 'contacts', label: '联系人', disabled, rules: [{ required: true, message: '请输入联系人' }] },
           {
-            pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
-            message: '电话格式有误',
-          }, { required: true, message: '请输入联系人手机号' }]
+            type: 'input', name: 'contactsMobile', label: '联系人手机号', disabled, rules: [
+              {
+                pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
+                message: '电话格式有误',
+              }, { required: true, message: '请输入联系人手机号' }]
+          },
+        ],
       },
       { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] },
     ];
     const formItemsPersonal = (): FormItemType[] => [
       { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
-      { type: 'input', name: 'name', label: '姓名', disabled, rules: [{ required: true, message: '请输入姓名' }] },
       {
-        type: 'radio', name: 'sex', label: '性别', disabled, items: [
-          { value: '男', text: '男' },
-          { value: '女', text: '女' }
-        ]
-      },
-      { type: 'select', name: 'idType', label: '证件类型', disabled, defaultValue: "身份证", items: idTypeItems },
-      {
-        type: 'input', name: 'idNumber', label: '身份证号码', disabled, rules: [{
-          required: true,
-          message: '请填写身份证号码',
-        },
-        {
-          // eslint-disable-next-line max-len
-          pattern: new RegExp(/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/),
-          message: '身份证号码格式有误',
-        },]
-      },
-      {
-        type: 'input', name: 'mobile', label: '手机号码', disabled, rules: [
+        type: 'group',
+        key: 'group1',
+        groupItems: [
+
+          { type: 'input', name: 'name', label: '姓名', disabled, rules: [{ required: true, message: '请输入姓名' }] },
           {
-            pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
-            message: '手机号码格式有误',
-          }, { required: true, message: '请输入手机号码' }]
+            type: 'radio', name: 'sex', label: '性别', disabled, items: [
+              { value: '男', text: '男' },
+              { value: '女', text: '女' }
+            ]
+          },
+        ],
       },
       {
-        type: 'input', name: 'email', label: '邮箱', disabled, rules: [
+        type: 'group',
+        key: 'group2',
+        groupItems: [
+          { type: 'select', name: 'idType', label: '证件类型', disabled, defaultValue: "身份证", items: idTypeItems },
           {
-            type: 'email',
-            message: '邮箱格式有误',
-          }, { required: true, message: '请输入邮箱' }
-        ]
+            type: 'input', name: 'idNumber', label: '身份证号码', disabled, rules: [{
+              required: true,
+              message: '请填写身份证号码',
+            },
+            {
+              // eslint-disable-next-line max-len
+              pattern: new RegExp(/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/),
+              message: '身份证号码格式有误',
+            },]
+          },
+        ],
+      },
+      {
+        type: 'group',
+        key: 'group3',
+        groupItems: [
+          {
+            type: 'input', name: 'mobile', label: '手机号码', disabled, rules: [
+              {
+                pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
+                message: '手机号码格式有误',
+              }, { required: true, message: '请输入手机号码' }]
+          },
+          {
+            type: 'input', name: 'email', label: '邮箱', disabled, rules: [
+              {
+                type: 'email',
+                message: '邮箱格式有误',
+              }, { required: true, message: '请输入邮箱' }
+            ]
+          },
+        ],
       },
       { type: 'input', name: 'homeAddress', label: '联系地址', disabled, rules: [{ required: true, message: '请输入联系地址' }] },
-      { type: 'input', name: 'zipCode', label: '邮编', disabled, },
-      { type: 'input', name: 'profession', label: '职业', disabled, },
-      { type: 'select', name: 'status', label: '当前状态', disabled, items: memberStatusItems },
+      {
+        type: 'group',
+        key: 'group4',
+        groupItems: [
+
+          { type: 'input', name: 'zipCode', label: '邮编', disabled, },
+          { type: 'input', name: 'profession', label: '职业', disabled, },
+        ],
+      },
       {
         type: 'input', name: 'website', label: '个人网站', disabled, rules: [
           {

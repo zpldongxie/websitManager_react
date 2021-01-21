@@ -39,14 +39,10 @@ div[class*='standardListForm'] {
   :global {
     .ant-modal-body {
       position: relative;
-      height: calc(~'100vh - 335px');
+      max-height: calc(~'100vh - 335px');
       overflow-y: auto;
-      .ant-form-item {
-        margin-bottom: 12px;
-        &:last-child {
-          margin-bottom: 32px;
-          padding-top: 4px;
-        }
+      .ant-spin-nested-loading{
+        padding: 0 20px;
       }
     }
   }
