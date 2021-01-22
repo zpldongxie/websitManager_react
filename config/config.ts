@@ -124,7 +124,7 @@ export default defineConfig({
             },
             {
               name: 'serviceRequestManagement',
-              icon: 'TeamOutlined',
+              icon: 'HeartOutlined',
               path: '/serviceRequestManagement',
               authority: ['admin', 'user'],
               routes: [
@@ -176,7 +176,7 @@ export default defineConfig({
             },
             {
               name: 'manufacturer',
-              icon: 'TeamOutlined',
+              icon: 'ShopOutlined',
               path: '/manufacturer',
               authority: ['admin', 'user'],
               routes: [
@@ -196,7 +196,7 @@ export default defineConfig({
             },
             {
               name: 'product',
-              icon: 'TeamOutlined',
+              icon: 'ProfileOutlined',
               path: '/product',
               authority: ['admin', 'user'],
               routes: [
