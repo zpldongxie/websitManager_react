@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { Col, Form, Row } from 'antd';
 import type { FormItemType, FormSelectProps } from './interfice';
@@ -71,10 +72,27 @@ type Props = {
    */
   setSubmitFun?: (submit: () => void) => void;
   onFinish: (values: any) => void;
-}
+  onFinishFailed?: ({
+    errorFields,
+  }: {
+    errorFields: {
+      name: (string | number)[];
+      errors: string[];
+    }[];
+  }) => void;
+  style?: React.CSSProperties;
+};
 
 const CustomForm = (props: Props) => {
-  const { formLayout, formItems, values, setSubmitFun, onFinish } = props;
+  const {
+    formLayout,
+    formItems,
+    values,
+    setSubmitFun,
+    onFinish = () => {},
+    onFinishFailed = () => {},
+    style,
+  } = props;
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -88,7 +106,13 @@ const CustomForm = (props: Props) => {
   }, [values]);
 
   return (
-    <Form {...formLayout} form={form} onFinish={onFinish}>
+    <Form
+      {...formLayout}
+      form={form}
+      onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
+      style={style}
+    >
       {renderFormItems(formItems)}
     </Form>
   );

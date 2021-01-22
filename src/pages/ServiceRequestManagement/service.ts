@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import request from 'umi-request';
-import { TableListItem, TableListParams } from './data.d';
+import type { TableListItem, TableListParams } from './data.d';
 
 /**
  * 按条件查询列表
@@ -58,11 +58,11 @@ export async function upsert(params: TableListItem) {
  * 删除
  *
  * @export
- * @param {number[]} ids
+ * @param {string[]} ids
  * @returns
  */
-export async function remove(ids: number[]) {
-  return request('/api/servicerequest', {
+export async function remove(ids: string[]) {
+  return request('/api/servicerequests', {
     method: 'DELETE',
     data: {
       ids,

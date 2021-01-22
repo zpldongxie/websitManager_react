@@ -9,24 +9,20 @@ import React from 'react';
 import { Divider, Popconfirm, message } from 'antd';
 
 import { remove } from '../service';
+import type { ServiceStatus } from '../data';
 
-interface OptType {
-  id: number;
+type OptType = {
+  id: string;
   refreshHandler: () => void;
-}
+};
 
-const EditOpt = ({ id }: { id: number }) => (
-  <a
-    onClick={() => {
-      window.open(`/editArticle/edit?id=${id}`);
-    }}
-  >
-    编辑
-  </a>
+const EditOpt = ({ editHandler = () => {} }: { editHandler: () => void }) => (
+  <a onClick={editHandler}>编辑</a>
 );
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ApplyOpt = ({ id, refreshHandler }: OptType) => <a href="#">审核</a>;
+const AuditOpt = ({ auditHandler }: { auditHandler: () => void }) => (
+  <a onClick={auditHandler}>审核</a>
+);
 
 const DelOpt = ({ id, refreshHandler }: OptType) => (
   <Popconfirm
@@ -52,23 +48,25 @@ const DelOpt = ({ id, refreshHandler }: OptType) => (
   </Popconfirm>
 );
 
-interface Props {
-  id?: number;
-  status: '申请中' | '接受申请' | '拒绝申请' | '服务中' | '服务完成';
+type Props = {
+  id?: string;
+  status: ServiceStatus;
   refreshHandler: () => void;
-}
+  editHandler: () => void;
+  auditHandler: () => void;
+};
 
 const Option: React.FC<Props> = (props) => {
-  const { id = -1, status, refreshHandler } = props;
+  const { id = '', status, refreshHandler, editHandler, auditHandler } = props;
   switch (status) {
     case '申请中':
     case '接受申请':
     case '服务中':
       return (
         <>
-          <ApplyOpt id={id} refreshHandler={refreshHandler} />
+          <AuditOpt auditHandler={auditHandler} />
           <Divider type="vertical" />
-          <EditOpt id={id} />
+          <EditOpt editHandler={editHandler} />
           <Divider type="vertical" />
           <DelOpt id={id} refreshHandler={refreshHandler} />
         </>
@@ -77,7 +75,7 @@ const Option: React.FC<Props> = (props) => {
     case '服务完成':
       return (
         <>
-          <EditOpt id={id} />
+          <EditOpt editHandler={editHandler} />
           <Divider type="vertical" />
           <DelOpt id={id} refreshHandler={refreshHandler} />
         </>

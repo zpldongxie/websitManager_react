@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import CustomForm from '@/components/CustomForm';
-import { Button, Col, Row, Space } from 'antd';
+import { Button, Col, message, Row, Space } from 'antd';
 import type { FormItemType } from '@/components/CustomForm/interfice';
 import type { TableListItem } from '../data';
 
@@ -25,13 +25,14 @@ const serviceStatus = [
   { value: '服务完成', text: '服务完成' },
 ];
 
-const getFormItems = (): FormItemType[] => [
+const getFormItems = (infoEdit: boolean): FormItemType[] => [
   { type: 'input', name: 'id', label: 'id', hidden: true },
   {
     type: 'input',
     name: 'corporateName',
     label: '公司名称',
     rules: [{ required: true, message: '请输入公司名称' }],
+    disabled: !infoEdit,
   },
   {
     type: 'group',
@@ -42,12 +43,14 @@ const getFormItems = (): FormItemType[] => [
         name: 'tel',
         label: '座机',
         rules: [{ required: true, message: '请输入公司座机号' }],
+        disabled: !infoEdit,
       },
       {
         type: 'input',
         name: 'email',
         label: '邮箱',
         rules: [{ required: true, message: '请输入邮箱' }],
+        disabled: !infoEdit,
       },
     ],
   },
@@ -55,11 +58,11 @@ const getFormItems = (): FormItemType[] => [
     type: 'group',
     key: 'group2',
     groupItems: [
-      { type: 'input', name: 'address', label: '地址' },
-      { type: 'input', name: 'zipCode', label: '邮编' },
+      { type: 'input', name: 'address', label: '地址', disabled: !infoEdit },
+      { type: 'input', name: 'zipCode', label: '邮编', disabled: !infoEdit },
     ],
   },
-  { type: 'input', name: 'website', label: '公司网站' },
+  { type: 'input', name: 'website', label: '公司网站', disabled: !infoEdit },
   {
     type: 'group',
     key: 'group3',
@@ -69,12 +72,14 @@ const getFormItems = (): FormItemType[] => [
         name: 'contacts',
         label: '联系人',
         rules: [{ required: true, message: '请输入联系人姓名' }],
+        disabled: !infoEdit,
       },
       {
         type: 'input',
         name: 'contactsMobile',
         label: '手机号',
         rules: [{ required: true, message: '请输入联系人手机' }],
+        disabled: !infoEdit,
       },
     ],
   },
@@ -84,6 +89,7 @@ const getFormItems = (): FormItemType[] => [
     name: 'requestDesc',
     label: '需求描述',
     rules: [{ required: true, message: '请输入需求描述' }],
+    disabled: !infoEdit,
   },
   {
     type: 'group',
@@ -95,12 +101,14 @@ const getFormItems = (): FormItemType[] => [
         label: '服务状态',
         rules: [{ required: true, message: '请设置服务状态' }],
         items: serviceStatus,
+        disabled: !infoEdit,
       },
       {
         type: 'input',
         name: 'rejectReason',
         label: '拒绝原因',
         placeholder: '如果服务状态为拒绝，建议填写拒绝原因',
+        disabled: !infoEdit,
       },
     ],
   },
@@ -109,6 +117,7 @@ const getFormItems = (): FormItemType[] => [
     name: 'serviceDesc',
     label: '服务描述',
     placeholder: '服务描述，管理员选填，便于事后追溯',
+    disabled: !infoEdit,
   },
   {
     type: 'group',
@@ -124,13 +133,14 @@ const getFormItems = (): FormItemType[] => [
 let submitFun: () => void;
 
 type PropsType = {
+  infoEdit?: boolean;
   current?: Partial<TableListItem> | null;
   onSubmit: (values: TableListItem) => void;
   onCancel?: () => void;
 };
 
 const UpdateForm = (props: PropsType) => {
-  const { current, onSubmit, onCancel } = props;
+  const { infoEdit = false, current, onSubmit, onCancel } = props;
 
   const handleSubmit = () => {
     if (typeof submitFun === 'function') submitFun();
@@ -147,23 +157,35 @@ const UpdateForm = (props: PropsType) => {
     <>
       <CustomForm
         formLayout={formLayout}
-        formItems={getFormItems()}
-        values={current || {}}
+        formItems={getFormItems(infoEdit)}
+        values={current || { status: '申请中' }}
         onFinish={handleFinish}
+        onFinishFailed={({ errorFields }) => {
+          const msg = errorFields[0].errors[0] || '请正确填写表单';
+          message.warn(msg);
+        }}
         setSubmitFun={(submit: () => void) => {
           submitFun = submit;
         }}
+        style={{
+          overflowY: 'auto',
+          height: 'calc(100% - 3rem)',
+          marginBottom: '1rem',
+          padding: '0.5rem',
+        }}
       />
-      <Row justify="end">
-        <Col>
-          <Space>
-            <Button onClick={onCancel}>取消</Button>
-            <Button type="primary" onClick={handleSubmit}>
-              确定
-            </Button>
-          </Space>
-        </Col>
-      </Row>
+      {infoEdit && (
+        <Row justify="end">
+          <Col>
+            <Space>
+              <Button onClick={onCancel}>取消</Button>
+              <Button type="primary" onClick={handleSubmit}>
+                确定
+              </Button>
+            </Space>
+          </Col>
+        </Row>
+      )}
     </>
   );
 };

@@ -1,61 +1,51 @@
-import React, { useState, useRef } from 'react';
-import {
-  DownOutlined,
-  PlusOutlined,
-  createFromIconfontCN,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
+import React, { useState, useRef, useEffect } from 'react';
+import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Popover, Modal, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 
-import StepPanel from '@/components/StepPanel';
-import { TableListItem, TableListParams } from './data.d';
+import type { ServiceStatus, TableListItem, TableListParams } from './data.d';
 import Option from './components/Option';
 
-import { queryList, remove } from './service';
+import { queryList, upsert, remove } from './service';
 
 import styles from './index.module.less';
-import OperationPanel from './components/OperationPanel';
 import UpdateForm from './components/UpdateForm';
+import Audit from './components/Audit';
 
-const IconFont = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2063431_zeaap9rtglr.js',
-});
-
-const handleAdd = (value: TableListItem) => {
-  return value;
-};
-
-const delHandler = (ids: number[], action: any) => {
-  Modal.confirm({
-    title: `确认删除选中的${ids.length}条吗？`,
-    content: <div style={{ color: 'red' }}>注意，删除后数据将无法恢复。</div>,
-    icon: <ExclamationCircleOutlined />,
-    onOk() {
-      (async () => {
-        const result = await remove(ids);
-        if (result.status === 'ok') {
-          message.info('删除成功');
-          action.reload();
-        }
-      })();
-    },
-  });
-};
-
-const TableList: React.FC<{}> = () => {
+const TableList: React.FC = () => {
+  const [demandType, setDemandType] = useState('方案咨询');
   // 模态框
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  // 模态框类型，info为单独显示申请信息，setp为按审核步骤显示
-  const [modalType, setModalType] = useState<'info' | 'step'>('info');
+  // 模态框加载内容类型，info为编辑查看界面，audit为审核界面
+  const [modalType, setModalType] = useState<'info' | 'audit'>('info');
   // 模态框中的信息是否可编辑
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [infoEdit, setInfoEdit] = useState(false);
+  // 当前信息，用于回填表单
   const [current, setCurrent] = useState<TableListItem | null>(null);
-  // 鼠标经过id预览图标时对应的文章ID
-  const [hoverId, setHoverId] = useState('');
+  // 列表对象引用，可主动执行刷新等操作
   const actionRef = useRef<ActionType>();
+
+  useEffect(() => {
+    const enName = window.location.pathname.split('/')[2];
+    switch (enName) {
+      case 'schemeConsultation':
+        setDemandType('方案咨询');
+        break;
+      case 'schemeDemonstration':
+        setDemandType('方案论证');
+        break;
+      case 'schemeDesign':
+        setDemandType('方案设计');
+        break;
+      case 'safetyAssessment':
+        setDemandType('安全评估');
+        break;
+      default:
+        break;
+    }
+  }, []);
 
   const columns: ProColumns<TableListItem>[] = [
     {
@@ -63,28 +53,16 @@ const TableList: React.FC<{}> = () => {
       dataIndex: 'id',
       search: false,
       width: '3em',
-      render: (id) => (
-        <Popover content={id} title="id">
-          <IconFont
-            onMouseOver={() => {
-              setHoverId(id as string);
-            }}
-            onMouseLeave={() => {
-              setHoverId('');
-            }}
-            type={hoverId === id ? 'iconyanjing' : 'iconyanjing_bi'}
-          />
-        </Popover>
-      ),
+      hideInTable: true,
     },
     {
       title: '公司名称',
       dataIndex: 'corporateName',
-      // ellipsis: true,
+      ellipsis: true,
       render: (text, record) => (
         <a
           onClick={() => {
-            setModalType('step');
+            setModalType('info');
             setInfoEdit(false);
             setCurrent(record);
             setModalVisible(true);
@@ -143,11 +121,13 @@ const TableList: React.FC<{}> = () => {
       hideInTable: true,
       title: '需求类型',
       dataIndex: 'demandType',
+      search: false,
       // width: '15em',
     },
     {
       title: '需求描述',
       dataIndex: 'requestDesc',
+      search: false,
       // width: '15em',
     },
     {
@@ -172,10 +152,20 @@ const TableList: React.FC<{}> = () => {
       // width: '7em',
       valueEnum: {
         申请中: { text: '申请中', status: 'Default' },
-        接受申请: { text: '接受申请', status: 'Success' },
+        接受申请: { text: '接受申请', status: 'Processing' },
         拒绝申请: { text: '拒绝申请', status: 'Error' },
-        服务中: { text: '服务中', status: 'Error' },
-        服务完成: { text: '服务完成', status: 'Error' },
+        服务中: { text: '服务中', status: 'Processing' },
+        服务完成: { text: '服务完成', status: 'Success' },
+      },
+      render: (dom, item) => {
+        if (item.status === '拒绝申请') {
+          return (
+            <Popover title="拒绝原因" content={item.rejectReason}>
+              <div>{dom}</div>
+            </Popover>
+          );
+        }
+        return dom;
       },
       filters: [
         {
@@ -205,12 +195,14 @@ const TableList: React.FC<{}> = () => {
       hideInTable: true,
       title: '拒绝原因',
       dataIndex: 'rejectReason',
+      search: false,
       // width: '15em',
     },
     {
       hideInTable: true,
       title: '服务描述',
       dataIndex: 'serviceDesc',
+      search: false,
       // width: '15em',
     },
     {
@@ -228,6 +220,17 @@ const TableList: React.FC<{}> = () => {
                 actionRef.current.reload();
               }
             }}
+            editHandler={() => {
+              setModalType('info');
+              setInfoEdit(true);
+              setCurrent(record);
+              setModalVisible(true);
+            }}
+            auditHandler={() => {
+              setModalType('audit');
+              setCurrent(record);
+              setModalVisible(true);
+            }}
           />
         </div>
       ),
@@ -235,10 +238,50 @@ const TableList: React.FC<{}> = () => {
     },
   ];
 
+  /**
+   * 实时设置模态框标题
+   *
+   * @return {*}
+   */
+  const getModelTitle = () => {
+    if (modalType === 'audit') return '审核';
+    if (infoEdit) return '编辑信息';
+    return '查看信息';
+  };
+
+  const handleAdd = async (value: TableListItem) => {
+    const res = await upsert({ ...value, demandType });
+    if (res.status === 'ok') {
+      setModalVisible(false);
+      const action = actionRef.current;
+      action?.reload();
+      message.info('操作成功');
+    } else {
+      message.warn(res.message);
+    }
+  };
+
+  const delHandler = (ids: string[], action: any) => {
+    Modal.confirm({
+      title: `确认删除选中的${ids.length}条吗？`,
+      content: <div style={{ color: 'red' }}>注意，删除后数据将无法恢复。</div>,
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        (async () => {
+          const result = await remove(ids);
+          if (result.status === 'ok') {
+            message.info('删除成功');
+            action.reload();
+          }
+        })();
+      },
+    });
+  };
+
   return (
     <PageHeaderWrapper className={styles.contentListWrapper} title={false}>
       <ProTable<TableListItem>
-        headerTitle="文章管理"
+        headerTitle={demandType}
         actionRef={actionRef}
         rowKey="id"
         toolBarRender={(action, { selectedRows }) => [
@@ -271,7 +314,6 @@ const TableList: React.FC<{}> = () => {
                   }}
                   selectedKeys={[]}
                 >
-                  <Menu.Item key="apply">批量审核</Menu.Item>
                   <Menu.Item key="del">批量删除</Menu.Item>
                 </Menu>
               }
@@ -283,14 +325,10 @@ const TableList: React.FC<{}> = () => {
           ),
         ]}
         tableAlertRender={false}
-        // tableAlertRender={({ selectedRowKeys }) => (
-        //   <div>
-        //     已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项&nbsp;&nbsp;
-        //   </div>
-        // )}
         request={(params, sorter, filter) => {
           const opts: TableListParams = {
             ...params,
+            demandType,
             sorter: Object.keys(sorter).length ? sorter : { createdAt: 'descend' },
             filter,
           };
@@ -306,20 +344,40 @@ const TableList: React.FC<{}> = () => {
         columns={columns}
         rowSelection={{}}
       />
-      <OperationPanel
-        title={modalType === 'info' ? '编辑信息' : '查询审核'}
+      <Modal
+        title={getModelTitle()}
+        destroyOnClose
+        visible={modalVisible}
         onCancel={() => setModalVisible(false)}
-        modalVisible={modalVisible}
+        footer={null}
+        maskClosable={false}
+        width={modalType === 'info' ? 800 : 600}
+        bodyStyle={{
+          maxHeight: '65vh',
+          overflowY: 'auto',
+          height: modalType === 'info' ? '100vh' : 'auto',
+        }}
       >
         {modalType === 'info' && (
           <UpdateForm
+            infoEdit={infoEdit}
             current={current}
             onSubmit={handleAdd}
             onCancel={() => setModalVisible(false)}
           />
         )}
-        {modalType === 'step' && <StepPanel steps={['申请信息', '审核']} />}
-      </OperationPanel>
+        {modalType === 'audit' && (
+          <Audit
+            info={current}
+            onSuccess={(s: ServiceStatus) => {
+              const action = actionRef.current;
+              action?.reload();
+              setCurrent({ ...current!, status: s });
+            }}
+            onCancel={() => setModalVisible(false)}
+          />
+        )}
+      </Modal>
     </PageHeaderWrapper>
   );
 };
