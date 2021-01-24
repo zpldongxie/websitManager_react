@@ -1,4 +1,4 @@
-import type { MenuDataItem } from '@ant-design/pro-layout';
+import type { MenuDataItem, ProSettings } from '@ant-design/pro-layout';
 import { getMenuData, getPageTitle } from '@ant-design/pro-layout';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import type { ConnectProps } from 'umi';
@@ -12,10 +12,13 @@ import styles from './UserLayout.less';
 
 export type UserLayoutProps = {
   breadcrumbNameMap: Record<string, MenuDataItem>;
-} & Partial<ConnectProps>
+  versoin: string;
+} & Partial<ConnectProps> &
+  ProSettings;
 
 const UserLayout: React.FC<UserLayoutProps> = (props) => {
   const {
+    versoin,
     route = {
       routes: [],
     },
@@ -37,7 +40,7 @@ const UserLayout: React.FC<UserLayoutProps> = (props) => {
   });
   const bgStyle = {
     backgroundImage: `url(${background})`,
-  }
+  };
   return (
     <HelmetProvider>
       <Helmet>
@@ -58,17 +61,20 @@ const UserLayout: React.FC<UserLayoutProps> = (props) => {
             <div className={styles.top}>
               <div className={styles.header}>
                 <Link to="/">
-                  <span className={styles.title}>云适配网站管理系统</span>
+                  <span className={styles.title}>{props.title || '网站管理系统'}</span>
                 </Link>
               </div>
               <div className={styles.desc}>欢迎登录</div>
             </div>
             {children}
-            <div className={styles.tip}>温馨提示：推荐您使用Chrome浏览器访问本系统，享受更流畅的体验。</div>
+            <div className={styles.tip}>
+              温馨提示：推荐您使用Chrome浏览器访问本系统，享受更流畅的体验。
+            </div>
           </div>
         </div>
         <div className={styles.loginfooter}>
-          Copyright<span>2021 西安云适配</span><span>版本：V2.0</span>
+          Copyright<span>2021 西安云适配</span>
+          <span>版本：{versoin}</span>
         </div>
       </div>
     </HelmetProvider>

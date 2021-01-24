@@ -3,17 +3,19 @@
  * You can view component api by:
  * https://github.com/ant-design/ant-design-pro-layout
  */
-import ProLayout, {
+import type {
   MenuDataItem,
   BasicLayoutProps as ProLayoutProps,
   Settings,
 } from '@ant-design/pro-layout';
+import ProLayout from '@ant-design/pro-layout';
 import React, { useEffect } from 'react';
-import { Link, useIntl, connect, Dispatch, history } from 'umi';
-import { Result, Button } from 'antd';
+import type { Dispatch } from 'umi';
+import { Link, useIntl, connect, history } from 'umi';
+import { Result, Button, Row, Col } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
-import { ConnectState } from '@/models/connect';
+import type { ConnectState } from '@/models/connect';
 import { getAuthorityFromRouter } from '@/utils/utils';
 import GlobalFooter from '@/components/GlobalFooter';
 import logo from '../assets/logo.svg';
@@ -31,19 +33,18 @@ const noMatch = (
   />
 );
 export interface BasicLayoutProps extends ProLayoutProps {
-  breadcrumbNameMap: {
-    [path: string]: MenuDataItem;
-  };
+  breadcrumbNameMap: Record<string, MenuDataItem>;
   route: ProLayoutProps['route'] & {
     authority: string[];
   };
-  settings: Settings;
+  settings: Settings & {
+    versoin: string;
+    pwa: boolean;
+  };
   dispatch: Dispatch;
 }
 export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
-  breadcrumbNameMap: {
-    [path: string]: MenuDataItem;
-  };
+  breadcrumbNameMap: Record<string, MenuDataItem>;
 };
 /**
  * use Authorized check all menu item
@@ -58,9 +59,7 @@ const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] =>
     return Authorized.check(item.authority, localItem, null) as MenuDataItem;
   });
 
-const defaultFooterDom = (
-  <GlobalFooter />
-);
+const defaultFooterDom = <GlobalFooter />;
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const {
@@ -70,6 +69,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     location = {
       pathname: '/',
     },
+    collapsed,
   } = props;
   /**
    * constructor
@@ -106,6 +106,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       formatMessage={formatMessage}
       onCollapse={handleMenuCollapse}
       onMenuHeaderClick={() => history.push('/')}
+      collapsedButtonRender={collapsed && undefined}
       menuItemRender={(menuItemProps, defaultDom) => {
         if (menuItemProps.isUrl || !menuItemProps.path) {
           return defaultDom;
@@ -129,9 +130,19 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       }}
       footerRender={() => defaultFooterDom}
       menuDataRender={menuDataRender}
+      menuFooterRender={() => {
+        return (
+          <Row justify="center" style={{ color: '#fff', padding: '1rem 0' }}>
+            <Col style={{ display: collapsed ? 'none' : 'block' }}>版本号：</Col>
+            <Col>{settings.versoin}</Col>
+          </Row>
+        );
+      }}
       rightContentRender={() => <RightContent />}
       {...props}
       {...settings}
+      // settings中会读取到全称，显示不友好，此处做覆盖处理
+      title="网站管理平台"
     >
       <Authorized authority={authorized!.authority} noMatch={noMatch}>
         {children}

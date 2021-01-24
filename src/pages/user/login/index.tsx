@@ -1,5 +1,5 @@
-import { Alert, Checkbox } from 'antd';
 import React, { useState } from 'react';
+import { Alert, Checkbox } from 'antd';
 import type { Dispatch } from 'umi';
 import { connect } from 'umi';
 import type { StateType } from '@/models/login';
@@ -14,7 +14,7 @@ type LoginProps = {
   dispatch: Dispatch;
   userLogin: StateType;
   submitting?: boolean;
-}
+};
 
 const LoginMessage: React.FC<{
   content: string;
@@ -42,7 +42,7 @@ const Login: React.FC<LoginProps> = (props) => {
       payload: { ...values, type },
     });
   };
-  
+
   return (
     <div className={styles.main}>
       <LoginForm activeKey={type} onTabChange={setType} onSubmit={handleSubmit}>
@@ -71,7 +71,7 @@ const Login: React.FC<LoginProps> = (props) => {
               },
             ]}
           />
-        </Tab>        
+        </Tab>
         <div>
           <Checkbox checked={autoLogin} onChange={(e) => setAutoLogin(e.target.checked)}>
             自动登录
