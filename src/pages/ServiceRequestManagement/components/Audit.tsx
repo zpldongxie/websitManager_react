@@ -11,7 +11,7 @@ const { Step } = Steps;
  * @description: 审批组件
  * @author: zpl
  * @Date: 2021-01-22 11:12:09
- * @LastEditTime: 2021-01-25 11:05:26
+ * @LastEditTime: 2021-01-25 11:37:26
  * @LastEditors: zpl
  */
 /**
@@ -212,6 +212,7 @@ const Audit = ({ info, onSuccess }: PropsType) => {
         hidden={!showRejectReason}
         value={rejectReason}
         disabled={rejectReasonDisable}
+        allowClear
         onChange={(e) => {
           const v = e.target.value;
           setRejectReason(v);
@@ -223,6 +224,7 @@ const Audit = ({ info, onSuccess }: PropsType) => {
           <Col key={btn.key}>
             <Button
               type={i === btns.length - 1 ? 'primary' : 'default'}
+              danger={btn.key === '拒绝申请' || btn.key === '确认拒绝'}
               onClick={() => {
                 onClick(btn.key);
               }}
