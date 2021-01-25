@@ -5,11 +5,11 @@
  * @LastEditTime: 2021-01-08 15:08:33
  * @LastEditors: zpl
  */
-import React from 'react';
+import React, { useState } from 'react';
 import CustomForm from '@/components/CustomForm';
 import { Button, Col, message, Row, Space } from 'antd';
 import type { FormItemType } from '@/components/CustomForm/interfice';
-import type { TableListItem } from '../data';
+import type { ServiceStatus, TableListItem } from '../data';
 
 const formLayout = {
   labelCol: { flex: '7em' },
@@ -25,111 +25,6 @@ const serviceStatus = [
   { value: '服务完成', text: '服务完成' },
 ];
 
-const getFormItems = (infoEdit: boolean): FormItemType[] => [
-  { type: 'input', name: 'id', label: 'id', hidden: true },
-  {
-    type: 'input',
-    name: 'corporateName',
-    label: '公司名称',
-    rules: [{ required: true, message: '请输入公司名称' }],
-    disabled: !infoEdit,
-  },
-  {
-    type: 'group',
-    key: 'group1',
-    groupItems: [
-      {
-        type: 'input',
-        name: 'tel',
-        label: '座机',
-        rules: [{ required: true, message: '请输入公司座机号' }],
-        disabled: !infoEdit,
-      },
-      {
-        type: 'input',
-        name: 'email',
-        label: '邮箱',
-        rules: [{ required: true, message: '请输入邮箱' }],
-        disabled: !infoEdit,
-      },
-    ],
-  },
-  {
-    type: 'group',
-    key: 'group2',
-    groupItems: [
-      { type: 'input', name: 'address', label: '地址', disabled: !infoEdit },
-      { type: 'input', name: 'zipCode', label: '邮编', disabled: !infoEdit },
-    ],
-  },
-  { type: 'input', name: 'website', label: '公司网站', disabled: !infoEdit },
-  {
-    type: 'group',
-    key: 'group3',
-    groupItems: [
-      {
-        type: 'input',
-        name: 'contacts',
-        label: '联系人',
-        rules: [{ required: true, message: '请输入联系人姓名' }],
-        disabled: !infoEdit,
-      },
-      {
-        type: 'input',
-        name: 'contactsMobile',
-        label: '手机号',
-        rules: [{ required: true, message: '请输入联系人手机' }],
-        disabled: !infoEdit,
-      },
-    ],
-  },
-  { type: 'input', name: 'demandType', label: '需求类型', hidden: true },
-  {
-    type: 'textArae',
-    name: 'requestDesc',
-    label: '需求描述',
-    rules: [{ required: true, message: '请输入需求描述' }],
-    disabled: !infoEdit,
-  },
-  {
-    type: 'group',
-    key: 'group4',
-    groupItems: [
-      {
-        type: 'select',
-        name: 'status',
-        label: '服务状态',
-        rules: [{ required: true, message: '请设置服务状态' }],
-        items: serviceStatus,
-        disabled: !infoEdit,
-      },
-      {
-        type: 'input',
-        name: 'rejectReason',
-        label: '拒绝原因',
-        placeholder: '如果服务状态为拒绝，建议填写拒绝原因',
-        disabled: !infoEdit,
-      },
-    ],
-  },
-  {
-    type: 'input',
-    name: 'serviceDesc',
-    label: '服务描述',
-    placeholder: '服务描述，管理员选填，便于事后追溯',
-    disabled: !infoEdit,
-  },
-  {
-    type: 'group',
-    key: 'group5',
-    groupItems: [
-      { type: 'input', name: 'createdAt', label: '申请时间', placeholder: '-', disabled: true },
-      { type: 'input', name: 'updatedAt', label: '最近处理时间', placeholder: '-', disabled: true },
-      // { type: 'empty'}
-    ],
-  },
-];
-
 let submitFun: () => void;
 
 type PropsType = {
@@ -141,6 +36,121 @@ type PropsType = {
 
 const UpdateForm = (props: PropsType) => {
   const { infoEdit = false, current, onSubmit, onCancel } = props;
+  const [status, setStatus] = useState<ServiceStatus>(current?.status || '申请中');
+
+  const formItemList: FormItemType[] = [
+    { type: 'input', name: 'id', label: 'id', hidden: true },
+    {
+      type: 'input',
+      name: 'corporateName',
+      label: '公司名称',
+      rules: [{ required: true, message: '请输入公司名称' }],
+      disabled: !infoEdit,
+    },
+    {
+      type: 'group',
+      key: 'group1',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'tel',
+          label: '座机',
+          rules: [{ required: true, message: '请输入公司座机号' }],
+          disabled: !infoEdit,
+        },
+        {
+          type: 'input',
+          name: 'email',
+          label: '邮箱',
+          rules: [{ required: true, message: '请输入邮箱' }],
+          disabled: !infoEdit,
+        },
+      ],
+    },
+    {
+      type: 'group',
+      key: 'group2',
+      groupItems: [
+        { type: 'input', name: 'address', label: '地址', disabled: !infoEdit },
+        { type: 'input', name: 'zipCode', label: '邮编', disabled: !infoEdit },
+      ],
+    },
+    { type: 'input', name: 'website', label: '公司网站', disabled: !infoEdit },
+    {
+      type: 'group',
+      key: 'group3',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'contacts',
+          label: '联系人',
+          rules: [{ required: true, message: '请输入联系人姓名' }],
+          disabled: !infoEdit,
+        },
+        {
+          type: 'input',
+          name: 'contactsMobile',
+          label: '手机号',
+          rules: [{ required: true, message: '请输入联系人手机' }],
+          disabled: !infoEdit,
+        },
+      ],
+    },
+    { type: 'input', name: 'demandType', label: '需求类型', hidden: true },
+    {
+      type: 'textArae',
+      name: 'requestDesc',
+      label: '需求描述',
+      rules: [{ required: true, message: '请输入需求描述' }],
+      disabled: !infoEdit,
+    },
+    {
+      type: 'group',
+      key: 'group4',
+      groupItems: [
+        {
+          type: 'select',
+          name: 'status',
+          label: '服务状态',
+          rules: [{ required: true, message: '请设置服务状态' }],
+          items: serviceStatus,
+          disabled: !infoEdit,
+          onChange: (_: any, formatString: any) => {
+            setStatus(formatString.key);
+          },
+        },
+        {
+          type: 'input',
+          name: 'rejectReason',
+          label: '拒绝原因',
+          rules: [{ required: status === '拒绝申请', message: '请输入拒绝原因' }],
+          disabled: !infoEdit,
+        },
+      ],
+    },
+    {
+      type: 'input',
+      name: 'serviceDesc',
+      label: '服务描述',
+      placeholder: '服务描述，管理员选填，便于事后追溯',
+      disabled: !infoEdit,
+    },
+    {
+      type: 'group',
+      key: 'group5',
+      groupItems: [
+        { type: 'input', name: 'createdAt', label: '申请时间', placeholder: '-', disabled: true },
+        {
+          type: 'input',
+          name: 'updatedAt',
+          label: '最近处理时间',
+          placeholder: '-',
+          disabled: true,
+        },
+        // { type: 'empty'}
+      ],
+    },
+  ];
 
   const handleSubmit = () => {
     if (typeof submitFun === 'function') submitFun();
@@ -157,7 +167,8 @@ const UpdateForm = (props: PropsType) => {
     <>
       <CustomForm
         formLayout={formLayout}
-        formItems={getFormItems(infoEdit)}
+        formItems={formItemList}
+        // formItems={getFormItems(infoEdit)}
         values={current || { status: '申请中' }}
         onFinish={handleFinish}
         onFinishFailed={({ errorFields }) => {
