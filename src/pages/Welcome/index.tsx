@@ -2,7 +2,7 @@
  * @description: 欢迎页
  * @author: zpl
  * @Date: 2021-01-24 16:58:42
- * @LastEditTime: 2021-01-24 20:50:42
+ * @LastEditTime: 2021-01-25 09:50:51
  * @LastEditors: zpl
  */
 import React from 'react';
@@ -53,7 +53,8 @@ const defaultColStyle: React.CSSProperties = {
  * @param {LayoutItemType[]} list
  * @return {*}
  */
-const renderList = ({ list, paddingX, paddingY }: layoutConfigType) => {
+const renderList = (setting: layoutConfigType | undefined) => {
+  const { list = [], paddingY = 10 } = setting || {};
   if (!list.length) {
     return <></>;
   }
@@ -63,10 +64,13 @@ const renderList = ({ list, paddingX, paddingY }: layoutConfigType) => {
     const style = { ...defaultColStyle, height };
     if (item.type === 'group') {
       return (
-        <Col key={settings.key} span={settings.span} flex={settings.flex}>
-          <Row gutter={paddingX}>
-            {renderList({ list: item.children || [], paddingX, paddingY })}
-          </Row>
+        <Col
+          key={settings.key}
+          span={settings.span}
+          flex={settings.flex}
+          style={{ margin: `${paddingY / 2}px 0` }}
+        >
+          <Row gutter={item.children?.paddingX}>{renderList(item.children)}</Row>
         </Col>
       );
     }

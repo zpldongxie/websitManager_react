@@ -2,7 +2,7 @@
  * @description: 数据格式定义
  * @author: zpl
  * @Date: 2021-01-24 17:12:34
- * @LastEditTime: 2021-01-24 20:43:52
+ * @LastEditTime: 2021-01-25 09:34:11
  * @LastEditors: zpl
  */
 // 图形组件类型
@@ -24,7 +24,7 @@ export type LayoutItemType = {
    * @type {ChartType}
    */
   type: 'group' | ChartType | CustomeType;
-  children?: LayoutItemType[];
+  children?: layoutConfigType;
   /**
    * 标题
    *
