@@ -11,7 +11,7 @@ const { Step } = Steps;
  * @description: 审批组件
  * @author: zpl
  * @Date: 2021-01-22 11:12:09
- * @LastEditTime: 2021-01-22 21:39:15
+ * @LastEditTime: 2021-01-25 11:05:26
  * @LastEditors: zpl
  */
 /**
@@ -181,7 +181,11 @@ const Audit = ({ info, onSuccess }: PropsType) => {
       if (res.status === 'ok') {
         message.info('操作成功');
         onSuccess(newStatus);
-        if (newStatus === '拒绝申请') setRejectReasonDisable(true);
+        if (newStatus === '拒绝申请') {
+          setRejectReasonDisable(true);
+        } else {
+          setShowRejectReason(false);
+        }
       } else {
         message.error(res.message);
       }
