@@ -51,13 +51,25 @@ const UploadConfiguration = () => {
    */
   const resetConfig = (val: string) => {
     const confData = {};
-    context
+    context.resetConfig
       .filter((conf) => conf.name.startsWith(val))
       .forEach((conf) => {
         confData[conf.name] = conf.value;
         updateConfig(conf.name, conf.value);
       });
     setCurrentValues({ ...currentValues, ...confData });
+  };
+
+  /**
+   * 重置邮件配置
+   */
+  const mailConfig = () => {
+    const mailData = {};
+    context.mailConfig.forEach((conf) => {
+      mailData[conf.name] = conf.value;
+      updateConfig(conf.name, conf.value);
+    });
+    setCurrentValues({ ...currentValues, ...mailData });
   };
   const text = (
     <div>
@@ -70,7 +82,6 @@ const UploadConfiguration = () => {
       <Tabs className={styles.tabstyle}>
         <TabPane tab="上传配置" key="1">
           <div className={styles.con}>
-            {/* <Button type="primary" shape="round" size='large' onClick={resetConfig} >重置默认设置</Button> */}
             <div className={styles.itembg}>
               <p>
                 资源根路径
@@ -363,7 +374,119 @@ const UploadConfiguration = () => {
             </div>
           </div>
         </TabPane>
-        <TabPane tab="邮件配置" key="2"></TabPane>
+        <TabPane tab="邮件配置" key="2">
+          <div className={styles.con}>
+            <div className={styles.itembg}>
+              <p>
+                发件人账号管理
+                <Button type="primary" ghost onClick={mailConfig} className={styles.btnstyle}>
+                  恢复默认设置
+                </Button>
+              </p>
+              <Row className={styles.secondRow}>
+                <Col flex="9em" className={styles.labelCol}>
+                  <span>邮箱地址</span>
+                </Col>
+                <Col className={styles.valueCol}>
+                  <Input
+                    name="from"
+                    value={currentValues.from}
+                    onChange={(e) => {
+                      setCurrentValues({ ...currentValues, from: e.target.value });
+                    }}
+                    onPressEnter={(e) => {
+                      updateConfig('from', (e.target as HTMLInputElement).value);
+                    }}
+                    onBlur={(e) => {
+                      updateConfig('from', e.target.value);
+                    }}
+                  />
+                </Col>
+              </Row>
+              <Row className={styles.secondRow}>
+                <Col flex="9em" className={styles.labelCol}>
+                  <span>用户名</span>
+                </Col>
+                <Col className={styles.valueCol}>
+                  <Input
+                    name="user"
+                    value={currentValues.user}
+                    onChange={(e) => {
+                      setCurrentValues({ ...currentValues, user: e.target.value });
+                    }}
+                    onPressEnter={(e) => {
+                      updateConfig('user', (e.target as HTMLInputElement).value);
+                    }}
+                    onBlur={(e) => {
+                      updateConfig('user', e.target.value);
+                    }}
+                  />
+                </Col>
+              </Row>
+              <Row className={styles.secondRow}>
+                <Col flex="9em" className={styles.labelCol}>
+                  <span>密码</span>
+                </Col>
+                <Col className={styles.valueCol}>
+                  <Input
+                    name="pass"
+                    value={currentValues.pass}
+                    onChange={(e) => {
+                      setCurrentValues({ ...currentValues, pass: e.target.value });
+                    }}
+                    onPressEnter={(e) => {
+                      updateConfig('pass', (e.target as HTMLInputElement).value);
+                    }}
+                    onBlur={(e) => {
+                      updateConfig('pass', e.target.value);
+                    }}
+                  />
+                </Col>
+              </Row>
+              <p style={{ marginTop: 21 }}>发件服务器</p>
+              <Row className={styles.secondRow}>
+                <Col flex="9em" className={styles.labelCol}>
+                  <span>SMTP服务器</span>
+                </Col>
+                <Col className={styles.valueCol}>
+                  <Input
+                    name="host"
+                    value={currentValues.host}
+                    onChange={(e) => {
+                      setCurrentValues({ ...currentValues, host: e.target.value });
+                    }}
+                    onPressEnter={(e) => {
+                      updateConfig('host', (e.target as HTMLInputElement).value);
+                    }}
+                    onBlur={(e) => {
+                      updateConfig('host', e.target.value);
+                    }}
+                  />
+                </Col>
+              </Row>
+              <Row className={styles.secondRow}>
+                <Col flex="9em" className={styles.labelCol}>
+                  <span>端口号</span>
+                </Col>
+                <Col className={styles.valueCol}>
+                  <Input
+                    name="port"
+                    value={currentValues.port}
+                    onChange={(e) => {
+                      setCurrentValues({ ...currentValues, port: e.target.value });
+                    }}
+                    onPressEnter={(e) => {
+                      updateConfig('port', (e.target as HTMLInputElement).value);
+                    }}
+                    onBlur={(e) => {
+                      updateConfig('port', e.target.value);
+                    }}
+                  />
+                </Col>
+              </Row>
+            </div>
+          </div>
+        </TabPane>
       </Tabs>
     </PageContainer>
   );
