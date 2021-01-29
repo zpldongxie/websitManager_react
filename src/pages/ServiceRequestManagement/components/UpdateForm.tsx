@@ -169,7 +169,7 @@ const UpdateForm = (props: PropsType) => {
         formLayout={formLayout}
         formItems={formItemList}
         // formItems={getFormItems(infoEdit)}
-        values={current || { status: '申请中' }}
+        values={current || { status }}
         onFinish={handleFinish}
         onFinishFailed={({ errorFields }) => {
           const msg = errorFields[0].errors[0] || '请正确填写表单';
