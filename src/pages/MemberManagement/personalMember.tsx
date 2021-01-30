@@ -177,7 +177,7 @@ const TableList: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '注册日期',
+      title: '入会日期',
       dataIndex: 'logonDate',
       search: false,
       hideInTable: currentStatus !== "official",
