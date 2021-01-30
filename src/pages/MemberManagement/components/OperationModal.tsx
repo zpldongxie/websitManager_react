@@ -2,8 +2,10 @@ import type { FC } from 'react';
 import React, { useState, useEffect } from 'react';
 import { Modal, Spin } from 'antd';
 import CustomForm from '@/components/CustomForm';
-import type { TableListItem, PersonalTableListItem } from '../data';
+import type { TableListItem, PersonalTableListItem, MemberStatus } from '../data';
 import type { FormItemType } from '@/components/CustomForm/interfice';
+
+import { queryMemberTypes } from '../service';
 
 type OperationModalProps = {
   type?: string;
@@ -30,11 +32,36 @@ const OperationModal: FC<OperationModalProps> = (props) => {
   const { type, done, visible, loading, current, currentPersonal, onDone, onCancel, onSubmit, onSubmitPersonal } = props;
 
   const [expand, setExpand] = useState({});
-
+  const [status] = useState<MemberStatus>(current?.status || '申请中');
+  const [memberTypes, setMemberTypes] = useState<{ value: any; text: any; }[] | undefined>(undefined);
+  const [MemberTypeId, setMemberTypeId] = useState<string | undefined>(current?.MemberTypeId || undefined);
+  const [MemberIndvicId, setMemberIndvicId] = useState<string | undefined>(current?.MemberTypeId || undefined);
+  const curmemberTypes: React.SetStateAction<{ value: any; text: any; }[] | undefined> = [];
+  const getMemberTypes = async () => {
+    const result = await queryMemberTypes();
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].name !== "个人会员") {
+        curmemberTypes.push({
+          value: result[i].id,
+          text: result[i].name,
+        })
+        if (result[i].name === "单位会员") {
+          setMemberTypeId(result[i].id)
+        }
+      } else {
+        setMemberIndvicId(result[i].id)
+      }
+    }
+    setMemberTypes(curmemberTypes);
+  }
   useEffect(() => {
     if (!props.visible) {
       setExpand({});
     }
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    memberTypes === undefined ? getMemberTypes() : '';
   }, [props.visible]);
 
   const handleSubmit = () => {
@@ -49,7 +76,6 @@ const OperationModal: FC<OperationModalProps> = (props) => {
       onSubmit(values as TableListItem);
     }
   };
-
   const modalFooter = done
     ? { footer: null, onCancel: onDone }
     : { okText: '保存', onOk: handleSubmit, onCancel };
@@ -60,10 +86,42 @@ const OperationModal: FC<OperationModalProps> = (props) => {
   const getModalContent = () => {
     const formItems = (): FormItemType[] => [
       { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
+      { type: 'input', name: 'status', label: '会员状态', disabled: true, hidden: true },
       { type: 'input', name: 'corporateName', label: '单位名称', disabled, rules: [{ required: true, message: '请输入单位名称' }] },
       {
         type: 'group',
         key: 'group1',
+        groupItems: [
+          {
+            type: 'select', name: 'MemberTypeId', label: '会员等级', disabled, items: memberTypes,
+          },
+          { type: 'input', name: 'contacts', label: '联系人', disabled, rules: [{ required: true, message: '请输入联系人' }] },
+        ],
+      },
+      {
+        type: 'group',
+        key: 'group2',
+        groupItems: [
+          {
+            type: 'input', name: 'contactsMobile', label: '手机号', disabled, rules: [
+              {
+                pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
+                message: '电话格式有误',
+              }, { required: true, message: '请输入手机号' }]
+          },
+          {
+            type: 'input', name: 'email', label: '联系邮箱', disabled, rules: [
+              {
+                type: 'email',
+                message: '联系邮箱格式有误',
+              }, { required: true, message: '请输入联系邮箱' }
+            ]
+          },
+        ],
+      },
+      {
+        type: 'group',
+        key: 'group3',
         groupItems: [
           {
             type: 'input', name: 'tel', label: '单位电话', disabled, rules: [
@@ -73,58 +131,24 @@ const OperationModal: FC<OperationModalProps> = (props) => {
               }, { required: true, message: '请输入单位电话' }
             ]
           },
-          {
-            type: 'input', name: 'email', label: '联系邮箱', disabled, rules: [
-              {
-                type: 'email',
-                message: '邮箱格式有误',
-              }, { required: true, message: '请输入联系邮箱' }
-            ]
-          },
+          { type: 'input', name: 'zipCode', label: '单位邮编', disabled, },
         ],
       },
       { type: 'input', name: 'address', label: '联系地址', disabled, rules: [{ required: true, message: '请输入联系地址' }] },
       {
-        type: 'group',
-        key: 'group2',
-        groupItems: [
-          { type: 'input', name: 'zipCode', label: '单位邮编', disabled, },
+        type: 'input', name: 'website', label: '单位网站', disabled, rules: [
           {
-            type: 'input', name: 'website', label: '单位网站', disabled, rules: [
-              {
-                type: 'url',
-                message: '网站格式有误',
-              },
-            ]
+            type: 'url',
+            message: '网站格式有误',
           },
-        ],
-      },
-      {
-        type: 'group',
-        key: 'group3',
-        groupItems: [
-          { type: 'input', name: 'legalPerson', label: '法人', disabled, },
-          { type: 'input', name: 'industry', label: '所属行业', disabled, },
-        ],
-      },
-      {
-        type: 'group',
-        key: 'group4',
-        groupItems: [
-          { type: 'input', name: 'contacts', label: '联系人', disabled, rules: [{ required: true, message: '请输入联系人' }] },
-          {
-            type: 'input', name: 'contactsMobile', label: '联系人手机号', disabled, rules: [
-              {
-                pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
-                message: '电话格式有误',
-              }, { required: true, message: '请输入联系人手机号' }]
-          },
-        ],
+        ]
       },
       { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] },
     ];
     const formItemsPersonal = (): FormItemType[] => [
       { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
+      { type: 'input', name: 'MemberTypeId', label: '会员等级ID', disabled: true, hidden: true },
+      { type: 'input', name: 'status', label: '会员状态', disabled: true, hidden: true },
       {
         type: 'group',
         key: 'group1',
@@ -143,6 +167,20 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'group',
         key: 'group2',
         groupItems: [
+          { type: 'input', name: 'profession', label: '职业', disabled, },
+          {
+            type: 'input', name: 'mobile', label: '手机号', disabled, rules: [
+              {
+                pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
+                message: '手机号码格式有误',
+              }, { required: true, message: '请输入手机号' }]
+          },
+        ],
+      },
+      {
+        type: 'group',
+        key: 'group3',
+        groupItems: [
           { type: 'select', name: 'idType', label: '证件类型', disabled, defaultValue: "身份证", items: idTypeItems },
           {
             type: 'input', name: 'idNumber', label: '身份证号码', disabled, rules: [{
@@ -159,48 +197,31 @@ const OperationModal: FC<OperationModalProps> = (props) => {
       },
       {
         type: 'group',
-        key: 'group3',
+        key: 'group4',
         groupItems: [
           {
-            type: 'input', name: 'mobile', label: '手机号码', disabled, rules: [
-              {
-                pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
-                message: '手机号码格式有误',
-              }, { required: true, message: '请输入手机号码' }]
-          },
-          {
-            type: 'input', name: 'email', label: '邮箱', disabled, rules: [
+            type: 'input', name: 'email', label: '联系邮箱', disabled, rules: [
               {
                 type: 'email',
                 message: '邮箱格式有误',
-              }, { required: true, message: '请输入邮箱' }
+              }, { required: true, message: '请输入联系邮箱' }
+            ]
+          },
+          {
+            type: 'input', name: 'website', label: '个人网站', disabled, rules: [
+              {
+                type: 'url',
+                message: '网站格式有误',
+              },
             ]
           },
         ],
       },
-      { type: 'input', name: 'homeAddress', label: '联系地址', disabled, rules: [{ required: true, message: '请输入联系地址' }] },
-      {
-        type: 'group',
-        key: 'group4',
-        groupItems: [
-
-          { type: 'input', name: 'zipCode', label: '邮编', disabled, },
-          { type: 'input', name: 'profession', label: '职业', disabled, },
-        ],
-      },
-      {
-        type: 'input', name: 'website', label: '个人网站', disabled, rules: [
-          {
-            type: 'url',
-            message: '网站格式有误',
-          },
-        ]
-      },
-      { type: 'textArae', name: 'intro', label: '个人简介', disabled, rules: [{ required: true, message: '请输入个人简介' }] },
+      { type: 'textArae', name: 'intro', label: '个人介绍', disabled, rules: [{ required: true, message: '请输入个人介绍' }] },
     ];
     const curFormItem = type ? formItemsPersonal() : formItems();
     const curValue = type ? currentPersonal : current;
-    const defaultValues = type ? { sex: '男', status: '申请中', idType: '身份证' } : { status: '申请中' };
+    const defaultValues = type ? { sex: '男', status: '申请中', idType: '身份证', MemberTypeId: MemberIndvicId } : { status, MemberTypeId };
     return (
       <CustomForm
         formLayout={formLayout}
@@ -214,7 +235,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
   const curTitle = currentPersonal || current;
   return (
     <Modal
-      title={done ? `查看${type ? '个人' : '企业'}会员` : `${curTitle ? '编辑' : '添加'}${type ? '个人' : '企业'}会员`}
+      title={done ? `查看信息` : `${curTitle ? '编辑信息' : '新增'}`}
       className='standardListForm'
       width={640}
       bodyStyle={{ padding: '28px 0 0' }}

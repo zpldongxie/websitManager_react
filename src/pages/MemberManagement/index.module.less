@@ -40,9 +40,19 @@ div[class*='standardListForm'] {
     .ant-modal-body {
       position: relative;
       max-height: calc(~'100vh - 335px');
+      padding-bottom: 24px !important;
       overflow-y: auto;
-      .ant-spin-nested-loading{
+
+      .ant-spin-nested-loading {
         padding: 0 20px;
+      }
+
+      .ant-row.ant-row-end {
+        margin: 0 !important;
+      }
+
+      .ant-steps {
+        width: auto !important;
       }
     }
   }

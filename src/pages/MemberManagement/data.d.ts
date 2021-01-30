@@ -1,3 +1,5 @@
+export type MemberStatus = '申请中' | '初审通过' | '申请驳回' | '正式会员' | '禁用';
+
 // 渲染企业会员表单行
 export type TableListItem = {
   key: number;
@@ -73,7 +75,7 @@ export type TableListItem = {
    */
   zipCode: string;
   /**
-   * 公司简介
+   * 单位简介
    *
    * @type {string}
    * @memberof TableListItem
@@ -87,12 +89,47 @@ export type TableListItem = {
    */
   logonDate: string;
   /**
+   * 申请日期
+   *
+   * @type {string}
+   * @memberof TableListItem
+   */
+  createdAt: string;
+  /**
+  * 更新日期
+  *
+  * @type {string}
+  * @memberof TableListItem
+  */
+  updatedAt: string;
+  /**
+  * 会员等级
+  *
+  * @type {string}
+  * @memberof TableListItem
+  */
+  MemberTypeId: string;
+  /**
+  * 邮件发送状态
+  *
+  * @type {string}
+  * @memberof TableListItem
+  */
+  sendEmailStatus: string;
+  /**
    * 状态
    *
    * @type {string}
    * @memberof TableListItem
    */
-  status: string;
+  status: MemberStatus;
+  /**
+   * 驳回原因
+   *
+   * @type {string}
+   * @memberof TableListItem
+   */ 
+  rejectDesc?: string;
 }
 
 // 渲染个人会员表单行
@@ -154,42 +191,42 @@ export type PersonalTableListItem = {
    * @type {string}
    * @memberof TableListItem
    */
-  maritalStatus: string;
+  maritalStatus?: string;
   /**
    * 个人网站
    *
    * @type {string}
    * @memberof TableListItem
    */
-  website: string;
+  website?: string;
   /**
    * 家庭地址
    *
    * @type {string}
    * @memberof TableListItem
    */
-  homeAddress: string;
+  homeAddress?: string;
   /**
    * 邮编
    *
    * @type {string}
    * @memberof TableListItem
    */
-  zipCode: string;
+  zipCode?: string;
   /**
    * 职业
    *
    * @type {string}
    * @memberof TableListItem
    */
-  profession: string;
+  profession?: string;
   /**
    * 出生日期
    *
    * @type {string}
    * @memberof TableListItem
    */
-  birthday: string;
+  birthday?: string;
   /**
    * 个人简介
    *
@@ -203,14 +240,49 @@ export type PersonalTableListItem = {
    * @type {string}
    * @memberof TableListItem
    */
-  logonDate: string;
+  logonDate?: string;
+  /**
+   * 申请日期
+   *
+   * @type {string}
+   * @memberof TableListItem
+   */
+  createdAt: string;
+  /**
+  * 更新日期
+  *
+  * @type {string}
+  * @memberof TableListItem
+  */
+  updatedAt: string;
+  /**
+  * 会员等级
+  *
+  * @type {string}
+  * @memberof TableListItem
+  */
+  MemberTypeId: string;
+  /**
+  * 邮件发送状态
+  *
+  * @type {string}
+  * @memberof TableListItem
+  */
+  sendEmailStatus: string;
   /**
    * 状态
    *
    * @type {string}
    * @memberof TableListItem
    */
-  status: string;
+  status: MemberStatus;
+  /**
+   * 驳回原因
+   *
+   * @type {string}
+   * @memberof TableListItem
+   */ 
+  rejectDesc?: string;
 }
 
 // 翻页信息
@@ -304,6 +376,6 @@ export type PersonalUpsertParams = {
  */
 export type AuditMemberParams = {
   id: string;
-  status: string;
+  status: MemberStatus;
   rejectDesc?: string;
 }

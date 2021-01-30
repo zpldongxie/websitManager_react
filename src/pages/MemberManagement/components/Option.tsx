@@ -7,12 +7,13 @@
  */
 import React from 'react';
 import { Divider, Popconfirm, message } from 'antd';
+import type { MemberStatus } from '../data';
 import { removeCompanyMember, removePersonalMember, auditCompanyMember, auditPersonalMember } from '../service';
 
 type OptType = {
   id?: string;
   type?: string;
-  status?: string;
+  status?: MemberStatus;
   refreshHandler?: () => void;
   editHandler?: () => void;
   auditHandler?: () => void;
@@ -64,6 +65,9 @@ const DisableOpt = ({ id, type, status, refreshHandler }: OptType) => (
           if (result.status === 'ok') {
             message.info('禁用成功');
             refreshHandler();
+          }else if (result.message.indexOf('邮件') > -1) {
+            refreshHandler();
+            message.warn('禁用成功，邮件发送失败，请检查邮箱地址是否有效');
           } else {
             message.error('禁用失败，请联系管理员或稍后重试。');
           }
@@ -110,7 +114,7 @@ const DelOpt = ({ id, type, refreshHandler }: OptType) => (
 type Props = {
   id: string;
   type?: string;
-  status: string;
+  status: MemberStatus;
   refreshHandler: () => void;
   editHandler: () => void;
   auditHandler: () => void;

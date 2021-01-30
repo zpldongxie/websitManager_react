@@ -204,3 +204,33 @@ export async function removePersonalMember(ids: string[]) {
     },
   });
 }
+
+
+/**
+ * 查询会员等级
+ *
+ * @export
+ * @returns
+ */
+export async function queryMemberTypes() {
+  const result = await request('/api/membertypes');
+
+  if (result.status === 'ok') {
+    return result.data;
+  }
+  return [];
+}
+/**
+ * 查询会员等级ID
+ *
+ * @export
+ * @returns
+ */
+export async function queryMemberTypeID(name: string) {
+  const result = await request(`/api/membertype/byName/${name}`);
+
+  if (result.status === 'ok') {
+    return result.data;
+  }
+  return [];
+}

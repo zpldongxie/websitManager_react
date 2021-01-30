@@ -39,7 +39,7 @@ const delHandler = (ids: string[], action: any) => {
 };
 
 const TableList: React.FC = () => {
-  const [currentStatus, setCurrentStatus] = useState<string[] | undefined>(['正式会员', '禁用']);
+  const [currentStatus, setCurrentStatus] = useState<string | undefined>('official');
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的会员ID
   const [opVisible, setOpVisible] = useState<boolean>(false);
   const [auditVisible, setAuditVisible] = useState<boolean>(false);
@@ -67,7 +67,7 @@ const TableList: React.FC = () => {
   const showAuditModal = (item: PersonalTableListItem) => {
     const currentItem = { ...item };
     setAuditVisible(true);
-    setCurrentAudit({ id: currentItem.id, status: currentItem.status });
+    setCurrentAudit({ id: currentItem.id, status: currentItem.status, rejectDesc: currentItem.rejectDesc });
   };
   const handleDone = () => {
     setDone(false);
@@ -82,8 +82,10 @@ const TableList: React.FC = () => {
   const handleOperationSubmit = async (values: PersonalTableListItem) => {
     const pram = { ...values };
     const result = await upsertPersonalMember(pram);
+    setLoadingSpin(true);
     if (result.status === "ok") {
       setOpVisible(false);
+      setLoadingSpin(false);
       const action = actionRef.current;
       action?.reload();
       if (currentOp) {
@@ -92,22 +94,25 @@ const TableList: React.FC = () => {
         message.info('个人会员添加成功');
       }
     } else {
+      setLoadingSpin(false);
       message.error(result.message);
     }
   };
   const handleAuditSubmit = async (values: AuditMemberParams) => {
     const pram = { ...values };
-    setLoadingSpin(true);
     const result = await auditPersonalMember(pram);
     if (result.status === "ok") {
       setAuditVisible(false);
-      setLoadingSpin(false);
       const action = actionRef.current;
       action?.reload();
       message.info('审核成功');
+    } else if (result.message.indexOf('邮件') > -1) {
+      setAuditVisible(false);
+      const action = actionRef.current;
+      action?.reload();
+      message.warn('审核成功，邮件发送失败，请检查邮箱地址是否有效');
     } else {
       setAuditVisible(false);
-      setLoadingSpin(false);
       message.error('审核失败，请联系管理员或稍后重试。');
     }
   }
@@ -147,12 +152,12 @@ const TableList: React.FC = () => {
       ),
     },
     {
-      title: '联系电话',
+      title: '手机号',
       dataIndex: 'mobile',
       width: '7em',
     },
     {
-      title: '身份证号',
+      title: '身份证号码',
       dataIndex: 'idNumber',
       search: false,
       width: '10em',
@@ -166,14 +171,16 @@ const TableList: React.FC = () => {
     {
       title: '邮箱',
       search: false,
-      ellipsis: true,
+      hideInTable: currentStatus !== "official",
       dataIndex: 'email',
-      width: '9em',
+      width: '7em',
+      ellipsis: true,
     },
     {
       title: '注册日期',
       dataIndex: 'logonDate',
       search: false,
+      hideInTable: currentStatus !== "official",
       sorter: true,
       ellipsis: true,
       width: '8em',
@@ -182,17 +189,84 @@ const TableList: React.FC = () => {
       )
     },
     {
-      title: '状态',
-      dataIndex: 'status',
+      title: '申请日期',
+      dataIndex: 'createdAt',
       search: false,
-      width: '5em',
+      hideInTable: currentStatus === "official",
+      sorter: true,
+      ellipsis: true,
+      width: '8em',
+      render: (_, record) => (
+        <span>{record.createdAt?.split(/T/g)[0]}</span>
+      )
     },
     {
-      title: '个人简介',
+      title: '更新日期',
+      dataIndex: 'updatedAt',
       search: false,
-      dataIndex: 'intro',
+      hideInTable: currentStatus === "official",
+      sorter: true,
       ellipsis: true,
+      width: '8em',
+      render: (_, record) => (
+        <span>{record.updatedAt?.split(/T/g)[0]}  {record.updatedAt?.substring(11,16)}</span>
+      )
+    },
+    {
+      title: '发件状态',
+      dataIndex: 'sendEmailStatus',
+      search: false,
+      hideInTable: currentStatus === "official",
+      sorter: true,
+      ellipsis: true,
+      width: '8em',
+      render: (_, record) => (
+        <span>{record.sendEmailStatus?.split(/T/g)[0]}  {record.sendEmailStatus?.substring(11,16)}</span>
+      )
+    },
+    {
+      title: currentStatus === "official" ? '状态' : '审核状态',
+      dataIndex: 'status',
       width: '7em',
+      valueEnum: {
+        申请中: { text: '申请中', status: 'Default' },
+        初审通过: { text: '初审通过', status: 'Processing' },
+        申请驳回: { text: '申请驳回', status: 'Error' },
+        正式会员: { text: '正式会员', status: 'Success' },
+        禁用: { text: '禁用', status: 'Error' },
+      },
+      render: (dom, item) => {
+        if (item.status === '申请驳回') {
+          return (
+            <Popover title="驳回原因" content={item.rejectDesc}>
+              <div>{dom}</div>
+            </Popover>
+          );
+        }
+        return dom;
+      },
+      filters: currentStatus === "official" ? [{
+        text: '正式会员',
+        value: '正式会员',
+      },
+      {
+        text: '禁用',
+        value: '禁用',
+      },] : [
+          {
+            text: '申请中',
+            value: '申请中',
+          },
+          {
+            text: '初审通过',
+            value: '初审通过',
+          },
+          {
+            text: '申请驳回',
+            value: '申请驳回',
+          },
+        ],
+      search: false,
     },
     {
       title: '操作',
@@ -247,14 +321,7 @@ const TableList: React.FC = () => {
                 },
               ],
               onChange: (activeKey) => {
-                let curStatus: string[] | undefined;
-                if (activeKey === "official") {
-                  curStatus = ['正式会员', '禁用']
-                }
-                if (activeKey === "apply") {
-                  curStatus = ['申请中', '初审通过', '申请驳回']
-                }
-                setCurrentStatus(curStatus);
+                setCurrentStatus(activeKey?.toString());
                 actionRef.current?.reload();
               },
             },
@@ -301,7 +368,7 @@ const TableList: React.FC = () => {
               ...params,
               sorter: Object.keys(sorter).length ? sorter : { status: 'descend' },
               filter,
-              status: currentStatus
+              status: currentStatus === "official" ? ['正式会员', '禁用'] : ['申请中', '初审通过', '申请驳回']
             };
             return queryPersonalMemberList(opts);
           }}
