@@ -5,7 +5,7 @@ export type TableListItem = {
   key: number;
   id?: string;
   /**
-   * 公司名称
+   * 单位名称
    *
    * @type {string}
    * @memberof TableListItem

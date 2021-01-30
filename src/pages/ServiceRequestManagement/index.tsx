@@ -56,7 +56,7 @@ const TableList: React.FC = () => {
       hideInTable: true,
     },
     {
-      title: '公司名称',
+      title: '单位名称',
       dataIndex: 'corporateName',
       ellipsis: true,
       render: (text, record) => (
@@ -110,6 +110,7 @@ const TableList: React.FC = () => {
     {
       title: '联系人',
       dataIndex: 'contacts',
+      search: false,
       // width: '15em',
     },
     {
@@ -147,7 +148,7 @@ const TableList: React.FC = () => {
       // width: '15em',
     },
     {
-      title: '状态',
+      title: '服务状态',
       dataIndex: 'status',
       // width: '7em',
       valueEnum: {
@@ -245,7 +246,12 @@ const TableList: React.FC = () => {
    */
   const getModelTitle = () => {
     if (modalType === 'audit') return '审核';
-    if (infoEdit) return '编辑信息';
+    if (infoEdit) {
+      if(current){
+        return '编辑信息';
+      }
+      return '新增';
+    };
     return '查看信息';
   };
 

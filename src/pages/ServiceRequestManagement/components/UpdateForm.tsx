@@ -43,39 +43,10 @@ const UpdateForm = (props: PropsType) => {
     {
       type: 'input',
       name: 'corporateName',
-      label: '公司名称',
-      rules: [{ required: true, message: '请输入公司名称' }],
+      label: '单位名称',
+      rules: [{ required: true, message: '请输入单位名称' }],
       disabled: !infoEdit,
     },
-    {
-      type: 'group',
-      key: 'group1',
-      groupItems: [
-        {
-          type: 'input',
-          name: 'tel',
-          label: '座机',
-          rules: [{ required: true, message: '请输入公司座机号' }],
-          disabled: !infoEdit,
-        },
-        {
-          type: 'input',
-          name: 'email',
-          label: '邮箱',
-          rules: [{ required: true, message: '请输入邮箱' }],
-          disabled: !infoEdit,
-        },
-      ],
-    },
-    {
-      type: 'group',
-      key: 'group2',
-      groupItems: [
-        { type: 'input', name: 'address', label: '地址', disabled: !infoEdit },
-        { type: 'input', name: 'zipCode', label: '邮编', disabled: !infoEdit },
-      ],
-    },
-    { type: 'input', name: 'website', label: '公司网站', disabled: !infoEdit },
     {
       type: 'group',
       key: 'group3',
@@ -91,11 +62,51 @@ const UpdateForm = (props: PropsType) => {
           type: 'input',
           name: 'contactsMobile',
           label: '手机号',
-          rules: [{ required: true, message: '请输入联系人手机' }],
+          rules: [
+            {
+              pattern: new RegExp(/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/),
+              message: '电话格式有误',
+            },
+            { required: true, message: '请输入联系人手机' }
+          ],
           disabled: !infoEdit,
         },
       ],
     },
+    {
+      type: 'group',
+      key: 'group1',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'tel',
+          label: '单位电话',
+          rules: [
+            {
+              pattern: new RegExp(/\d{3}-\d{8}|\d{4}-\d{7}/),
+              message: '电话格式有误',
+            },
+            { required: true, message: '请输入单位电话号' }],
+          disabled: !infoEdit,
+        },
+        {
+          type: 'input',
+          name: 'email',
+          label: '联系邮箱',
+          rules: [{ required: true, message: '请输入联系邮箱' }],
+          disabled: !infoEdit,
+        },
+      ],
+    },
+    {
+      type: 'group',
+      key: 'group2',
+      groupItems: [
+        { type: 'input', name: 'address', label: '联系地址', disabled: !infoEdit },
+        { type: 'input', name: 'zipCode', label: '单位邮编', disabled: !infoEdit },
+      ],
+    },
+    { type: 'input', name: 'website', label: '单位网站', disabled: !infoEdit },
     { type: 'input', name: 'demandType', label: '需求类型', hidden: true },
     {
       type: 'textArae',
@@ -139,13 +150,14 @@ const UpdateForm = (props: PropsType) => {
       type: 'group',
       key: 'group5',
       groupItems: [
-        { type: 'input', name: 'createdAt', label: '申请时间', placeholder: '-', disabled: true },
+        { type: 'input', name: 'createdAt', label: '申请时间', placeholder: '-', disabled: true, hidden: true, },
         {
           type: 'input',
           name: 'updatedAt',
-          label: '最近处理时间',
+          label: '更新时间',
           placeholder: '-',
           disabled: true,
+          hidden: true,
         },
         // { type: 'empty'}
       ],

@@ -64,9 +64,9 @@ const Option: React.FC<Props> = (props) => {
     case '服务中':
       return (
         <>
-          <AuditOpt auditHandler={auditHandler} />
-          <Divider type="vertical" />
           <EditOpt editHandler={editHandler} />
+          <Divider type="vertical" />
+          <AuditOpt auditHandler={auditHandler} />
           <Divider type="vertical" />
           <DelOpt id={id} refreshHandler={refreshHandler} />
         </>
