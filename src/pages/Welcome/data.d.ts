@@ -8,7 +8,7 @@
 // 图形组件类型
 type ChartType = 'Line' | 'Column';
 // 自定义组件类型
-type CustomeType = 'test';
+type CustomeType = 'test' | 'Grid' | 'Legend' | 'Tab' | 'List';
 
 // 拆线图配置
 export type LineChartSettings = LineConfig & React.RefAttributes<unknown>;
@@ -31,6 +31,14 @@ export type LayoutItemType = {
    * @type {string}
    */
   title?: string;
+  /**
+  * 数据是否反转显示
+  *
+  * @type {boolean}
+  * 
+  */
+
+  reverse?: boolean;
   /**
    * 数据，请自行保证组件使用数据的正确性
    *
@@ -64,6 +72,7 @@ export type LayoutItemType = {
    */
   orderIndex?: number;
   height?: string;
+  className?: string;
   /**
    * 布局宽度，请参考antd Col对应属性
    *

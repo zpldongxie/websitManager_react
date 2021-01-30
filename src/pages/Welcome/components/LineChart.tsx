@@ -11,47 +11,46 @@ import request from 'umi-request';
 
 import type { LineChartSettings } from '../data';
 
+const defaultData = [
+  { year: "2017", value: 2, category: "副理事长单位" },
+  { year: "2017", value: 4, category: "理事单位" },
+  { year: "2017", value: 8, category: "单位会员" },
+  { year: "2017", value: 0, category: "个人会员" },
+  { year: "2018", value: 2, category: "副理事长单位" },
+  { year: "2018", value: 5, category: "理事单位" },
+  { year: "2018", value: 12, category: "单位会员" },
+  { year: "2018", value: 0, category: "个人会员" },
+  { year: "2019", value: 4, category: "副理事长单位" },
+  { year: "2019", value: 8, category: "理事单位" },
+  { year: "2019", value: 27, category: "单位会员" },
+  { year: "2019", value: 0, category: "个人会员" },
+  { year: "2020", value: 4, category: "副理事长单位" },
+  { year: "2020", value: 8, category: "理事单位" },
+  { year: "2020", value: 35, category: "单位会员" },
+  { year: "2020", value: 0, category: "个人会员" },
+  { year: "2021", value: 4, category: "副理事长单位" },
+  { year: "2021", value: 8, category: "理事单位" },
+  { year: "2021", value: 35, category: "单位会员" },
+  { year: "2021", value: 0, category: "个人会员" },
+];
 const defaultSettings: LineChartSettings = {
-  data: [
-    { Date: '2010-01', scales: 1998 },
-    { Date: '2010-02', scales: 1850 },
-    { Date: '2010-03', scales: 1720 },
-    { Date: '2010-04', scales: 1818 },
-    { Date: '2010-05', scales: 1920 },
-    { Date: '2010-06', scales: 1802 },
-    { Date: '2010-07', scales: 1945 },
-    { Date: '2010-08', scales: 1856 },
-    { Date: '2010-09', scales: 2107 },
-    { Date: '2010-10', scales: 2140 },
-    { Date: '2010-11', scales: 2311 },
-  ],
-  padding: 'auto',
-  xField: 'Date',
-  yField: 'scales',
-  annotations: [
-    {
-      type: 'regionFilter',
-      start: ['min', 'median'],
-      end: ['max', '0'],
-      color: '#F4664A',
-    },
-    {
-      type: 'text',
-      position: ['min', 'median'],
-      content: '中位数',
-      offsetY: -4,
-      style: { textBaseline: 'bottom' },
-    },
-    {
-      type: 'line',
-      start: ['min', 'median'],
-      end: ['max', 'median'],
-      style: {
-        stroke: '#F4664A',
-        lineDash: [2, 2],
+  // eslint-disable-next-line object-shorthand
+  data: defaultData,
+  xField: 'year',
+  yField: 'value',
+  seriesField: 'category',
+  legend: { position: 'top-right' },
+  yAxis: {
+    label: {
+      formatter: function formatter(v: string) {
+        // eslint-disable-next-line func-names
+        return ''.concat(v).replace(/\d{1,3}(?=(\d{3})+$)/g, function (s) {
+          return ''.concat(s, ',');
+        });
       },
     },
-  ],
+  },
+  color: ['#1979C9', '#D62A0D', '#FAA219', '#52C41A'],
 };
 
 type PropsType = {
