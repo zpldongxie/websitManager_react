@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Row, Col, Input, InputNumber, Tooltip, message, Button, Tabs } from 'antd';
+import { Row, Col, Input, InputNumber, Tooltip, message, Button, Tabs, Form } from 'antd';
 
 import { ExclamationCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { getConfigList, putConfig } from './service';
+import { getConfigList, putConfig, submitEmail } from './service';
 import DefaultContext from './defaultContext';
 import styles from './index.module.less';
 
 const { TabPane } = Tabs;
+const { TextArea } = Input;
 
 const UploadConfiguration = () => {
   const [defaultValues, setDefaultValues] = useState<any>({});
@@ -77,6 +78,22 @@ const UploadConfiguration = () => {
       <div>例如：http://www.snains.cn/upload</div>
     </div>
   );
+
+  /**
+   * 测试邮件发送功能
+   * @param values
+   */
+  const onFinish = async (values: any) => {
+    if (values.mailTo) {
+      console.log('Success:', values);
+
+      const res = await submitEmail(values);
+      if (res.status === 'ok') {
+        message.success('发送成功');
+      } else message.error(res.msg);
+    }
+  };
+
   return (
     <PageContainer title={false}>
       <Tabs className={styles.tabstyle}>
@@ -484,6 +501,45 @@ const UploadConfiguration = () => {
                   />
                 </Col>
               </Row>
+            </div>
+            <div className={styles.itembg}>
+              <p>测试邮件发送功能</p>
+              <Form
+                name="email"
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                colon={false}
+              >
+                <Form.Item
+                  label="测试邮箱地址"
+                  name="mailTo"
+                  rules={[{ type: 'email', required: true, message: '请输入正确有效的邮箱' }]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item
+                  label="标题"
+                  name="subject"
+                  rules={[{ required: true, message: '请输入标题' }]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item
+                  label="正文"
+                  name="text"
+                  rules={[{ required: true, message: '请输入内容' }]}
+                >
+                  <TextArea rows={3} />
+                </Form.Item>
+
+                <Form.Item>
+                  <Button type="primary" htmlType="submit" style={{ marginLeft: 128 }}>
+                    发送
+                  </Button>
+                </Form.Item>
+              </Form>
             </div>
           </div>
         </TabPane>
