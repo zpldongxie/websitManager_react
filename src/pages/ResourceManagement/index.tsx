@@ -183,6 +183,7 @@ export default () => {
               onRemove={removeFileHandler}
             />
           </Col>
+          <div className={styles.bgc}></div>
           <Col className={styles.slider} flex="15em">
             <Collapse defaultActiveKey={['image']} accordion onChange={collapseChandHandler}>
               <Panel header="图片" key="image">

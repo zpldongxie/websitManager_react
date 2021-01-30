@@ -114,7 +114,6 @@ const TableList: React.FC = () => {
         return (
           <Select
             showSearch
-            style={{ width: 200 }}
             placeholder="选择一个培训活动"
             optionFilterProp="children"
             filterOption={(inputValue: string, option: any) =>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal } from 'antd';
 import CustomForm from '@/components/CustomForm';
+import { FormItemType } from '@/components/CustomForm/interfice';
 import { TableListItem } from '../data';
 
 const formLayout = {
@@ -39,7 +40,7 @@ interface EditModalProps {
 const EditModal: React.FC<EditModalProps> = (props) => {
   const { modalVisible, current, trainingItems, onSubmit, onCancel } = props;
 
-  const formItems = [
+  const formItems: FormItemType[] = [
     { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
     { type: 'select', name: 'TrainingId', label: '培训信息', rules: [{required: true, message: '请选择培训信息'}], items: trainingItems },
     { type: 'input', name: 'name', label: '姓名', rules: [{required: true, message: '请输入姓名'}] },

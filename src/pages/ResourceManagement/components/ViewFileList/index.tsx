@@ -8,8 +8,8 @@
  */
 import type { FC } from 'react';
 import React, { useState } from 'react';
-import { Upload, Modal, message } from 'antd';
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Upload, Modal, message, Button } from 'antd';
+import { ExclamationCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/lib/upload/interface';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
@@ -147,10 +147,15 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
         onChange={handleChange}
         onRemove={handleRemove}
       >
-        <div className={type === 'image' ? styles.blockBtn : styles.flexBtn}>
-          <PlusOutlined />
-          <div className={styles.uploadText}>上传</div>
-        </div>
+        {
+          type === 'image' ?
+            <div className={ styles.blockBtn }>
+              <PlusOutlined />
+              <div className={styles.uploadText}>上传</div>
+            </div>
+          :
+            <Button className={ styles.uploadBtn } type='primary' icon={<UploadOutlined />}>上传</Button>
+        }
       </Upload>
       <Modal
         visible={previewVisible}
