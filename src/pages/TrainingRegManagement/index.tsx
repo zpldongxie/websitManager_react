@@ -2,10 +2,11 @@ import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Divider, Dropdown, Menu, message, Modal, Select, Switch } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 
 import EditModal from './components/EditModal';
-import { TableListItem } from './data';
+import type { TableListItem } from './data';
 import { queryList, putTrainingReg, removeTrainingReg, getTrainings, setPassed } from './service';
 
 const { confirm } = Modal;
@@ -98,14 +99,14 @@ const TableList: React.FC = () => {
 
   const columns: ProColumns<TableListItem>[] = [
     {
-      title: '培训信息',
+      title: '培训名称',
       dataIndex: 'TrainingId',
       hideInTable: true,
       formItemProps: {
         rules: [
           {
             required: true,
-            message: '请选择培训信息',
+            message: '请选择培训名称',
           },
         ],
       },
@@ -130,7 +131,7 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '培训信息',
+      title: '培训名称',
       dataIndex: 'Training',
       hideInTable: !!trainingId, // 过滤条件trainingId存在时，不显示此列
       hideInForm: true,
@@ -141,7 +142,6 @@ const TableList: React.FC = () => {
       title: '培训类型',
       dataIndex: 'Training',
       hideInForm: true,
-      search: false,
       hideInTable: !!trainingId, // 过滤条件trainingId存在时，不显示此列
       renderText: (training: {
         id: string;
@@ -152,6 +152,7 @@ const TableList: React.FC = () => {
     {
       title: '姓名',
       dataIndex: 'name',
+      search: false,
       formItemProps: {
         rules: [
           {
@@ -176,6 +177,7 @@ const TableList: React.FC = () => {
     {
       title: '邮箱',
       dataIndex: 'email',
+      search: false,
       formItemProps: {
         rules: [
           {
@@ -186,13 +188,14 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '公司',
+      title: '单位',
+      search: false,
       dataIndex: 'comp',
       formItemProps: {
         rules: [
           {
             required: true,
-            message: '公司为必填项',
+            message: '单位为必填项',
           },
         ],
       },
@@ -277,7 +280,7 @@ const TableList: React.FC = () => {
   return (
     <PageHeaderWrapper title={false}>
       <ProTable<TableListItem>
-        headerTitle="查询表格"
+        headerTitle="报名审批"
         actionRef={actionRef}
         rowKey="id"
         toolBarRender={(action, { selectedRows }) => [
@@ -297,7 +300,7 @@ const TableList: React.FC = () => {
                           onOk() {
                             (async () => {
                               await handleRemove(selectedRows);
-                              action.reload();
+                              action?.reload();
                             })()
                           },
                         });
@@ -310,7 +313,7 @@ const TableList: React.FC = () => {
                             (async () => {
                               const ids = selectedRows.map(row => row.id);
                               await handleApproval(ids, true);
-                              action.reload();
+                              action?.reload();
                             })()
                           },
                         });
