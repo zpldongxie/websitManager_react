@@ -9,7 +9,7 @@
 import type { FC } from 'react';
 import React, { useState } from 'react';
 import { Upload, Modal, message, Button } from 'antd';
-import { ExclamationCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/lib/upload/interface';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
@@ -28,29 +28,42 @@ type PreviewType = {
   type: string;
   name: string;
   url: string;
-}
+};
 
 const Preview = ({ type, name, url }: PreviewType) => {
   switch (type) {
     case 'image':
       return <img alt={name} src={url} className={styles.preview} />;
     case 'video':
-      return <video src={url} controls className={styles.preview}><track kind="captions" /></video>;
+      return (
+        <video src={url} controls className={styles.preview}>
+          <track kind="captions" />
+        </video>
+      );
     case 'audio':
-      return <audio src={url} controls className={styles.preview}><track kind="captions" /></audio>
+      return (
+        <audio src={url} controls className={styles.preview}>
+          <track kind="captions" />
+        </audio>
+      );
     default:
-      return <div />
+      return <div />;
   }
-}
+};
 
 type PropsType = {
   type: string;
   currentFileList: UploadFile<any>[];
   setCurrentFileList: React.Dispatch<React.SetStateAction<UploadFile<any>[]>>;
   onRemove: (fileName: string) => Promise<boolean>;
-}
+};
 
-const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList, onRemove }: PropsType) => {
+const ViewFileList: FC<PropsType> = ({
+  type,
+  currentFileList,
+  setCurrentFileList,
+  onRemove,
+}: PropsType) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewTitle, setPreviewTitle] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
@@ -90,12 +103,14 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
     }
     if (file.status === 'done') {
       // eslint-disable-next-line no-param-reassign
-      fileList.filter((f: UploadFile<any>) => !!f.xhr).forEach((f: UploadFile<any>) => {
-        f.thumbUrl = '';
-        f.url = f.xhr.response;
-        const urlArr = f.xhr.response.split(/\//g);
-        f.name = urlArr[urlArr.length - 1];
-      });
+      fileList
+        .filter((f: UploadFile<any>) => !!f.xhr)
+        .forEach((f: UploadFile<any>) => {
+          f.thumbUrl = '';
+          f.url = f.xhr.response;
+          const urlArr = f.xhr.response.split(/\//g);
+          f.name = urlArr[urlArr.length - 1];
+        });
       message.success('上传成功');
     }
     setCurrentFileList(fileList);
@@ -120,20 +135,28 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
         onOk() {
           (async () => {
             resolve(await onRemove(file.name));
-          })()
+          })();
         },
         onCancel() {
           resolve(false);
-        }
+        },
       });
-    })
-  }
+    });
+  };
 
   let accept: string = '*/*';
-  let listType: "text" | "picture" | "picture-card" = 'text';
-  if (type === 'image') { accept = "image/*"; listType = "picture-card"; }
-  if (type === 'video') { accept = "video/*"; listType = 'picture'; }
-  if (type === 'audio') { accept = "audio/*"; }
+  let listType: 'text' | 'picture' | 'picture-card' = 'text';
+  if (type === 'image') {
+    accept = 'image/*';
+    listType = 'picture-card';
+  }
+  if (type === 'video') {
+    accept = 'video/*';
+    listType = 'picture';
+  }
+  if (type === 'audio') {
+    accept = 'audio/*';
+  }
 
   return (
     <div>
@@ -147,26 +170,30 @@ const ViewFileList: FC<PropsType> = ({ type, currentFileList, setCurrentFileList
         onChange={handleChange}
         onRemove={handleRemove}
       >
-        {
-          type === 'image' ?
-            <div className={ styles.blockBtn }>
-              <PlusOutlined />
-              <div className={styles.uploadText}>上传</div>
-            </div>
-          :
-            <Button className={ styles.uploadBtn } type='primary' icon={<UploadOutlined />}>上传</Button>
-        }
+        {type === 'image' ? (
+          <div className={styles.blockBtn}>
+            <UploadOutlined />
+            <div className={styles.uploadText}>上传</div>
+          </div>
+        ) : (
+          <Button className={styles.uploadBtn} type="primary" icon={<UploadOutlined />}>
+            上传
+          </Button>
+        )}
       </Upload>
       <Modal
         visible={previewVisible}
         title={previewTitle}
         footer={
           <div className={styles.previewFooter}>
-            <CopyToClipboard text={previewUrl}
-              onCopy={() => message.info('链接已复制到剪贴板')}>
+            <CopyToClipboard text={previewUrl} onCopy={() => message.info('链接已复制到剪贴板')}>
               <a>复制链接</a>
             </CopyToClipboard>
-            {type !== 'image' && <a href={previewUrl} download={previewUrl}>下载文件</a>}
+            {type !== 'image' && (
+              <a href={previewUrl} download={previewUrl}>
+                下载文件
+              </a>
+            )}
           </div>
         }
         onCancel={handleCancel}
