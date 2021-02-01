@@ -1,8 +1,8 @@
 import React from 'react';
 import { Modal } from 'antd';
 import CustomForm from '@/components/CustomForm';
-import { FormItemType } from '@/components/CustomForm/interfice';
-import { TableListItem } from '../data';
+import type { FormItemType } from '@/components/CustomForm/interfice';
+import type { TableListItem } from '../data';
 
 const formLayout = {
   labelCol: { span: 7 },
@@ -10,9 +10,9 @@ const formLayout = {
 };
 
 // 用于引用表单的提交方法
-let submitFun: ()=>void;
+let submitFun: () => void;
 
-interface EditModalProps {
+type EditModalProps = {
   modalVisible: boolean;
   /**
    * 是否有回填的值
@@ -44,15 +44,15 @@ const EditModal: React.FC<EditModalProps> = (props) => {
     { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
     { type: 'select', name: 'TrainingId', label: '培训信息', rules: [{required: true, message: '请选择培训信息'}], items: trainingItems },
     { type: 'input', name: 'name', label: '姓名', rules: [{required: true, message: '请输入姓名'}] },
-    { type: 'input', name: 'mobile', label: '手机', rules: [{required: true, message: '请输入手机号码'}] },
+    { type: 'input', name: 'mobile', label: '手机号', rules: [{required: true, message: '请输入手机号'}] },
     { type: 'input', name: 'email', label: '邮箱', rules: [{required: true, message: '请输入邮箱地址'}] },
-    { type: 'input', name: 'comp', label: '公司', rules: [{required: true, message: '请输入公司名称'}] },
+    { type: 'input', name: 'comp', label: '单位', rules: [{required: true, message: '请输入单位名称'}] },
   ];
 
   return (
     <Modal
       destroyOnClose
-      title={`${current ? '编辑' : '添加'}报名`}
+      title={`${current ? '编辑信息' : '新增'}`}
       visible={modalVisible}
       okText='保存'
       onOk={() => submitFun()}

@@ -149,7 +149,7 @@ const TableList: React.FC = () => {
       }) => training?.Channel?.name,
     },
     {
-      title: '姓名',
+      title: '联系人',
       dataIndex: 'name',
       search: false,
       formItemProps: {
@@ -162,13 +162,13 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '手机',
+      title: '手机号',
       dataIndex: 'mobile',
       formItemProps: {
         rules: [
           {
             required: true,
-            message: '手机为必填项',
+            message: '手机号为必填项',
           },
         ],
       },
@@ -177,6 +177,7 @@ const TableList: React.FC = () => {
       title: '邮箱',
       dataIndex: 'email',
       search: false,
+      hideInTable: true,
       formItemProps: {
         rules: [
           {
@@ -198,7 +199,7 @@ const TableList: React.FC = () => {
           },
         ],
       },
-      sorter: true,
+      sorter: false,
     },
     {
       title: '报名时间',
