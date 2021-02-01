@@ -10,7 +10,7 @@ import { Divider, Popconfirm, message } from 'antd';
 
 import { remove, setPub } from '../service';
 
-interface OptType {
+type OptType = {
   id: string;
   refreshHandler: () => void;
 }
@@ -110,7 +110,7 @@ const DelOpt = ({ id, refreshHandler }: OptType) => (
 
 const RealDelOpt = ({ id, refreshHandler }: OptType) => (
   <Popconfirm
-    title="彻底删除后数据将不可恢复，是否确定?"
+    title="彻底删除后数据将不可恢复，是否删除?"
     onConfirm={async () => {
       try {
         const result = await remove([id]);
@@ -128,11 +128,11 @@ const RealDelOpt = ({ id, refreshHandler }: OptType) => (
     cancelText="No"
     placement="topLeft"
   >
-    <a href="#">彻底删除</a>
+    <a href="#" style={{color:'red'}}>彻底删除</a>
   </Popconfirm>
 );
 
-interface Props {
+type Props = {
   id: string;
   pubStatus: string;
   refreshHandler: () => void;
