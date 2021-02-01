@@ -48,7 +48,7 @@ const UserInfo: React.FC<PropsType> = ({ data, dataRequest }) => {
     <div className={styles.collectData}>
       <div>
         <p>文章总数</p>
-        <span>361</span>
+        <span>254</span>
       </div>
       <div>
         <p>入驻厂商</p>

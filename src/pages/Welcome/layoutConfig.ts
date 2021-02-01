@@ -9,6 +9,7 @@ import type { layoutConfigType } from './data';
 
 const articleYear = [{ name: '2021年新增', number: 3 }, { name: '2020年新增', number: 77 }, { name: '2019年新增', number: 28 }, { name: '2018年新增', number: 26 }];
 const memberNum = [{ name: '副理事长单位', number: '4' }, { name: '理事单位', number: '8' }, { name: '单位会员', number: '35' }, { name: '个人会员', number: '0' }];
+const serviceNum = [{ name: '方案咨询', number: '0' }, { name: '方案论证', number: '0' }, { name: '方案设计', number: '0' }, { name: '安全评估', number: '0' }];
 const todoList = [
   { tabName: '企业入会', dataRequestUrl: '', tabList: [{name:'陕西君宴亚联司法鉴定评估有限公司',status:'申请中'},{name:'西安云适配网络科技有限公司',status:'初审通过'}]},
   { tabName: '个人入会', dataRequestUrl: '', tabList: [{name:'刘安平',status:'申请中'}]},
@@ -93,7 +94,7 @@ const layoutConfig: layoutConfigType = {
     {
       key: 4,
       type: 'group',
-      title: 'test',
+      title: '培训报名审批',
       height: '255px',
       span: 6,
       children: {
@@ -105,7 +106,7 @@ const layoutConfig: layoutConfigType = {
           height: '55px',
           className: 'boxBordered',
           span: 24,
-          data: '文章'
+          data: '培训报名审批'
         }, {
           key: '4-1',
           type: 'List',
@@ -130,7 +131,7 @@ const layoutConfig: layoutConfigType = {
             reverse: true,
             className: 'paddingZero',
             height: '260px',
-            data: articleYear,
+            data: serviceNum,
             span: 24
           }
         ],
