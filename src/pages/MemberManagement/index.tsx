@@ -178,6 +178,9 @@ const TableList: React.FC = () => {
         理事单位: { text: '理事单位', status: 'Processing' },
         单位会员: { text: '单位会员', status: 'Error' },
       },
+      render: (_, record) => (
+        <span>{record.MemberType?.name}</span>
+      ),
       search: { transform: (_: any, __: string, object: any) => object },
     },
     {

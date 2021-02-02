@@ -1,5 +1,8 @@
 export type MemberStatus = '申请中' | '初审通过' | '申请驳回' | '正式会员' | '禁用';
-
+export type MemberTypes = {
+  id: string;
+  name: string;
+};
 // 渲染企业会员表单行
 export type TableListItem = {
   key: number;
@@ -109,6 +112,7 @@ export type TableListItem = {
   * @memberof TableListItem
   */
   MemberTypeId: string;
+  MemberType: MemberTypes;
   /**
   * 邮件发送状态
   *
@@ -128,7 +132,7 @@ export type TableListItem = {
    *
    * @type {string}
    * @memberof TableListItem
-   */ 
+   */
   rejectDesc?: string;
 }
 
@@ -281,7 +285,7 @@ export type PersonalTableListItem = {
    *
    * @type {string}
    * @memberof TableListItem
-   */ 
+   */
   rejectDesc?: string;
 }
 

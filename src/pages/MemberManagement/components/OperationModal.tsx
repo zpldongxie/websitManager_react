@@ -31,8 +31,8 @@ let submitFun: () => void;
 const OperationModal: FC<OperationModalProps> = (props) => {
   const { type, done, visible, loading, current, currentPersonal, onDone, onCancel, onSubmit, onSubmitPersonal } = props;
 
-  const [expand, setExpand] = useState({});
-  const [status] = useState<MemberStatus>(current?.status || '申请中');
+
+  const [status, setStatus] = useState<MemberStatus>(current?.status || '申请中');
   const [memberTypes, setMemberTypes] = useState<{ value: any; text: any; }[] | undefined>(undefined);
   const [MemberTypeId, setMemberTypeId] = useState<string | undefined>(current?.MemberTypeId || undefined);
   const [MemberIndvicId, setMemberIndvicId] = useState<string | undefined>(current?.MemberTypeId || undefined);
@@ -56,14 +56,11 @@ const OperationModal: FC<OperationModalProps> = (props) => {
     setMemberTypes(curmemberTypes);
   }
   useEffect(() => {
-    if (!props.visible) {
-      setExpand({});
-    }
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     memberTypes === undefined ? getMemberTypes() : '';
   }, [props.visible]);
-
+  useEffect(() => setStatus(current?.status), [current]);
   const handleSubmit = () => {
     if (typeof submitFun === 'function')
       submitFun();
@@ -83,10 +80,15 @@ const OperationModal: FC<OperationModalProps> = (props) => {
   const idTypeItems = [
     { value: '身份证', text: '身份证' },
   ];
+  const auditStatus = [
+    { value: '申请中', text: '申请中' },
+    { value: '初审通过', text: '初审通过' },
+    { value: '申请驳回', text: '申请驳回' },
+    { value: '正式会员', text: '正式会员' },
+    { value: '禁用', text: '禁用' },];
   const getModalContent = () => {
     const formItems = (): FormItemType[] => [
       { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
-      { type: 'input', name: 'status', label: '会员状态', disabled: true, hidden: true },
       { type: 'input', name: 'corporateName', label: '单位名称', disabled, rules: [{ required: true, message: '请输入单位名称' }] },
       {
         type: 'group',
@@ -143,7 +145,19 @@ const OperationModal: FC<OperationModalProps> = (props) => {
           },
         ]
       },
-      { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] },
+      { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] }, {
+        type: 'group',
+        key: 'group4',
+        groupItems: [
+          {
+            type: 'select', name: 'status', label: '审核状态', disabled, items: auditStatus,
+            onChange: (_: any, formatString: any) => {
+              setStatus(formatString.key);
+            },
+          },
+          { type: 'input', name: 'rejectDesc', label: '驳回原因', disabled, rules: [{ required:  status === '申请驳回', message: '请输入驳回原因' }] },
+        ],
+      },
     ];
     const formItemsPersonal = (): FormItemType[] => [
       { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
@@ -216,17 +230,17 @@ const OperationModal: FC<OperationModalProps> = (props) => {
             ]
           },
         ],
-      },
-      { type: 'textArae', name: 'intro', label: '个人介绍', disabled, rules: [{ required: true, message: '请输入个人介绍' }] },
+      }
     ];
     const curFormItem = type ? formItemsPersonal() : formItems();
     const curValue = type ? currentPersonal : current;
     const defaultValues = type ? { sex: '男', status: '申请中', idType: '身份证', MemberTypeId: MemberIndvicId } : { status, MemberTypeId };
+    console.log({ status, MemberTypeId });
     return (
       <CustomForm
         formLayout={formLayout}
         formItems={curFormItem}
-        values={{ ...(curValue || defaultValues), ...expand }}
+        values={(curValue || defaultValues)}
         onFinish={handleFinish}
         setSubmitFun={(submit: () => void) => { submitFun = submit }}
       />

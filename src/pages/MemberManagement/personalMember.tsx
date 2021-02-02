@@ -379,7 +379,7 @@ const TableList: React.FC = () => {
       <OperationModal
         type="personal"
         visible={opVisible}
-        current={currentOp}
+        currentPersonal={currentOp}
         done={done}
         loading={loadingSpin}
         onDone={handleDone}

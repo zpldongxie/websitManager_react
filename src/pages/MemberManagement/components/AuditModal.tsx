@@ -67,7 +67,7 @@ const getOpt = (
       };
     case '申请驳回':
       return {
-        desc: '该项会员申请已拒绝。若仍需申请，请相关人员重新申请。',
+        desc: '该项会员申请已驳回。若仍需申请，请相关人员重新申请。',
         btns: [],
       };
     case '禁用':
@@ -131,7 +131,7 @@ const AuditModal: FC<OperationModalProps> = (props) => {
   }, [status]);
 
   useEffect(() => {
-    // 当驳回原因输入框出现时，拒绝申请按钮改为确认驳回
+    // 当驳回原因输入框出现时，申请驳回按钮改为确认驳回
     const rejectBtn = btns.find((btn) => btn.text === '申请驳回');
     if (rejectBtn) {
       if (showRejectReason) {
@@ -151,9 +151,9 @@ const AuditModal: FC<OperationModalProps> = (props) => {
 
   const onClick = async (s: MemberStatus | '确认驳回') => {
     if (current) {
-      // 拒绝申请操作需要多确认一次
+      // 驳回申请操作需要多确认一次
       if (s === '申请驳回') {
-        message.info('请输入拒绝原因');
+        message.info('请输入驳回原因');
         setShowRejectReason(true);
         return;
       }
