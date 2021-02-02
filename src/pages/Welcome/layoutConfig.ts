@@ -33,7 +33,7 @@ const layoutConfig: layoutConfigType = {
           height: '55px',
           className: 'boxBordered',
           span: 24,
-          data: '文章'
+          data: '文章数量趋势'
         },
         {
           key: '1-1',
@@ -65,7 +65,7 @@ const layoutConfig: layoutConfigType = {
           height: '55px',
           className: 'boxBordered',
           span: 24,
-          data: '会员'
+          data: '会员数量统计及趋势'
         }, {
           key: '2-1',
           type: 'Grid',
