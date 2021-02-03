@@ -1,8 +1,10 @@
-import React, { FC, useState, useEffect } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import type { FC } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Result, Button } from 'antd';
 import CustomForm from '@/components/CustomForm';
-import { FormItemType } from '@/components/CustomForm/interfice';
-import { TrainingDataType } from '../data.d';
+import type { FormItemType } from '@/components/CustomForm/interfice';
+import type { TrainingDataType } from '../data.d';
 import styles from '../style.module.less';
 
 interface OperationModalProps {
@@ -13,6 +15,7 @@ interface OperationModalProps {
   onDone: () => void;
   onSubmit: (values: TrainingDataType) => void;
   onCancel: () => void;
+  disabled: boolean;
 }
 
 const formLayout = {
@@ -23,7 +26,7 @@ const formLayout = {
 let submitFun: () => void;
 
 const OperationModal: FC<OperationModalProps> = (props) => {
-  const { done, visible, current, channelList = [], onDone, onCancel, onSubmit } = props;
+  const { done, visible, current, channelList = [], onDone, onCancel, onSubmit, disabled } = props;
 
   const [expand, setExpand] = useState({});
 
@@ -37,7 +40,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
     if (typeof submitFun === 'function') submitFun();
   };
 
-  const handleFinish = (values: { [key: string]: any }) => {
+  const handleFinish = (values: Record<string, any>) => {
     if (onSubmit) {
       onSubmit(values as TrainingDataType);
     }
@@ -78,8 +81,10 @@ const OperationModal: FC<OperationModalProps> = (props) => {
       });
     };
 
-    const channelItems = channelList.map((channel) => ({ value: channel.id, text: channel.name }));
-
+    const channelItems = channelList
+      .filter((item) => item.name.indexOf('安全培训') === -1)
+      .map((channel) => ({ value: channel.id, text: channel.name }))
+      .reverse();
     const trainingMethodItems = [
       { value: '线上公开', text: '线上公开' },
       { value: '线上私享', text: '线上私享' },
@@ -92,13 +97,15 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'input',
         name: 'title',
         label: '培训标题',
+        disabled,
         rules: [{ required: true, message: '请输入培训标题' }],
       },
-      { type: 'input', name: 'subTitle', label: '培训副标题' },
+      { type: 'input', name: 'subTitle', disabled, label: '培训副标题' },
       {
         type: 'select',
         name: 'ChannelId',
         label: '所属栏目',
+        disabled,
         rules: [{ required: true, message: '请选择所属栏目' }],
         items: channelItems,
       },
@@ -106,6 +113,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'select',
         name: 'trainingMethod',
         label: '培训形式',
+        disabled,
         rules: [{ required: true, message: '请选择培训形式' }],
         items: trainingMethodItems,
       },
@@ -113,6 +121,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'timeRange',
         name: 'registTimeRange',
         label: '报名时间',
+        disabled,
         rules: [{ required: true, message: '请设置报名时间' }],
         onChange: onRegTimeChange,
       },
@@ -120,6 +129,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'input',
         name: 'registStartTime',
         label: '报名开始时间',
+        disabled,
         rules: [{ required: true, message: '请设置报名开始时间' }],
         hidden: true,
       },
@@ -127,6 +137,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'input',
         name: 'registEndTime',
         label: '报名截止时间',
+        disabled,
         rules: [{ required: true, message: '请设置报名截止时间' }],
         hidden: true,
       },
@@ -134,6 +145,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'timeRange',
         name: 'timeRange',
         label: '培训时间',
+        disabled,
         rules: [{ required: true, message: '请设置培训时间' }],
         onChange: onTimeChange,
       },
@@ -141,6 +153,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'input',
         name: 'startTime',
         label: '培训开始时间',
+        disabled,
         rules: [{ required: true, message: '请设置培训开始时间' }],
         hidden: true,
       },
@@ -148,10 +161,11 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         type: 'input',
         name: 'endTime',
         label: '培训结束时间',
+        disabled,
         rules: [{ required: true, message: '请设置培训结束时间' }],
         hidden: true,
       },
-      { type: 'textArae', name: 'desc', label: '培训活动描述' },
+      { type: 'textArae', name: 'desc', disabled, label: '培训活动描述' },
     ];
 
     return (

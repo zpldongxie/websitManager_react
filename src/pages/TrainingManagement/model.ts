@@ -1,11 +1,5 @@
 import type { Effect, Reducer } from 'umi';
-import {
-  getChannelList,
-  addFakeList,
-  queryTrainingList,
-  removeFakeList,
-  updateFakeList,
-} from './service';
+import { getChannelList, addFakeList, queryTrainingList, updateFakeList } from './service';
 
 import type { TrainingDataType } from './data.d';
 
@@ -70,7 +64,7 @@ const Model: ModelType = {
     *submit({ payload }, { call, put }) {
       let callback = addFakeList;
       if (payload.id) {
-        callback = Object.keys(payload).length === 1 ? removeFakeList : updateFakeList;
+        callback = updateFakeList;
       }
       yield call(callback, payload); // post
       // const response = yield call(queryTrainingList, payload);

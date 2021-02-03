@@ -73,13 +73,13 @@ export interface TrainingDataType {
    */
   desc: string;
   Channel: {
-    name: string
-  },
+    name: string;
+  };
 }
 
 export interface QueryListDataType {
   ChannelId?: number;
-  search?: {name: string, value: string}[],
+  search?: { name: string; value: string }[];
   pageNum?: number;
   pageSize?: number;
 }
@@ -112,4 +112,14 @@ export interface BasicListItemDataType {
   message: number;
   content: string;
   members: Member[];
+}
+// 查询参数
+export interface TableListParams {
+  name?: string;
+  desc?: string;
+  key?: number;
+  pageSize?: number;
+  currentPage?: number;
+  filter?: { [key: string]: any[] };
+  sorter?: { [key: string]: any };
 }

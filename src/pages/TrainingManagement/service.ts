@@ -1,5 +1,5 @@
 import request from 'umi-request';
-import type { TrainingDataType, QueryListDataType } from './data.d';
+import type { TrainingDataType, QueryListDataType, TableListParams } from './data.d';
 
 type ParamsType = {
   count?: number;
@@ -16,18 +16,73 @@ export async function queryTrainingList(params: QueryListDataType) {
   });
 }
 
-export async function removeFakeList(params: ParamsType) {
+/**
+ * 按条件查询列表，支持分页和过滤
+ *
+ * @export
+ * @param {TableListParams} [params]
+ * @returns
+ */
+export async function queryList(params?: TableListParams) {
+  const result = await request('/api/getTrainingList', {
+    method: 'POST',
+    data: { ...params },
+  });
+
+  if (result.status === 'ok') {
+    return {
+      data: result.data.list,
+      total: result.data.total,
+      success: true,
+      pageSize: params?.pageSize,
+      current: params?.currentPage,
+    };
+  }
+  return {
+    data: [],
+    total: 0,
+    success: false,
+    pageSize: 0,
+    current: 1,
+  };
+}
+
+/**
+ * 删除多个
+ *
+ * @export
+ * @param {{ ids: string[] }} ids
+ * @returns
+ */
+export async function removeFakeList(ids: string[]) {
   return request('/api/trainings', {
     method: 'DELETE',
-    data: { ids: [params.id] },
+    data: { ids },
   });
 }
 
-export async function addFakeList(params: ParamsType) {
-  return request('/api/training', {
+export async function addFakeList(params: TableListParams) {
+  const result = await request('/api/training', {
     method: 'PUT',
-    data: params,
+    data: { ...params },
   });
+
+  if (result.status === 'ok') {
+    return {
+      data: result.data.list,
+      total: result.data.total,
+      success: true,
+      pageSize: params?.pageSize,
+      current: params?.currentPage,
+    };
+  }
+  return {
+    data: [],
+    total: 0,
+    success: false,
+    pageSize: 0,
+    current: 1,
+  };
 }
 
 export async function updateFakeList(params: ParamsType) {
