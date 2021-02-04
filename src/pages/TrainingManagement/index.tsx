@@ -45,7 +45,13 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   const [visible, setVisible] = useState<boolean>(false);
   const [current, setCurrent] = useState<Partial<TrainingDataType> | undefined>(undefined);
   const [disabled, setDisabled] = useState<boolean>(false);
-
+  const valueEnum = {};
+  // eslint-disable-next-line array-callback-return
+  channelList.reverse().map((item) => {
+    valueEnum[item.name] = {
+      text: item.name,
+    };
+  });
   /**
    * 所有查询，包括搜索、排序、翻页，都走这里
    *
@@ -61,7 +67,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   useEffect(() => {
     dispatch({
       type: 'trainingManagement/getChannels',
-      payload: '培训',
+      payload: '安全培训',
     });
   }, []);
 
@@ -204,20 +210,13 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
       render: (text, record) => {
         return <div>{record.Channel.name}</div>;
       },
-      valueEnum: {
-        all: { text: '全部' },
-        安全意识培训: { text: '安全意识培训' },
-        安全技能培训: { text: '安全技能培训' },
-        行业团体培训: { text: '行业团体培训' },
-        认证培训: { text: '认证培训' },
-      },
+      valueEnum,
     },
     {
       title: '培训形式',
       width: 180,
       dataIndex: 'trainingMethod',
       valueEnum: {
-        all: { text: '全部' },
         线上公开: { text: '线上公开' },
         线上私享: { text: '线上私享' },
         线下公开: { text: '线下公开' },

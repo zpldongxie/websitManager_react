@@ -6,7 +6,7 @@ type ParamsType = {
 } & Partial<TrainingDataType>;
 
 export async function getChannelList(filter: string) {
-  return request(`/api/channels/${filter}`);
+  return request(`/api/channels/type/${filter}`);
 }
 
 export async function queryTrainingList(params: QueryListDataType) {

@@ -81,10 +81,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
       });
     };
 
-    const channelItems = channelList
-      .filter((item) => item.name.indexOf('安全培训') === -1)
-      .map((channel) => ({ value: channel.id, text: channel.name }))
-      .reverse();
+    const channelItems = channelList.map((channel) => ({ value: channel.id, text: channel.name }));
     const trainingMethodItems = [
       { value: '线上公开', text: '线上公开' },
       { value: '线上私享', text: '线上私享' },

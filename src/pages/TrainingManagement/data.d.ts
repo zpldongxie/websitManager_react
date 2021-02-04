@@ -1,4 +1,4 @@
-import { Moment } from 'moment';
+import type { Moment } from 'moment';
 
 export interface TrainingDataType {
   id?: string;
@@ -120,6 +120,6 @@ export interface TableListParams {
   key?: number;
   pageSize?: number;
   currentPage?: number;
-  filter?: { [key: string]: any[] };
-  sorter?: { [key: string]: any };
+  filter?: Record<string, any[]>;
+  sorter?: Record<string, any>;
 }
