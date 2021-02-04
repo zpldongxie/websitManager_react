@@ -29,56 +29,41 @@ const getOpt = (
   switch (status) {
     case '申请中':
       return {
-        desc: '通过或驳回，如果驳回，需要填写驳回原因。',
+        desc: '同意或驳回，如果驳回，需填写驳回原因。',
         btns: [
           {
             key: '申请驳回',
-            text: '申请驳回',
+            text: '驳回申请',
           },
           {
             key: '初审通过',
-            text: '初审通过',
+            text: '同意申请',
           },
         ],
       };
     case '初审通过':
       return {
-        desc: '会员资料确认无误，双方均无异议，如果驳回，请输入驳回原因。',
+        desc: '线下审核后，同意入会或驳回，如果驳回，需填写驳回原因。',
         btns: [
           {
             key: '申请驳回',
-            text: '申请驳回',
+            text: '驳回申请',
           },
           {
             key: '正式会员',
-            text: '正式会员',
-          },
-        ],
-      };
-    case '正式会员':
-      return {
-        desc: '会员身份已经通过审核，如需存在争议，可点击“禁用”。',
-        btns: [
-          {
-            key: '禁用',
-            text: '禁用',
+            text: '同意入会',
           },
         ],
       };
     case '申请驳回':
       return {
-        desc: '该项会员申请已驳回。若仍需申请，请相关人员重新申请。',
+        desc: '申请已驳回。若仍需入会，请相关人员重新申请。',
         btns: [],
       };
-    case '禁用':
+    case '正式会员':
       return {
-        desc: '会员身份存在争议，如确认无误可点击“正式会员”。',
-        btns: [
-          {
-            key: '正式会员',
-            text: '正式会员',
-          },
-        ],
+        desc: '该申请单位或申请人已成功加入协会，成为本协会正式会员。',
+        btns: []
       };
     default:
       return {
@@ -117,22 +102,22 @@ const getStepList = (status: MemberStatus | undefined) => {
 const AuditModal: FC<OperationModalProps> = (props) => {
   const { visible, current, onCancel, onSubmit } = props;
   const { status } = current || {};
-
   const [desc, setDesc] = useState('');
   const [rejectDesc, setRejectDesc] = useState('');
+  const [statusNew, setStatusNew] = useState<MemberStatus>(status);
   const [showRejectReason, setShowRejectReason] = useState(false);
-  const [rejectDescDisable] = useState(false);
+  const [rejectDescDisable, setRejectDescDisable] = useState(false);
   const [btns, setBtns] = useState<{ key: MemberStatus | '确认驳回'; text: string }[]>([]);
 
   useEffect(() => {
-    const opt = getOpt(status);
+    const opt = statusNew ? getOpt(statusNew) : getOpt(status);
     setDesc(opt.desc);
     setBtns(opt.btns);
-  }, [status]);
+  }, [status, statusNew]);
 
   useEffect(() => {
     // 当驳回原因输入框出现时，申请驳回按钮改为确认驳回
-    const rejectBtn = btns.find((btn) => btn.text === '申请驳回');
+    const rejectBtn = btns.find((btn) => btn.text === '驳回申请');
     if (rejectBtn) {
       if (showRejectReason) {
         const reRejestBtn: {
@@ -142,11 +127,11 @@ const AuditModal: FC<OperationModalProps> = (props) => {
           key: '确认驳回',
           text: '确认驳回',
         };
-        const newBtns = [reRejestBtn].concat(...btns.filter((btn) => btn.text !== '申请驳回'));
+        const newBtns = [reRejestBtn].concat(...btns.filter((btn) => btn.text !== '驳回申请'));
         setBtns(newBtns);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showRejectReason]);
 
   const onClick = async (s: MemberStatus | '确认驳回') => {
@@ -162,7 +147,10 @@ const AuditModal: FC<OperationModalProps> = (props) => {
         message.warn('请输入驳回原因');
         return;
       }
-      onSubmit?.({...current, status: newStatus, rejectDesc });
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      newStatus === '申请驳回' ? setRejectDescDisable(true) : '';
+      setStatusNew(newStatus);
+      onSubmit?.({ ...current, status: newStatus, rejectDesc });
     }
   };
 
@@ -170,7 +158,7 @@ const AuditModal: FC<OperationModalProps> = (props) => {
     return (
       <>
         <Steps progressDot style={{ margin: '0 auto' }}>
-          {getStepList(status)}
+          {statusNew ? getStepList(statusNew) : getStepList(status)}
         </Steps>
         <div
           style={{

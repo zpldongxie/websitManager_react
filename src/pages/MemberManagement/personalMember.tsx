@@ -231,8 +231,8 @@ const TableList: React.FC = () => {
       valueEnum: {
         申请中: { text: '申请中', status: 'Default' },
         初审通过: { text: '初审通过', status: 'Processing' },
-        申请驳回: { text: '申请驳回', status: 'Error' },
-        正式会员: { text: '正式会员', status: 'Success' },
+        申请驳回: { text: '已驳回', status: 'Error' },
+        正式会员: { text: '已入会', status: 'Success' },
         禁用: { text: '禁用', status: 'Error' },
       },
       render: (dom, item) => {
@@ -379,7 +379,7 @@ const TableList: React.FC = () => {
       <OperationModal
         type="personal"
         visible={opVisible}
-        currentPersonal={currentOp}
+        current={currentOp}
         done={done}
         loading={loadingSpin}
         onDone={handleDone}
