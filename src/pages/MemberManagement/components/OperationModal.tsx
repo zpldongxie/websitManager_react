@@ -29,7 +29,7 @@ const formLayout = {
 let submitFun: () => void;
 
 const OperationModal: FC<OperationModalProps> = (props) => {
-  const { type, done, visible, loading, current, currentPersonal, onDone, onCancel, onSubmit, onSubmitPersonal } = props;
+  const { type, done, visible, loading, current, onDone, onCancel, onSubmit, onSubmitPersonal } = props;
 
 
   const [status, setStatus] = useState<MemberStatus>(current?.status || '申请中');
@@ -59,8 +59,11 @@ const OperationModal: FC<OperationModalProps> = (props) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     memberTypes === undefined ? getMemberTypes() : '';
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.visible]);
-  useEffect(() => setStatus(current?.status), [current]);
+  useEffect(() => {
+    setStatus(current?.status || '申请中')
+  }, [current]);
   const handleSubmit = () => {
     if (typeof submitFun === 'function')
       submitFun();
@@ -83,9 +86,9 @@ const OperationModal: FC<OperationModalProps> = (props) => {
   const auditStatus = [
     { value: '申请中', text: '申请中' },
     { value: '初审通过', text: '初审通过' },
-    { value: '申请驳回', text: '申请驳回' },
-    { value: '正式会员', text: '正式会员' },
-    { value: '禁用', text: '禁用' },];
+    { value: '申请驳回', text: '已驳回' },
+    { value: '正式会员', text: '已入会' },
+  ];
   const getModalContent = () => {
     const formItems = (): FormItemType[] => [
       { type: 'input', name: 'id', label: 'id', disabled: true, hidden: true },
@@ -145,7 +148,8 @@ const OperationModal: FC<OperationModalProps> = (props) => {
           },
         ]
       },
-      { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] }, {
+      { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] }, 
+      {
         type: 'group',
         key: 'group4',
         groupItems: [
@@ -155,7 +159,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
               setStatus(formatString.key);
             },
           },
-          { type: 'input', name: 'rejectDesc', label: '驳回原因', disabled, rules: [{ required:  status === '申请驳回', message: '请输入驳回原因' }] },
+          { type: 'input', name: 'rejectDesc', label: '驳回原因', hidden: status !== '申请驳回', disabled, rules: [{ required:  status === '申请驳回', message: '请输入驳回原因' }] },
         ],
       },
     ];
@@ -228,28 +232,40 @@ const OperationModal: FC<OperationModalProps> = (props) => {
                 message: '网站格式有误',
               },
             ]
-          },
+          }
         ],
-      }
+      },
+      { type: 'textArae', name: 'intro', label: '个人简介', disabled, rules: [{ required: true, message: '请输入个人简介' }] }, 
+      {
+        type: 'group',
+        key: 'group5',
+        groupItems: [
+          {
+            type: 'select', name: 'status', label: '审核状态', disabled, items: auditStatus,
+            onChange: (_: any, formatString: any) => {
+              setStatus(formatString.key);
+            },
+          },
+          { type: 'input', name: 'rejectDesc', label: '驳回原因', disabled, hidden: status !== '申请驳回',rules: [{ required: status === '申请驳回', message: '请输入驳回原因' }] },
+        ],
+      },
     ];
     const curFormItem = type ? formItemsPersonal() : formItems();
-    const curValue = type ? currentPersonal : current;
-    const defaultValues = type ? { sex: '男', status: '申请中', idType: '身份证', MemberTypeId: MemberIndvicId } : { status, MemberTypeId };
-    console.log({ status, MemberTypeId });
+    const defaultValues = type ? { sex: '男', status, idType: '身份证', MemberTypeId: MemberIndvicId } : { status, MemberTypeId };
+
     return (
       <CustomForm
         formLayout={formLayout}
         formItems={curFormItem}
-        values={(curValue || defaultValues)}
+        values={(current || defaultValues)}
         onFinish={handleFinish}
         setSubmitFun={(submit: () => void) => { submitFun = submit }}
       />
     );
   };
-  const curTitle = currentPersonal || current;
   return (
     <Modal
-      title={done ? `查看信息` : `${curTitle ? '编辑信息' : '新增'}`}
+      title={done ? `查看信息` : `${current ? '编辑信息' : '新增'}`}
       className='standardListForm'
       width={640}
       bodyStyle={{ padding: '28px 0 0' }}

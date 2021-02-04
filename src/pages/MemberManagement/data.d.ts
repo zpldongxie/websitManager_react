@@ -1,4 +1,4 @@
-export type MemberStatus = '申请中' | '初审通过' | '申请驳回' | '正式会员' | '禁用';
+export type MemberStatus = '申请中' | '初审通过' | '申请驳回' | '正式会员' | '禁用' | undefined;
 export type MemberTypes = {
   id: string;
   name: string;

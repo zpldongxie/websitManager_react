@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   DownOutlined,
   PlusOutlined,
@@ -14,7 +14,7 @@ import Option from './components/Option';
 import OperationModal from './components/OperationModal';
 import AuditModal from './components/AuditModal';
 
-import { queryCompanyMemberList, removeCompanyMember, upsertCompanyMember, auditCompanyMember } from './service';
+import { queryCompanyMemberList, removeCompanyMember, upsertCompanyMember, auditCompanyMember, queryMemberTypes } from './service';
 
 import styles from './index.module.less';
 
@@ -37,7 +37,11 @@ const delHandler = (ids: string[], action: any) => {
     },
   });
 };
-
+let memberTypeValues: { id: any; name: any; }[] = [];
+const getMemberTypes = async () => {
+  const result = await queryMemberTypes();
+  memberTypeValues = result;
+}
 const TableList: React.FC = () => {
   const [currentStatus, setCurrentStatus] = useState<string | undefined>('official');
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的会员ID
@@ -48,7 +52,10 @@ const TableList: React.FC = () => {
   const [currentOp, setCurrentOp] = useState<Partial<TableListItem> | undefined>(undefined);
   const [currentAudit, setCurrentAudit] = useState<AuditMemberParams | undefined>(undefined);
   const actionRef = useRef<ActionType>();
-
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    memberTypeValues.length === 0 ? getMemberTypes() : '';
+  });
   const showModal = () => {
     setOpVisible(true);
     setCurrentOp(undefined);
@@ -84,7 +91,7 @@ const TableList: React.FC = () => {
     setLoadingSpin(true);
     const result = await upsertCompanyMember(pram);
     if (result.status === "ok") {
-      setOpVisible(false);
+      // setOpVisible(false);
       setLoadingSpin(false);
       const action = actionRef.current;
       action?.reload();
@@ -103,12 +110,12 @@ const TableList: React.FC = () => {
     const pram = { ...values };
     const result = await auditCompanyMember(pram);
     if (result.status === "ok") {
-      setAuditVisible(false);
+      // setAuditVisible(false);
       const action = actionRef.current;
       action?.reload();
       message.info('审核成功');
     } else if (result.message.indexOf('邮件') > -1) {
-      setAuditVisible(false);
+      // setAuditVisible(false);
       const action = actionRef.current;
       action?.reload();
       message.warn('审核成功，邮件发送失败，请检查邮箱地址是否有效');
@@ -172,16 +179,27 @@ const TableList: React.FC = () => {
       sorter: true,
       align: 'center',
       width: '7em',
-      // width: '7em',
+      valueType: 'select',
       valueEnum: {
-        副理事长单位: { text: '副理事长单位', status: 'Default' },
-        理事单位: { text: '理事单位', status: 'Processing' },
-        单位会员: { text: '单位会员', status: 'Error' },
+        副理事长单位: { text: '副理事长单位' },
+        理事单位: { text: '理事单位' },
+        单位会员: { text: '单位会员' },
       },
       render: (_, record) => (
         <span>{record.MemberType?.name}</span>
       ),
-      search: { transform: (_: any, __: string, object: any) => object },
+      search: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        transform: (_: any, __: string, object: any) => {
+          // eslint-disable-next-line func-names
+          const data = memberTypeValues.filter(function (item) {
+            return item.name === _;
+          });
+          return {
+            MemberTypeId:data[0].id
+          }
+        }
+      },
     },
     {
       title: '所属行业',
@@ -216,7 +234,7 @@ const TableList: React.FC = () => {
       ellipsis: true,
       width: '8em',
       render: (_, record) => (
-        <span>{record && record.logonDate && record.logonDate.split(/T/g)[0]}</span>
+        <span>{record.logonDate?.split(/T/g)[0]}</span>
       )
     },
     {
@@ -262,8 +280,8 @@ const TableList: React.FC = () => {
       valueEnum: {
         申请中: { text: '申请中', status: 'Default' },
         初审通过: { text: '初审通过', status: 'Processing' },
-        申请驳回: { text: '申请驳回', status: 'Error' },
-        正式会员: { text: '正式会员', status: 'Success' },
+        申请驳回: { text: '已驳回', status: 'Error' },
+        正式会员: { text: '已入会', status: 'Success' },
         禁用: { text: '禁用', status: 'Error' },
       },
       render: (dom, item) => {
