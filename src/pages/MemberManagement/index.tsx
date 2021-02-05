@@ -282,7 +282,7 @@ const TableList: React.FC = () => {
         初审通过: { text: '初审通过', status: 'Processing' },
         申请驳回: { text: '已驳回', status: 'Error' },
         正式会员: { text: '已入会', status: 'Success' },
-        禁用: { text: '禁用', status: 'Error' },
+        禁用: { text: '已禁用', status: 'Error' },
       },
       render: (dom, item) => {
         if (item.status === '申请驳回') {

@@ -59,7 +59,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     memberTypes === undefined ? getMemberTypes() : '';
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.visible]);
   useEffect(() => {
     setStatus(current?.status || '申请中')
@@ -148,18 +148,18 @@ const OperationModal: FC<OperationModalProps> = (props) => {
           },
         ]
       },
-      { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] }, 
+      { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] },
       {
         type: 'group',
         key: 'group4',
         groupItems: [
           {
-            type: 'select', name: 'status', label: '审核状态', disabled, items: auditStatus,
+            type: 'select', name: 'status', label: '审核状态', hidden: status === '禁用' || status === '正式会员', disabled, items: auditStatus,
             onChange: (_: any, formatString: any) => {
               setStatus(formatString.key);
             },
           },
-          { type: 'input', name: 'rejectDesc', label: '驳回原因', hidden: status !== '申请驳回', disabled, rules: [{ required:  status === '申请驳回', message: '请输入驳回原因' }] },
+          { type: 'input', name: 'rejectDesc', label: '驳回原因', hidden: status !== '申请驳回', disabled, rules: [{ required: status === '申请驳回', message: '请输入驳回原因' }] },
         ],
       },
     ];
@@ -235,18 +235,18 @@ const OperationModal: FC<OperationModalProps> = (props) => {
           }
         ],
       },
-      { type: 'textArae', name: 'intro', label: '个人简介', disabled, rules: [{ required: true, message: '请输入个人简介' }] }, 
+      { type: 'textArae', name: 'intro', label: '个人简介', disabled, rules: [{ required: true, message: '请输入个人简介' }] },
       {
         type: 'group',
         key: 'group5',
         groupItems: [
           {
-            type: 'select', name: 'status', label: '审核状态', disabled, items: auditStatus,
+            type: 'select', name: 'status', label: '审核状态', hidden: status === '禁用' || status === '正式会员',disabled, items: auditStatus,
             onChange: (_: any, formatString: any) => {
               setStatus(formatString.key);
             },
           },
-          { type: 'input', name: 'rejectDesc', label: '驳回原因', disabled, hidden: status !== '申请驳回',rules: [{ required: status === '申请驳回', message: '请输入驳回原因' }] },
+          { type: 'input', name: 'rejectDesc', label: '驳回原因', disabled, hidden: status !== '申请驳回', rules: [{ required: status === '申请驳回', message: '请输入驳回原因' }] },
         ],
       },
     ];

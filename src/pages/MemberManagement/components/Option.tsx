@@ -17,7 +17,6 @@ type OptType = {
   refreshHandler?: () => void;
   editHandler?: () => void;
   auditHandler?: () => void;
-  checkHandler?: () => void;
 }
 
 const EditOpt = ({ editHandler }: OptType) => (
@@ -41,17 +40,7 @@ const PubOpt = ({ auditHandler }: OptType) => (
     审核
   </a>
 );
-const CheckOpt = ({ checkHandler }: OptType) => (
-  <a
-    onClick={() => {
-      if (checkHandler) {
-        checkHandler();
-      }
-    }}
-  >
-    查看
-  </a >
-);
+
 
 const DisableOpt = ({ id, type, status, refreshHandler }: OptType) => (
   <Popconfirm
@@ -148,11 +137,10 @@ type Props = {
   refreshHandler: () => void;
   editHandler: () => void;
   auditHandler: () => void;
-  checkHandler: () => void;
 }
 
 const Option: React.FC<Props> = (props) => {
-  const { id, status, type, refreshHandler, editHandler, auditHandler, checkHandler } = props;
+  const { id, status, type, refreshHandler, editHandler, auditHandler } = props;
   switch (status) {
     case '正式会员':
       return (
@@ -168,8 +156,6 @@ const Option: React.FC<Props> = (props) => {
     case '禁用':
       return (
         <>
-          <CheckOpt id={id} checkHandler={checkHandler} />
-          <Divider type="vertical" />
           <EnableOpt id={id} type={type} status={status} refreshHandler={refreshHandler} />
           <Divider type="vertical" />
           <DelOpt id={id} type={type} refreshHandler={refreshHandler} editHandler={editHandler} />
