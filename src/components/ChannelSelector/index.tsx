@@ -8,9 +8,9 @@
 import React, { useEffect, useState } from 'react';
 import { TreeSelect } from 'antd';
 import { TreeNode } from 'antd/lib/tree-select';
-import { ChannelType, TreeNodeType } from '@/utils/data';
 import { convertChannelsToTree } from '@/utils/utils';
 import { queryChannels } from './service';
+import type { ChannelType, TreeNodeType } from '@/utils/data';
 
 /**
  * 渲染栏目树节点
@@ -57,8 +57,12 @@ const ChannelSelector = (props: PropsTypes) => {
   }, []);
 
   useEffect(() => {
-    setCurrentValue(value);
-  }, [value]);
+    if (channels.length) {
+      setCurrentValue(value);
+    } else {
+      setCurrentValue('');
+    }
+  }, [value, channels]);
 
   return (
     <TreeSelect

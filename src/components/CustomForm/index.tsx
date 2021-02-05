@@ -1,8 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { Col, Form, Row } from 'antd';
-import type { FormItemType, FormSelectProps } from './interfice';
-import { FormInput, FormSelect, FormTimeRange, FormTextArea, FormRadio } from './CustomFormItem';
+import type {
+  FormCustomProps,
+  FormInputProps,
+  FormItemType,
+  FormRadioProps,
+  FormSelectProps,
+  FormSwitchProps,
+} from './interfice';
+import {
+  FormInput,
+  FormSelect,
+  FormTimeRange,
+  FormTextArea,
+  FormRadio,
+  FormSwitch,
+  FormCustom,
+} from './CustomFormItem';
 
 const renderFormItems = (formItems: FormItemType[]) => {
   return formItems.map((formItem) => {
@@ -10,7 +25,7 @@ const renderFormItems = (formItems: FormItemType[]) => {
     const currentKey = key || formItem.label;
     switch (type) {
       case 'input':
-        return <FormInput {...currentProps} key={currentKey} />;
+        return <FormInput {...(currentProps as FormInputProps)} key={currentKey} />;
       case 'select':
         return <FormSelect {...(currentProps as FormSelectProps)} key={currentKey} />;
       case 'timeRange':
@@ -18,7 +33,11 @@ const renderFormItems = (formItems: FormItemType[]) => {
       case 'textArae':
         return <FormTextArea {...currentProps} key={currentKey} />;
       case 'radio':
-        return <FormRadio {...(currentProps as FormSelectProps)} key={currentKey} />;
+        return <FormRadio {...(currentProps as FormRadioProps)} key={currentKey} />;
+      case 'switch':
+        return <FormSwitch {...(currentProps as FormSwitchProps)} key={currentKey} />;
+      case 'custom':
+        return <FormCustom {...(currentProps as FormCustomProps)} key={currentKey} />;
       case 'group': {
         const colW = 24 / (groupItems ? groupItems.length : 1);
         return (

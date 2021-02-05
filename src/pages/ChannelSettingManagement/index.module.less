@@ -1,0 +1,35 @@
+textarea:disabled {
+  resize: none;
+}
+.contentListWrapper {
+  .channelCol {
+    display: block;
+    max-width: 10em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: default;
+  }
+  .optionCol {
+    min-width: 10em;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  .thumbnail {
+    width: 100px;
+    height: 100px;
+    padding: 5px;
+    border: 1px solid #aaa;
+    img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  :global(.my-editor) {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+}

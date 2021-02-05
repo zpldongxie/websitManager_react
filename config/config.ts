@@ -123,6 +123,26 @@ export default defineConfig({
               ],
             },
             {
+              name: 'channel',
+              icon: 'AppstoreOutlined',
+              path: '/channel',
+              authority: ['admin', 'user'],
+              routes: [
+                {
+                  name: 'management',
+                  path: '/channel/management',
+                  component: './ChannelManagement',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  name: 'setting',
+                  path: '/channel/setting',
+                  component: './ChannelSettingManagement',
+                  authority: ['admin', 'user'],
+                },
+              ],
+            },
+            {
               name: 'serviceRequestManagement',
               icon: 'HeartOutlined',
               path: '/serviceRequestManagement',

@@ -1,14 +1,34 @@
+// 栏目类型
+export type ChannelTypeType = {
+  id?: string;
+  name: string;
+  descStr?: string;
+  orderIndex: number;
+};
+
 /**
  * 请求获取到的栏目列表
  *
  * @export
  * @interface ChannelType
  */
-export interface ChannelType {
-  id: number;
+export type ChannelType = {
+  id?: string;
   name: string;
-  parentId?: number;
-}
+  enName: string;
+  parentId?: string | null;
+  keyWord: string;
+  descStr: string;
+  showStatus: number;
+  orderIndex?: number;
+  url?: string;
+  settingExtend: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  ChannelTypeId: string;
+  ChannelType?: ChannelTypeType;
+  ChannelSettings?: ChannelSettingType[];
+};
 
 /**
  * 栏目树数据结构
@@ -16,8 +36,8 @@ export interface ChannelType {
  * @interface TreeNodeType
  */
 export interface TreeNodeType {
-  value?: string | number;
+  value?: string;
   label?: React.ReactNode;
-  children?: Array<TreeNodeType>;
+  children?: TreeNodeType[];
   [key: string]: any;
 }
