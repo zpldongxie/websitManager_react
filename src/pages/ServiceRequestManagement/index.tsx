@@ -247,11 +247,11 @@ const TableList: React.FC = () => {
   const getModelTitle = () => {
     if (modalType === 'audit') return '审核';
     if (infoEdit) {
-      if(current){
+      if (current) {
         return '编辑信息';
       }
       return '新增';
-    };
+    }
     return '查看信息';
   };
 
@@ -262,6 +262,8 @@ const TableList: React.FC = () => {
       const action = actionRef.current;
       action?.reload();
       message.info('操作成功');
+    } else if (res.message instanceof Array) {
+      message.warn(res.message[0].message);
     } else {
       message.warn(res.message);
     }
