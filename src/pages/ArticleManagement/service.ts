@@ -98,7 +98,7 @@ export async function moveTo(ids: string[], cIds: number[]) {
     method: 'PUT',
     data: {
       ids,
-      cIds
+      cIds,
     },
   });
 }
@@ -116,7 +116,7 @@ export async function setPub(ids: string[], pubStatus: string) {
     method: 'PUT',
     data: {
       ids,
-      attr: { pubStatus }
+      attr: { pubStatus },
     },
   });
 }
@@ -134,7 +134,7 @@ export async function setIsHead(ids: string[], isHead: boolean) {
     method: 'PUT',
     data: {
       ids,
-      attr: { isHead }
+      attr: { isHead },
     },
   });
 }
@@ -152,7 +152,7 @@ export async function setIsRecom(ids: string[], isRecom: boolean) {
     method: 'PUT',
     data: {
       ids,
-      attr: { isRecom }
+      attr: { isRecom },
     },
   });
 }
@@ -178,13 +178,13 @@ function getBody(xhr: XMLHttpRequest) {
  * @param {BraftUploadFile} param
  */
 export function upload(param: BraftUploadFile) {
-  const serverURL = '/api/upload'
+  const serverURL = '/api/upload';
   const xhr = new XMLHttpRequest();
 
   if (xhr.upload) {
     xhr.upload.onprogress = function progress(e) {
       if (e.total > 0) {
-        param.progress(e.loaded / e.total * 100);
+        param.progress((e.loaded / e.total) * 100);
       }
     };
   }
@@ -200,8 +200,8 @@ export function upload(param: BraftUploadFile) {
     console.dir(e);
     console.log(`------xhr.onerror------`);
     param.error({
-      msg: 'unable to upload.'
-    })
+      msg: 'unable to upload.',
+    });
   };
 
   xhr.onload = () => {
@@ -209,8 +209,8 @@ export function upload(param: BraftUploadFile) {
     // see https://github.com/react-component/upload/issues/34
     if (xhr.status < 200 || xhr.status >= 300) {
       param.error({
-        msg: 'unable to upload.'
-      })
+        msg: 'unable to upload.',
+      });
     }
 
     const res = getBody(xhr);
@@ -224,8 +224,8 @@ export function upload(param: BraftUploadFile) {
         autoPlay: false,
         controls: true,
         poster: '',
-      }
-    })
+      },
+    });
   };
 
   xhr.open('POST', serverURL, true);

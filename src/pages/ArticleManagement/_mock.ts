@@ -7,34 +7,33 @@ import { TableListItem, TableListParams } from './data.d';
 const genList = (current: number, pageSize: number) => {
   const tableListDataSource: TableListItem[] = [];
 
-
   for (let i = 0; i < pageSize; i += 1) {
     const index = (current - 1) * 10 + i;
     tableListDataSource.push({
       key: index,
-      approvalStatus: "无需审核",
-      auth: "",
+      approvalStatus: '无需审核',
+      auth: '',
       canComment: false,
-      channels: [{ name: "国际", id: "105" }],
-      commentEndTime: "",
-      commentStartTime: "",
-      conDate: "2020-07-06T15:44",
-      contentType: "文章",
-      createTime: "2020/07/06 15:47:13",
+      channels: [{ name: '国际', id: '105' }],
+      commentEndTime: '',
+      commentStartTime: '',
+      conDate: '2020-07-06T15:44',
+      contentType: '文章',
+      createTime: '2020/07/06 15:47:13',
       id: 976,
       isHead: false,
       isRecom: false,
-      keyWord: "",
-      mainPic: "",
-      mainUrl: "",
-      mainVideo: "",
+      keyWord: '',
+      mainPic: '',
+      mainUrl: '',
+      mainVideo: '',
       orderIndex: 10,
-      pubStatus: "已发布",
-      source: "",
-      subtitle: "",
-      summary: "",
-      thumbnail: "",
-      title: "一张图带你读懂美国网络安全体系架构"
+      pubStatus: '已发布',
+      source: '',
+      subtitle: '',
+      summary: '',
+      thumbnail: '',
+      title: '一张图带你读懂美国网络安全体系架构',
     });
   }
   tableListDataSource.reverse();

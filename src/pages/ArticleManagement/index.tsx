@@ -7,12 +7,13 @@ import {
 } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Switch, Popover, Modal, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 
 import ContentPreview from '@/components/ContentPreview';
 import ChannelSelector from '@/components/ChannelSelector';
-import { TableListItem, TableListParams } from './data.d';
 import Option from './components/Option';
+import type { TableListItem, TableListParams } from './data.d';
 
 import { queryList, remove, moveTo, setIsHead, setIsRecom, setPub } from './service';
 
@@ -95,7 +96,7 @@ const unDelHandler = async (ids: string[], action: any) => {
   }
 };
 
-const TableList: React.FC<{}> = () => {
+const TableList: React.FC = () => {
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的文章ID
   const [previewId, setPreviewId] = useState('');
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -139,7 +140,7 @@ const TableList: React.FC<{}> = () => {
     },
     {
       title: '发布时间',
-      dataIndex: 'conDate',
+      dataIndex: 'createdAt',
       sorter: true,
       valueType: 'dateTime',
       hideInForm: true,

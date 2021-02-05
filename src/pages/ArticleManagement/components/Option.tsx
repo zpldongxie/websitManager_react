@@ -13,7 +13,7 @@ import { remove, setPub } from '../service';
 type OptType = {
   id: string;
   refreshHandler: () => void;
-}
+};
 
 const EditOpt = ({ id }: { id: string }) => (
   <a
@@ -81,7 +81,9 @@ const UnDelOpt = ({ id, refreshHandler }: OptType) => (
         message.error('恢复失败，请联系管理员或稍后重试。');
       }
     }}
-  >恢复</a>
+  >
+    恢复
+  </a>
 );
 
 const DelOpt = ({ id, refreshHandler }: OptType) => (
@@ -128,7 +130,9 @@ const RealDelOpt = ({ id, refreshHandler }: OptType) => (
     cancelText="No"
     placement="topLeft"
   >
-    <a href="#" style={{color:'red'}}>彻底删除</a>
+    <a href="#" style={{ color: 'red' }}>
+      彻底删除
+    </a>
   </Popconfirm>
 );
 
@@ -136,7 +140,7 @@ type Props = {
   id: string;
   pubStatus: string;
   refreshHandler: () => void;
-}
+};
 
 const Option: React.FC<Props> = (props) => {
   const { id, pubStatus, refreshHandler } = props;
@@ -150,7 +154,7 @@ const Option: React.FC<Props> = (props) => {
           <Divider type="vertical" />
           <RealDelOpt id={id} refreshHandler={refreshHandler} />
         </>
-      )
+      );
     default:
       return (
         <>

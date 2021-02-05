@@ -47,7 +47,7 @@ export default defineConfig({
             {
               name: 'edit',
               path: '/editArticle/edit',
-              component: './ContentManagement/EditArticle',
+              component: './ArticleManagement/EditArticle',
             },
           ],
         },
@@ -77,20 +77,13 @@ export default defineConfig({
                 {
                   name: 'list',
                   path: '/contentmanagement/list',
-                  component: './ContentManagement',
+                  component: './ArticleManagement',
                   authority: ['admin', 'user'],
-                },
-                {
-                  name: 'review',
-                  path: '/contentmanagement/recycleBin',
-                  component: './ContentManagement',
-                  // authority: ['admin'],
-                  authority: [], // 位置预留，暂不显示
                 },
                 {
                   name: 'recycle-bin',
                   path: '/contentmanagement/recycleBin',
-                  component: './ContentManagement',
+                  component: './ArticleManagement',
                   authority: ['admin', 'user'],
                 },
               ],

@@ -192,8 +192,8 @@ export interface TableListParams {
   key?: number;
   pageSize?: number;
   current?: number;
-  filter?: { [key: string]: any[] };
-  sorter?: { [key: string]: any };
+  filter?: Record<string, any[]>;
+  sorter?: Record<string, any>;
   channelId?: string;
 }
 
