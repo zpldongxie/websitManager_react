@@ -211,6 +211,8 @@ const TableList: React.FC = () => {
             handleChange={async (value: SelectValue) => {
               const res = await setShowStatus(record.id!, value as number);
               if (res.status === 'ok') {
+                const action = actionRef.current;
+                action?.reload();
                 message.success('设置成功');
               } else {
                 message.error('设置失败，请联系管理员');
@@ -236,7 +238,7 @@ const TableList: React.FC = () => {
     {
       title: '排序值',
       dataIndex: 'orderIndex',
-      // hideInTable: true,
+      hideInTable: true,
       search: false,
     },
     {
