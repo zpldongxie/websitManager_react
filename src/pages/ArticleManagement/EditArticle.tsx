@@ -24,7 +24,7 @@ import { defImg } from '@/constant';
 import 'braft-editor/dist/index.css';
 
 import { ChannelType } from '@/utils/data';
-import ContentPreview from '@/components/ContentPreview';
+import ArticlePreview from '@/components/ArticlePreview';
 import ChannelSelector from '@/components/ChannelSelector';
 import styles from './index.module.less';
 import { upsert, getById, upload, setPub } from './service';
@@ -205,7 +205,7 @@ const EditArticle = () => {
   const disabled = pubStatus !== '草稿';
   return (
     <div className={styles.container}>
-      <ContentPreview
+      <ArticlePreview
         id={id}
         visiable={previewVisible}
         hiddenHandler={() => {

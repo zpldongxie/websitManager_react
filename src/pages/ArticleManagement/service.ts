@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import request from 'umi-request';
-import { BraftUploadFile, TableListParams, UpsertParams } from './data.d';
+import type { BraftUploadFile, TableListParams, UpsertParams } from './data.d';
 
 /**
  * 按条件查询文章列表

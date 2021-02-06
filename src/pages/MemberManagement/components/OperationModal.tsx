@@ -148,7 +148,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
           },
         ]
       },
-      { type: 'textArae', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] },
+      { type: 'textArea', name: 'intro', label: '单位简介', disabled, rules: [{ required: true, message: '请输入单位简介' }] },
       {
         type: 'group',
         key: 'group4',
@@ -235,7 +235,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
           }
         ],
       },
-      { type: 'textArae', name: 'intro', label: '个人简介', disabled, rules: [{ required: true, message: '请输入个人简介' }] },
+      { type: 'textArea', name: 'intro', label: '个人简介', disabled, rules: [{ required: true, message: '请输入个人简介' }] },
       {
         type: 'group',
         key: 'group5',

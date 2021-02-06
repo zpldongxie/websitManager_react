@@ -54,12 +54,12 @@ const TestSecondMenu = () => {
   );
 };
 
-interface PropsType {
+type PropsType = {
   visiable?: boolean;
   id?: string;
   hiddenHandler: () => void;
 }
-const ContentPreview = ({ visiable = false, id, hiddenHandler }: PropsType) => {
+const ArticlePreview = ({ visiable = false, id, hiddenHandler }: PropsType) => {
   const [content, setContent] = useState<ContentType | null>(null);
   useEffect(() => {
     (async () => {
@@ -106,4 +106,4 @@ const ContentPreview = ({ visiable = false, id, hiddenHandler }: PropsType) => {
   );
 };
 
-export default ContentPreview;
+export default ArticlePreview;

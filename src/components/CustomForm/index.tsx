@@ -30,7 +30,7 @@ const renderFormItems = (formItems: FormItemType[]) => {
         return <FormSelect {...(currentProps as FormSelectProps)} key={currentKey} />;
       case 'timeRange':
         return <FormTimeRange {...currentProps} key={currentKey} />;
-      case 'textArae':
+      case 'textArea':
         return <FormTextArea {...currentProps} key={currentKey} />;
       case 'radio':
         return <FormRadio {...(currentProps as FormRadioProps)} key={currentKey} />;

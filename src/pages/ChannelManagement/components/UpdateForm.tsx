@@ -163,7 +163,7 @@ const UpdateForm = (props: PropsType) => {
       hidden: currentType !== '外部链接',
     },
     {
-      type: 'textArae',
+      type: 'textArea',
       name: 'descStr',
       label: '描述',
       disabled: !infoEdit,

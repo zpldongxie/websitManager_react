@@ -57,7 +57,7 @@ export type FormItemType = {
     | 'input'
     | 'select'
     | 'timeRange'
-    | 'textArae'
+    | 'textArea'
     | 'radio'
     | 'switch'
     | 'custom'

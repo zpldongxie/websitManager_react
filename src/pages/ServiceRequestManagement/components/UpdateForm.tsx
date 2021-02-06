@@ -143,7 +143,7 @@ const UpdateForm = (props: PropsType) => {
     },
     { type: 'input', name: 'demandType', label: '需求类型', hidden: true },
     {
-      type: 'textArae',
+      type: 'textArea',
       name: 'requestDesc',
       label: '需求描述',
       rules: [{ required: true, message: '请输入需求描述' }],

@@ -10,7 +10,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 
-import ContentPreview from '@/components/ContentPreview';
+import ArticlePreview from '@/components/ArticlePreview';
 import ChannelSelector from '@/components/ChannelSelector';
 import Option from './components/Option';
 import type { TableListItem, TableListParams } from './data.d';
@@ -281,7 +281,7 @@ const TableList: React.FC = () => {
 
   return (
     <PageHeaderWrapper className={styles.contentListWrapper} title={false}>
-      <ContentPreview
+      <ArticlePreview
         id={previewId}
         visiable={previewVisible}
         hiddenHandler={() => {

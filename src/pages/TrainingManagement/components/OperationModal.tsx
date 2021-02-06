@@ -162,7 +162,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
         rules: [{ required: true, message: '请设置培训结束时间' }],
         hidden: true,
       },
-      { type: 'textArae', name: 'desc', disabled, label: '培训活动描述' },
+      { type: 'textArea', name: 'desc', disabled, label: '培训活动描述' },
     ];
 
     return (

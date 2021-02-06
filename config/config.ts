@@ -69,20 +69,20 @@ export default defineConfig({
               authority: ['admin', 'user'],
             },
             {
-              name: 'contentmanagement',
+              name: 'articleManagement',
               icon: 'ReadOutlined',
-              path: '/contentmanagement',
+              path: '/articleManagement',
               authority: ['admin', 'user'],
               routes: [
                 {
                   name: 'list',
-                  path: '/contentmanagement/list',
+                  path: '/articleManagement/list',
                   component: './ArticleManagement',
                   authority: ['admin', 'user'],
                 },
                 {
                   name: 'recycle-bin',
-                  path: '/contentmanagement/recycleBin',
+                  path: '/articleManagement/recycleBin',
                   component: './ArticleManagement',
                   authority: ['admin', 'user'],
                 },
