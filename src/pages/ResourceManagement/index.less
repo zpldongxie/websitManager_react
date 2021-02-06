@@ -10,8 +10,13 @@
     height: calc(~'100vh - 20em');
     padding: 10px;
     overflow-y: auto;
+    :global {
+      .ant-upload-list-item-thumbnail {
+        opacity: 1;
+      }
+    }
   }
-  .bgc{
+  .bgc {
     width: 16px;
     background: rgb(240, 242, 245);
   }
@@ -23,7 +28,7 @@
       overflow-y: auto;
     }
   }
-  .resourceLoading{
+  .resourceLoading {
     position: fixed;
     top: 48vh;
     left: 49vw;

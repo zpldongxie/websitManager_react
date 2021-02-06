@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Menu, Row } from 'antd';
+import { Col, Menu, Row, Button } from 'antd';
 import Interweave from 'interweave';
+import moment from 'moment';
 
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, MailOutlined, SettingOutlined, LeftOutlined } from '@ant-design/icons';
 import { getContent } from './service';
 import styles from './index.module.less';
 
@@ -58,7 +59,7 @@ type PropsType = {
   visiable?: boolean;
   id?: string;
   hiddenHandler: () => void;
-}
+};
 const ArticlePreview = ({ visiable = false, id, hiddenHandler }: PropsType) => {
   const [content, setContent] = useState<ContentType | null>(null);
   useEffect(() => {
@@ -74,9 +75,15 @@ const ArticlePreview = ({ visiable = false, id, hiddenHandler }: PropsType) => {
   return (
     <div className={styles.articleCon} style={{ left: visiable ? '0' : '-100vw' }}>
       <div className={styles.header}>
-        <button type="button" onClick={hiddenHandler} className={styles.back}>
+        <Button
+          type="primary"
+          size="large"
+          icon={<LeftOutlined />}
+          onClick={hiddenHandler}
+          className={styles.back}
+        >
           返回
-        </button>
+        </Button>
         网页头部
       </div>
       <div className={styles.body}>
@@ -92,7 +99,7 @@ const ArticlePreview = ({ visiable = false, id, hiddenHandler }: PropsType) => {
             <div className="contentCon">
               <div className="content-title">{content ? content.title : ''}</div>
               <div className="content-time">{`时间： ${
-                content ? content.conDate.replace('T', '') : ''
+                content ? moment(content.conDate).format('YYYY-MM-DD HH:mm') : ''
               }`}</div>
               <div className="content-mainCon">
                 <Interweave content={content ? content.mainCon : ''} />
