@@ -20,7 +20,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@@/*": ["./src/.umi/*"]
-    }
+    },
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules", "build", "dist", "scripts", "src/.umi/*", "webpack", "jest"]
 }

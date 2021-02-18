@@ -1,0 +1,65 @@
+.tabstyle {
+  :global {
+    .ant-tabs-tab {
+      padding: 16px 0;
+      font-size: 16px;
+      .ant-tabs-tab-btn {
+        font-weight: bold;
+      }
+    }
+    .ant-tabs-nav {
+      padding: 1px 16px;
+      background: #fff;
+    }
+    .ant-input,
+    .ant-input-number-input {
+      height: 36px;
+      padding: 7px 16px;
+      line-height: 36px;
+    }
+  }
+}
+
+.con {
+  :global {
+    .ant-row:nth-child(n + 2) {
+      margin-top: 1rem;
+    }
+    .ant-btn {
+      line-height: 0.5715;
+    }
+    .ant-form-item-label {
+      flex: 0 0 8rem;
+    }
+    .ant-input {
+      width: 600px;
+    }
+  }
+
+  .labelCol {
+    line-height: 32px;
+    text-align: right;
+    span {
+      margin-right: 16px;
+    }
+  }
+  .valueCol {
+    display: flex;
+    width: 600px;
+    height: 36px;
+    line-height: 36px;
+    :global {
+      .ant-input-number {
+        margin-right: 0.5rem;
+        &.error + .anticon-exclamation-circle {
+          display: block;
+        }
+      }
+      .anticon-exclamation-circle {
+        display: none;
+        margin-left: 0.5rem;
+        line-height: 32px;
+      }
+    }
+  }
+}

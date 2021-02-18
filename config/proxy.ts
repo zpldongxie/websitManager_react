@@ -8,8 +8,9 @@
 export default {
   dev: {
     '/api/': {
+      target: 'http://139.186.165.200:8000',
       // target: 'http://www.snains.cn:8000',
-      target: 'http://49.234.158.74:3000',
+      // target: 'http://49.234.158.74:3000',
       changeOrigin: true,
       pathRewrite: { '^': '' },
     },
