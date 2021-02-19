@@ -14,7 +14,13 @@ import Option from './components/Option';
 import OperationModal from './components/OperationModal';
 import AuditModal from './components/AuditModal';
 
-import { queryCompanyMemberList, removeCompanyMember, upsertCompanyMember, auditCompanyMember, queryMemberTypes } from './service';
+import {
+  queryCompanyMemberList,
+  removeCompanyMember,
+  upsertCompanyMember,
+  auditCompanyMember,
+  queryMemberTypes,
+} from './service';
 
 import styles from './index.module.less';
 
@@ -37,11 +43,11 @@ const delHandler = (ids: string[], action: any) => {
     },
   });
 };
-let memberTypeValues: { id: any; name: any; }[] = [];
+let memberTypeValues: { id: any; name: any }[] = [];
 const getMemberTypes = async () => {
   const result = await queryMemberTypes();
   memberTypeValues = result;
-}
+};
 const TableList: React.FC = () => {
   const [currentStatus, setCurrentStatus] = useState<string | undefined>('official');
   const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的会员ID
@@ -74,7 +80,11 @@ const TableList: React.FC = () => {
   const showAuditModal = (item: TableListItem) => {
     const currentItem = { ...item };
     setAuditVisible(true);
-    setCurrentAudit({ id: currentItem.id, status: currentItem.status, rejectDesc: currentItem.rejectDesc });
+    setCurrentAudit({
+      id: currentItem.id,
+      status: currentItem.status,
+      rejectDesc: currentItem.rejectDesc,
+    });
   };
   const handleDone = () => {
     setDone(false);
@@ -90,8 +100,8 @@ const TableList: React.FC = () => {
     const pram = { ...values };
     setLoadingSpin(true);
     const result = await upsertCompanyMember(pram);
-    if (result.status === "ok") {
-      // setOpVisible(false);
+    if (result.status === 'ok') {
+      setOpVisible(false);
       setLoadingSpin(false);
       const action = actionRef.current;
       action?.reload();
@@ -106,10 +116,9 @@ const TableList: React.FC = () => {
     }
   };
   const handleAuditSubmit = async (values: AuditMemberParams) => {
-
     const pram = { ...values };
     const result = await auditCompanyMember(pram);
-    if (result.status === "ok") {
+    if (result.status === 'ok') {
       // setAuditVisible(false);
       const action = actionRef.current;
       action?.reload();
@@ -122,7 +131,7 @@ const TableList: React.FC = () => {
     } else {
       message.error('审核失败，请联系管理员或稍后重试。');
     }
-  }
+  };
   const columns: ProColumns<TableListItem>[] = [
     {
       title: 'ID',
@@ -151,9 +160,11 @@ const TableList: React.FC = () => {
       ellipsis: true,
       width: '7em',
       render: (text, record) => (
-        <a onClick={() => {
-          showCheckModal(record)
-        }}>
+        <a
+          onClick={() => {
+            showCheckModal(record);
+          }}
+        >
           {text}
         </a>
       ),
@@ -171,7 +182,7 @@ const TableList: React.FC = () => {
       dataIndex: 'contactsMobile',
       defaultSortOrder: 'descend',
       align: 'center',
-      width: '7em'
+      width: '7em',
     },
     {
       title: '会员等级',
@@ -185,9 +196,7 @@ const TableList: React.FC = () => {
         理事单位: { text: '理事单位' },
         单位会员: { text: '单位会员' },
       },
-      render: (_, record) => (
-        <span>{record.MemberType?.name}</span>
-      ),
+      render: (_, record) => <span>{record.MemberType?.name}</span>,
       search: {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         transform: (_: any, __: string, object: any) => {
@@ -196,9 +205,9 @@ const TableList: React.FC = () => {
             return item.name === _;
           });
           return {
-            MemberTypeId:data[0].id
-          }
-        }
+            MemberTypeId: data[0].id,
+          };
+        },
       },
     },
     {
@@ -220,7 +229,7 @@ const TableList: React.FC = () => {
     {
       title: '邮箱',
       search: false,
-      hideInTable: currentStatus !== "official",
+      hideInTable: currentStatus !== 'official',
       dataIndex: 'email',
       width: '7em',
       ellipsis: true,
@@ -229,52 +238,52 @@ const TableList: React.FC = () => {
       title: '入会日期',
       dataIndex: 'logonDate',
       search: false,
-      hideInTable: currentStatus !== "official",
+      hideInTable: currentStatus !== 'official',
       sorter: true,
       ellipsis: true,
       width: '8em',
-      render: (_, record) => (
-        <span>{record.logonDate?.split(/T/g)[0]}</span>
-      )
+      render: (_, record) => <span>{record.logonDate?.split(/T/g)[0]}</span>,
     },
     {
       title: '申请日期',
       dataIndex: 'createdAt',
       search: false,
-      hideInTable: currentStatus === "official",
+      hideInTable: currentStatus === 'official',
       sorter: true,
       ellipsis: true,
       width: '8em',
-      render: (_, record) => (
-        <span>{record.createdAt?.split(/T/g)[0]}</span>
-      )
+      render: (_, record) => <span>{record.createdAt?.split(/T/g)[0]}</span>,
     },
     {
       title: '更新日期',
       dataIndex: 'updatedAt',
       search: false,
-      hideInTable: currentStatus === "official",
+      hideInTable: currentStatus === 'official',
       sorter: true,
       ellipsis: true,
       width: '8em',
       render: (_, record) => (
-        <span>{record.updatedAt?.split(/T/g)[0]}  {record.updatedAt?.substring(11, 16)}</span>
-      )
+        <span>
+          {record.updatedAt?.split(/T/g)[0]} {record.updatedAt?.substring(11, 16)}
+        </span>
+      ),
     },
     {
       title: '发件状态',
       dataIndex: 'sendEmailStatus',
       search: false,
-      hideInTable: currentStatus === "official",
+      hideInTable: currentStatus === 'official',
       sorter: true,
       ellipsis: true,
       width: '8em',
       render: (_, record) => (
-        <span>{record.sendEmailStatus?.split(/T/g)[0]}  {record.sendEmailStatus?.substring(11, 16)}</span>
-      )
+        <span>
+          {record.sendEmailStatus?.split(/T/g)[0]} {record.sendEmailStatus?.substring(11, 16)}
+        </span>
+      ),
     },
     {
-      title: currentStatus === "official" ? '状态' : '审核状态',
+      title: currentStatus === 'official' ? '状态' : '审核状态',
       dataIndex: 'status',
       width: '7em',
       valueEnum: {
@@ -294,27 +303,32 @@ const TableList: React.FC = () => {
         }
         return dom;
       },
-      filters: currentStatus === "official" ? [{
-        text: '正式会员',
-        value: '正式会员',
-      },
-      {
-        text: '禁用',
-        value: '禁用',
-      },] : [
-          {
-            text: '申请中',
-            value: '申请中',
-          },
-          {
-            text: '初审通过',
-            value: '初审通过',
-          },
-          {
-            text: '申请驳回',
-            value: '申请驳回',
-          },
-        ],
+      filters:
+        currentStatus === 'official'
+          ? [
+              {
+                text: '正式会员',
+                value: '正式会员',
+              },
+              {
+                text: '禁用',
+                value: '禁用',
+              },
+            ]
+          : [
+              {
+                text: '申请中',
+                value: '申请中',
+              },
+              {
+                text: '初审通过',
+                value: '初审通过',
+              },
+              {
+                text: '申请驳回',
+                value: '申请驳回',
+              },
+            ],
       search: false,
     },
     {
@@ -351,7 +365,6 @@ const TableList: React.FC = () => {
   return (
     <>
       <PageHeaderWrapper className={styles.contentListWrapper} title={false}>
-
         <ProTable<TableListItem>
           actionRef={actionRef}
           rowKey="id"
@@ -376,12 +389,9 @@ const TableList: React.FC = () => {
           }}
           toolBarRender={(action, { selectedRows }) => [
             <>
-              <Button
-                type="primary"
-                onClick={showModal}
-              >
+              <Button type="primary" onClick={showModal}>
                 <PlusOutlined /> 新建
-                </Button>
+              </Button>
             </>,
             selectedRows && selectedRows.length > 0 && (
               <Dropdown
@@ -416,7 +426,10 @@ const TableList: React.FC = () => {
               ...params,
               sorter: Object.keys(sorter).length ? sorter : { status: 'descend' },
               filter,
-              status: currentStatus === "official" ? ['正式会员', '禁用'] : ['申请中', '初审通过', '申请驳回']
+              status:
+                currentStatus === 'official'
+                  ? ['正式会员', '禁用']
+                  : ['申请中', '初审通过', '申请驳回'],
             };
             return queryCompanyMemberList(opts);
           }}

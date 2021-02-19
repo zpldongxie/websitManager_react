@@ -47,7 +47,7 @@ const Preview = ({ type, name, url }: PreviewType) => {
         </audio>
       );
     default:
-      return <div />;
+      return <div>请下载后查看</div>;
   }
 };
 

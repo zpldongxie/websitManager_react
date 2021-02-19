@@ -154,7 +154,7 @@ const TableList: React.FC = () => {
       valueEnum: {
         草稿: { text: '草稿', status: 'Default' },
         已发布: { text: '已发布', status: 'Success' },
-        已删除: { text: '已删除', status: 'Error' },
+        // 已删除: { text: '已删除', status: 'Error' },
       },
       filters: isRecycleBin
         ? false
