@@ -1,5 +1,5 @@
 import request from 'umi-request';
-import { TableListParams, TableListItem } from './data.d';
+import type { TableListParams, TableListItem } from './data.d';
 
 /**
  * 按条件查询列表，支持分页和过滤
@@ -86,7 +86,7 @@ export async function getTrainings() {
  * @return {*}
  */
 export async function setPassed(params: { ids: (string | undefined)[]; passed: boolean }) {
-  return request('/api/trainingRegs/setPassed', {
+  return request('/api/trainingreg/setPassed', {
     method: 'POST',
     data: {
       ...params,

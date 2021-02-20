@@ -30,7 +30,7 @@ const handleAddOrUpdate = async (fields: TableListItem) => {
     hide();
     const errorMessage = error.data.message;
     switch (errorMessage) {
-      case "mobile must be unique":
+      case 'mobile must be unique':
         message.error(`该手机号已经提交过申请！`);
         break;
       default:
@@ -71,9 +71,9 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
 const handleApproval = async (ids: (string | undefined)[], passed: boolean) => {
   await setPassed({
     ids,
-    passed
-  })
-}
+    passed,
+  });
+};
 
 const TableList: React.FC = () => {
   const [editModalVisible, handleModalVisible] = useState<boolean>(false);
@@ -86,7 +86,7 @@ const TableList: React.FC = () => {
 
   useEffect(() => {
     // 获取所有培训名称，用于创建和筛选
-    const fetchData = async () => { 
+    const fetchData = async () => {
       const tras = await getTrainings();
       setTs(tras);
     };
@@ -94,8 +94,8 @@ const TableList: React.FC = () => {
     return () => {
       // 防止内存泄漏
       setTs = () => false;
-    }
-  }, [])
+    };
+  }, []);
 
   const columns: ProColumns<TableListItem>[] = [
     {
@@ -120,11 +120,11 @@ const TableList: React.FC = () => {
               option.children.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0
             }
           >
-            {
-              trainings.map((training: { id: string; title: string }) => (
-                <Select.Option key={training.id} value={training.id}>{training.title}</Select.Option>
-              ))
-            }
+            {trainings.map((training: { id: string; title: string }) => (
+              <Select.Option key={training.id} value={training.id}>
+                {training.title}
+              </Select.Option>
+            ))}
           </Select>
         );
       },
@@ -135,7 +135,7 @@ const TableList: React.FC = () => {
       hideInTable: !!trainingId, // 过滤条件trainingId存在时，不显示此列
       hideInForm: true,
       search: false,
-      renderText: (training: { id: string; title: string; }) => training?.title,
+      renderText: (training: { id: string; title: string }) => training?.title,
     },
     {
       title: '培训类型',
@@ -145,7 +145,7 @@ const TableList: React.FC = () => {
       renderText: (training: {
         id: string;
         title: string;
-        Channel: { id: string, name: string; }
+        Channel: { id: string; name: string };
       }) => training?.Channel?.name,
     },
     {
@@ -216,23 +216,22 @@ const TableList: React.FC = () => {
       hideInForm: true,
       align: 'center',
       render: (passed, record) => {
-        return <Switch
-          defaultChecked={passed as boolean}
-          size="small"
-          onChange={(checked: boolean) => {
-            handleApproval([record.id], checked)
-          }}
-        />
+        return (
+          <Switch
+            defaultChecked={passed as boolean}
+            size="small"
+            onChange={(checked: boolean) => {
+              handleApproval([record.id], checked);
+            }}
+          />
+        );
       },
       renderFormItem: () => (
-        <Select
-          placeholder='请选择'
-          optionFilterProp='children'
-        >
+        <Select placeholder="请选择" optionFilterProp="children">
           <Select.Option value={1}>已审批</Select.Option>
           <Select.Option value={0}>未审批</Select.Option>
         </Select>
-      )
+      ),
     },
     {
       title: '签到时间',
@@ -250,12 +249,12 @@ const TableList: React.FC = () => {
         <>
           <a
             onClick={() => {
-              message.info(`修改： ${record.name}`)
+              message.info(`修改： ${record.name}`);
               setCurrent(record);
-              handleModalVisible(true)
+              handleModalVisible(true);
             }}
           >
-            修改
+            编辑
           </a>
           <Divider type="vertical" />
           <a
@@ -267,11 +266,13 @@ const TableList: React.FC = () => {
                   (async () => {
                     await handleRemove([record]);
                     action.reload();
-                  })()
+                  })();
                 },
               });
             }}
-          >删除</a>
+          >
+            删除
+          </a>
         </>
       ),
     },
@@ -301,7 +302,7 @@ const TableList: React.FC = () => {
                             (async () => {
                               await handleRemove(selectedRows);
                               action?.reload();
-                            })()
+                            })();
                           },
                         });
                         break;
@@ -311,14 +312,14 @@ const TableList: React.FC = () => {
                           content: `批量选中${selectedRows.length}个。`,
                           onOk() {
                             (async () => {
-                              const ids = selectedRows.map(row => row.id);
+                              const ids = selectedRows.map((row) => row.id);
                               await handleApproval(ids, true);
                               action?.reload();
-                            })()
+                            })();
                           },
                         });
                         break;
-                    
+
                       default:
                         break;
                     }
@@ -355,16 +356,16 @@ const TableList: React.FC = () => {
         }}
         beforeSearchSubmit={(params: Partial<TableListItem>) => {
           // 查询工具栏中的下拉选无法设置boolean，发起查询前需要先做转换
-          if(typeof params.passed !== 'undefined'){
+          if (typeof params.passed !== 'undefined') {
             return {
               ...params,
-              passed: !!params.passed
-            }
+              passed: !!params.passed,
+            };
           }
           if (typeof params.TrainingId !== 'undefined') {
-            setTrainingId(params.TrainingId)
+            setTrainingId(params.TrainingId);
           } else {
-            setTrainingId('')
+            setTrainingId('');
           }
           return params;
         }}
@@ -372,23 +373,22 @@ const TableList: React.FC = () => {
       <EditModal
         modalVisible={editModalVisible}
         current={current}
-        trainingItems={
-          trainings.map((t: { id: string; title: string; }) => ({ value: t.id, text: t.title }))
-        }
-        onSubmit={
-          async (value: TableListItem) => {
-            const success = await handleAddOrUpdate(value);
-            if (success) {
-              handleModalVisible(false);
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-              setCurrent(null);
+        trainingItems={trainings.map((t: { id: string; title: string }) => ({
+          value: t.id,
+          text: t.title,
+        }))}
+        onSubmit={async (value: TableListItem) => {
+          const success = await handleAddOrUpdate(value);
+          if (success) {
+            handleModalVisible(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
             }
+            setCurrent(null);
           }
-        }
+        }}
         onCancel={() => {
-          handleModalVisible(false)
+          handleModalVisible(false);
           setCurrent(null);
         }}
       />
