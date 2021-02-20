@@ -352,9 +352,6 @@ const TableList: React.FC = () => {
             auditHandler={() => {
               showAuditModal(record);
             }}
-            checkHandler={() => {
-              showCheckModal(record);
-            }}
           />
         </div>
       ),
