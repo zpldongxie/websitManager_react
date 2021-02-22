@@ -32,3 +32,18 @@ export async function queryList(params?: TableListParams) {
     current: 1,
   };
 }
+
+/**
+ * 导航
+ *
+ * @export
+ * @returns
+ */
+export async function getNavList() {
+  const result = await request('/api/channels');
+
+  if (result.status === 'ok') {
+    return result.data;
+  }
+  return [];
+}

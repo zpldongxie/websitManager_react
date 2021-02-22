@@ -10,6 +10,10 @@ import { queryList } from './service';
 import type { TableListParams, TableListItem } from './data';
 import RegmanagementForm from './components/RegmanagementForm';
 
+/**
+ * 产品入驻-申请审批
+ */
+
 type GithubIssueItem = {
   url: string;
   id: number;

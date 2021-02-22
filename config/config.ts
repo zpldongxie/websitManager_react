@@ -220,14 +220,14 @@ export default defineConfig({
                   // 厂商名录
                   name: 'list',
                   path: '/manufacturer/list',
-                  component: './manufacturer/list',
+                  component: './ManufacturerEntry/directory',
                   authority: ['admin', 'user'],
                 },
                 {
                   // 申请审批
                   name: 'regmanagement',
                   path: '/manufacturer/regmanagement',
-                  component: './manufacturer/regmanagement',
+                  component: './ManufacturerEntry/regmanagement',
                   authority: ['admin', 'user'],
                 },
               ],
@@ -243,14 +243,14 @@ export default defineConfig({
                   // 产品清单
                   name: 'list',
                   path: '/product/list',
-                  component: './MemberManagement',
+                  component: './ProductEntry/directory',
                   authority: ['admin', 'user'],
                 },
                 {
                   // 申请审批
                   name: 'regmanagement',
                   path: '/product/regmanagement',
-                  component: './MemberManagement',
+                  component: './ProductEntry/regmanagement',
                   authority: ['admin', 'user'],
                 },
               ],

@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import CustomForm from '@/components/CustomForm';
 import type { FormItemType } from '@/components/CustomForm/interfice';
-import type { TableListItem } from '../data';
 import { message } from 'antd';
 
+import { getNavList } from '../service';
+import type { TableListItem } from '../data';
+
+/**
+ * 产品入驻-申请审批-编辑表单组件
+ */
 type PropsType = {
   disabled?: boolean;
   current?: TableListItem | null;
@@ -18,8 +23,24 @@ const formLayout = {
 };
 let setSubmitFun: () => void;
 
-const ListForm = (props: PropsType) => {
+const RegmanagementForm = (props: PropsType) => {
   const { disabled, onSubmit, submitFun, isSubmin } = props;
+
+  // 详细类别
+  const [typeItems, setTypeItems] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      // 组件加载完成立即获取栏目信息
+      const navList = await getNavList();
+      const parentNav = navList.find((nav: { name: string }) => nav.name === '产品名录');
+      const list = navList
+        .filter((nav: { parentId: any }) => nav.parentId === parentNav.id)
+        .map((item: { name: any }, key: any) => ({ value: key, text: item.name }))
+        .reverse();
+      setTypeItems(list);
+    })();
+  }, []);
 
   useEffect(() => {
     if (isSubmin) {
@@ -36,11 +57,6 @@ const ListForm = (props: PropsType) => {
     }
   };
 
-  // 详细类别
-  const typeItems = [
-    { value: 0, text: '厂商' },
-    { value: 1, text: '产品' },
-  ];
   const [info, setInfo] = useState<TableListItem | null>(null);
   const formItemList: FormItemType[] = [
     {
@@ -128,4 +144,4 @@ const ListForm = (props: PropsType) => {
   );
 };
 
-export default ListForm;
+export default RegmanagementForm;

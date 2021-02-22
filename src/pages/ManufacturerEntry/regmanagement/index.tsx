@@ -1,17 +1,17 @@
 import React, { useRef, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, Modal } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { Button, Divider, Modal } from 'antd';
 import moment from 'moment';
 
 import { queryList } from './service';
-import ListForm from './components/ListForm';
 import type { TableListParams, TableListItem } from './data';
+import RegmanagementForm from './components/RegmanagementForm';
 
 /**
- * 厂商名录
+ * 厂商入驻-申请审批
  */
 
 type GithubIssueItem = {
@@ -28,7 +28,6 @@ type GithubIssueItem = {
   created_at: string;
   updated_at: string;
   closed_at?: string;
-  logonDate?: string;
 };
 const Index: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -47,6 +46,7 @@ const Index: React.FC = () => {
   const onOK = () => {
     setIsSubmin(true);
   };
+
   const onSubmit = async (value: TableListItem) => {
     console.log('value', value);
     setVisible(false);
@@ -62,6 +62,7 @@ const Index: React.FC = () => {
     //   message.warn(res.message);
     // }
   };
+
   const columns: ProColumns<GithubIssueItem>[] = [
     {
       title: '单位名称',
@@ -83,8 +84,8 @@ const Index: React.FC = () => {
     {
       title: '联系人',
       dataIndex: 'contacts',
-      editable: false,
       search: false,
+      editable: false,
     },
     {
       title: '手机号',
@@ -98,17 +99,24 @@ const Index: React.FC = () => {
       editable: false,
     },
     {
-      title: '入驻时间',
-      dataIndex: 'logonDate',
+      title: '申请描述',
+      dataIndex: 'descStr',
       search: false,
       editable: false,
+      ellipsis: true,
+    },
+    {
+      title: '申请时间',
+      dataIndex: 'createdAt',
+      search: false,
       sorter: true,
+      ellipsis: true,
       render: (text) => {
         return <div>{moment(text as string).format('YYYY-MM-DD HH:mm')}</div>;
       },
     },
     {
-      title: '状态',
+      title: '申请状态',
       dataIndex: 'status',
       search: false,
       editable: false,
@@ -121,6 +129,19 @@ const Index: React.FC = () => {
         禁用: { text: '禁用', status: 'Error' },
       },
       width: 110,
+    },
+    {
+      title: '邮件发送状态',
+      dataIndex: 'sendEmailStatus',
+      search: false,
+      editable: false,
+      filters: true,
+      valueEnum: {
+        未发送: { text: '未发送', status: 'Default' },
+        发送成功: { text: '发送成功', status: 'Success' },
+        发送失败: { text: '发送失败', status: 'Error' },
+      },
+      width: 130,
     },
     {
       title: '操作',
@@ -138,39 +159,20 @@ const Index: React.FC = () => {
             编辑
           </a>
           <Divider type="vertical" />
-          <a
-            key="view"
-            onClick={() => {
-              setVisible(true);
-              setDisabled(true);
-            }}
-          >
-            查看
-          </a>
+          <a key="view">审核</a>
           <Divider type="vertical" />
           <a>删除</a>
         </div>
       ),
     },
   ];
+
   return (
     <PageHeaderWrapper title={false}>
       <ProTable<GithubIssueItem>
-        headerTitle="厂商名录"
+        headerTitle="申请审批"
         columns={columns}
         actionRef={actionRef}
-        toolBarRender={() => [
-          <Button
-            key="button"
-            icon={<PlusOutlined />}
-            type="primary"
-            onClick={() => {
-              setVisible(true);
-            }}
-          >
-            新建
-          </Button>,
-        ]}
         request={(params, sorter, filter) => {
           const opts: TableListParams = {
             ...params,
@@ -201,6 +203,18 @@ const Index: React.FC = () => {
         pagination={{
           pageSize: 5,
         }}
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            type="primary"
+            onClick={() => {
+              setVisible(true);
+            }}
+          >
+            新建
+          </Button>,
+        ]}
         rowSelection={{}}
       />
       <Modal
@@ -232,7 +246,7 @@ const Index: React.FC = () => {
           </div>
         }
       >
-        <ListForm
+        <RegmanagementForm
           submitFun={handleSubmit}
           onSubmit={onSubmit}
           isSubmin={isSubmin}
