@@ -220,14 +220,14 @@ export default defineConfig({
                   // 厂商名录
                   name: 'list',
                   path: '/manufacturer/list',
-                  component: './MemberManagement',
+                  component: './manufacturer/list',
                   authority: ['admin', 'user'],
                 },
                 {
                   // 申请审批
                   name: 'regmanagement',
                   path: '/manufacturer/regmanagement',
-                  component: './MemberManagement',
+                  component: './manufacturer/regmanagement',
                   authority: ['admin', 'user'],
                 },
               ],
