@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 import type { FC } from 'react';
 import { Alert, Button, Card, Col, Input, message, Modal, Row } from 'antd';
 
-import { putConfig, syncChannels, syncChannelSettings, syncArticles } from '../service';
+import { putConfig, syncCommonSettings, syncChannels, syncArticles, syncMemberCompanys } from '../service';
 import styles from '../index.module.less';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
@@ -31,8 +31,6 @@ const SyncData: FC<PropsType> = ({ defaultValues }) => {
    * @param {string} value
    */
   const updateConfig = async (name: string, value: string) => {
-    console.log('---------', name, value);
-
     // if (currentValues[name] !== value) {
     const res = await putConfig({ name, value });
     if (res.status === 'ok') {
@@ -40,6 +38,29 @@ const SyncData: FC<PropsType> = ({ defaultValues }) => {
       setCurrentValues({ ...currentValues, [name]: value });
     } else message.error(res.msg);
     // }
+  };
+
+  /**
+   * 从旧数据库同步公共配置数据
+   *
+   * @param {string} name
+   * @param {string} value
+   */
+  const doSyncCommonSettings = async () => {
+    Modal.confirm({
+      title: '请再次确认',
+      icon: <ExclamationCircleOutlined />,
+      content: '请再次确认是否要清空公共配置并从指定环境重新同步数据？',
+      onOk() {
+        (async () => {
+          const res = await syncCommonSettings();
+          if (res.status === 'ok') {
+            message.success('公共配置同步成功');
+          } else message.error(res.message);
+        })();
+      },
+      onCancel() {},
+    });
   };
 
   /**
@@ -56,33 +77,8 @@ const SyncData: FC<PropsType> = ({ defaultValues }) => {
       onOk() {
         (async () => {
           const res = await syncChannels();
-          console.log(res);
-
           if (res.status === 'ok') {
             message.success('栏目信息同步成功');
-          } else message.error(res.message);
-        })();
-      },
-      onCancel() {},
-    });
-  };
-
-  /**
-   * 从旧数据库同步栏目配置数据
-   *
-   * @param {string} name
-   * @param {string} value
-   */
-  const doSyncChannelSettings = async () => {
-    Modal.confirm({
-      title: '请再次确认',
-      icon: <ExclamationCircleOutlined />,
-      content: '请再次确认是否要清空栏目配置信息并从指定环境重新同步数据？',
-      onOk() {
-        (async () => {
-          const res = await syncChannelSettings();
-          if (res.status === 'ok') {
-            message.success('栏目配置信息同步成功');
           } else message.error(res.message);
         })();
       },
@@ -106,6 +102,29 @@ const SyncData: FC<PropsType> = ({ defaultValues }) => {
           const res = await syncArticles();
           if (res.status === 'ok') {
             message.success('文章信息同步成功');
+          } else message.error(res.message);
+        })();
+      },
+      onCancel() {},
+    });
+  };
+
+  /**
+   * 从旧数据库同步单位会员数据
+   *
+   * @param {string} name
+   * @param {string} value
+   */
+  const doSyncMemberCompanys = async () => {
+    Modal.confirm({
+      title: '请再次确认',
+      icon: <ExclamationCircleOutlined />,
+      content: '请再次确认是否要清空单位会员信息并从指定环境重新同步数据？',
+      onOk() {
+        (async () => {
+          const res = await syncMemberCompanys();
+          if (res.status === 'ok') {
+            message.success('单位会员信息同步成功');
           } else message.error(res.message);
         })();
       },
@@ -151,18 +170,23 @@ const SyncData: FC<PropsType> = ({ defaultValues }) => {
         />
         <Row gutter={40} justify="center" style={{ margin: '3rem 0' }}>
           <Col>
+            <Button danger shape="round" size="large" onClick={doSyncCommonSettings}>
+              同步公共配置数据
+            </Button>
+          </Col>
+          <Col>
             <Button danger shape="round" size="large" onClick={doSyncChannels}>
               同步栏目数据
             </Button>
           </Col>
           <Col>
-            <Button danger shape="round" size="large" onClick={doSyncChannelSettings}>
-              同步栏目配置数据
+            <Button danger shape="round" size="large" onClick={doSyncArticles}>
+              同步文章数据
             </Button>
           </Col>
           <Col>
-            <Button danger shape="round" size="large" onClick={doSyncArticles}>
-              同步文章数据
+            <Button danger shape="round" size="large" onClick={doSyncMemberCompanys}>
+              同步单位会员数据
             </Button>
           </Col>
         </Row>

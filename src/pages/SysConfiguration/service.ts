@@ -25,20 +25,20 @@ export async function sendEmail(params: { mailTo: string; subject: string; text:
 }
 
 /**
- * 从旧数据库同步栏目数据
+ * 从旧数据库同步公共配置
  */
-export async function syncChannels() {
-  return request('/api/databaseutil/channel/async', {
+export async function syncCommonSettings() {
+  return request('/api/databaseutil/commonSettings/sync', {
     method: 'POST',
     data: {},
   });
 }
 
 /**
- * 从旧数据库同步栏目配置数据
+ * 从旧数据库同步栏目数据
  */
-export async function syncChannelSettings() {
-  return request('/api/databaseutil/channelsettings/async', {
+export async function syncChannels() {
+  return request('/api/databaseutil/channel/sync', {
     method: 'POST',
     data: {},
   });
@@ -48,7 +48,17 @@ export async function syncChannelSettings() {
  * 从旧数据库同步文章数据
  */
 export async function syncArticles() {
-  return request('/api/databaseutil/article/async', {
+  return request('/api/databaseutil/article/sync', {
+    method: 'POST',
+    data: {},
+  });
+}
+
+/**
+ * 从旧数据库同步单位会员数据
+ */
+export async function syncMemberCompanys() {
+  return request('/api/databaseutil/membercompany/sync', {
     method: 'POST',
     data: {},
   });
