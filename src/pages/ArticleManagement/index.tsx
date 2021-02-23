@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import {
   DownOutlined,
   PlusOutlined,
-  createFromIconfontCN,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Switch, Popover, Modal, message } from 'antd';
@@ -12,16 +11,13 @@ import ProTable from '@ant-design/pro-table';
 
 import ArticlePreview from '@/components/ArticlePreview';
 import ChannelSelector from '@/components/ChannelSelector';
+import IconFont from '@/components/CustomIcon';
 import Option from './components/Option';
 import type { TableListItem, TableListParams } from './data.d';
 
 import { queryList, remove, moveTo, setIsHead, setIsRecom, setPub } from './service';
 
 import styles from './index.module.less';
-
-const IconFont = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2063431_zeaap9rtglr.js',
-});
 
 const pubHandler = async (ids: string[], action: any) => {
   try {
