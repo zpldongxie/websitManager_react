@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   DownOutlined,
   PlusOutlined,
-  createFromIconfontCN,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Popover, Modal, message } from 'antd';
@@ -13,6 +12,7 @@ import type { TableListItem, TableListParams, AuditMemberParams } from './data.d
 import Option from './components/Option';
 import OperationModal from './components/OperationModal';
 import AuditModal from './components/AuditModal';
+import IconFont from '@/components/CustomIcon';
 
 import {
   queryCompanyMemberList,
@@ -24,9 +24,6 @@ import {
 
 import styles from './index.module.less';
 
-const IconFont = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2063431_zeaap9rtglr.js',
-});
 const delHandler = (ids: string[], action: any) => {
   Modal.confirm({
     title: `确认删除选中的${ids.length}条吗？`,
