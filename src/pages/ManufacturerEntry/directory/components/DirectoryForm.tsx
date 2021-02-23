@@ -36,7 +36,7 @@ const DirectoryForm = (props: PropsType) => {
       const parentNav = navList.find((nav: { name: string }) => nav.name === '厂商名录');
       const list = navList
         .filter((nav: { parentId: any }) => nav.parentId === parentNav.id)
-        .map((item: { name: any }, key: any) => ({ value: key, text: item.name }))
+        .map((item: { name: any; id: string }) => ({ value: item.id, text: item.name }))
         .reverse();
       setTypeItems(list);
     })();
@@ -52,6 +52,12 @@ const DirectoryForm = (props: PropsType) => {
 
   // 表单提交
   const handleFinish = (values: TableListItem) => {
+    const Channels: { id: any }[] = [];
+    // eslint-disable-next-line no-param-reassign
+    values.type = '厂商';
+    values.Channels.map((item: any) => Channels.push({ id: item }));
+    // eslint-disable-next-line no-param-reassign
+    values.Channels = Channels;
     if (onSubmit) {
       onSubmit(values);
     }
@@ -64,31 +70,34 @@ const DirectoryForm = (props: PropsType) => {
       name: 'corporateName',
       label: '单位名称',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      rules: [{ required: true, message: '请填写单位名称' }],
     },
     {
       type: 'input',
       name: 'contacts',
       label: '联系人',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      rules: [{ required: true, message: '请填写联系人' }],
     },
     {
       type: 'input',
       name: 'contactsMobile',
       label: '手机号',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      rules: [{ required: true, message: '请填写手机号' }],
     },
     {
       type: 'select',
-      name: 'type',
+      name: 'Channels',
       label: '详细类别',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      mode: 'multiple',
+      rules: [{ required: true, message: '请选择详细类别' }],
       items: typeItems,
       onChange: (_: any, formatString: any) => {
-        setInfo({ ...info!, type: formatString.value });
+        const typeData: any = [];
+        formatString.map((item: any) => typeData.push(item.value));
+        setInfo({ ...info!, Channels: typeData });
       },
     },
     {
@@ -96,7 +105,14 @@ const DirectoryForm = (props: PropsType) => {
       name: 'email',
       label: '邮箱',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      rules: [{ required: true, message: '请填写邮箱' }],
+    },
+    {
+      type: 'input',
+      name: 'tel',
+      label: '电话',
+      disabled,
+      rules: [{ required: true, message: '请填写电话' }],
     },
     {
       type: 'input',
@@ -121,6 +137,7 @@ const DirectoryForm = (props: PropsType) => {
       name: 'descStr',
       label: '申请理由',
       disabled,
+      rules: [{ required: true, message: '请填写申请理由' }],
     },
   ];
   return (

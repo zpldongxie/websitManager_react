@@ -40,10 +40,11 @@ const FormInput = (props: FormInputProps) => {
  * @returns
  */
 const FormSelect = (props: FormSelectProps) => {
-  const { disabled, placeholder, items, onChange, ...formProps } = props;
+  const { disabled, placeholder, items, onChange, mode, ...formProps } = props;
   return (
     <Form.Item {...formProps}>
       <Select
+        mode={mode}
         disabled={disabled}
         placeholder={placeholder || '请选择'}
         optionFilterProp="children"

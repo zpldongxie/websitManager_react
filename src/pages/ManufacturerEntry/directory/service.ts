@@ -10,7 +10,7 @@ import type { TableListParams } from './data';
  * @return {*}
  */
 export async function queryList(params?: TableListParams) {
-  const result = await request('/api/getServiceRequestList', {
+  const result = await request('/api/getEntryList', {
     method: 'POST',
     data: { ...params },
   });
@@ -46,4 +46,20 @@ export async function getNavList() {
     return result.data;
   }
   return [];
+}
+
+/**
+ * 新增或修改
+ *
+ * @export
+ * @param {TableListParams} params
+ * @returns
+ */
+export async function upEntry(params: TableListParams) {
+  return request('/api/entry', {
+    method: 'PUT',
+    data: {
+      ...params,
+    },
+  });
 }
