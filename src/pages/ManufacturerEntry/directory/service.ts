@@ -63,3 +63,17 @@ export async function upEntry(params: TableListParams) {
     },
   });
 }
+
+/**
+ * 删除一个或多个
+ *
+ * @export
+ * @param {{ ids: string[] }} ids
+ * @returns
+ */
+export async function removeFakeList(ids: string[]) {
+  return request('/api/entrys', {
+    method: 'DELETE',
+    data: { ids },
+  });
+}

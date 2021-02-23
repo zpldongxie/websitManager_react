@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, Modal, message, Tooltip } from 'antd';
+import { PlusOutlined, DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Divider, Modal, message, Tooltip, Dropdown, Menu } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import moment from 'moment';
 
-import { queryList, upEntry } from './service';
+import { queryList, upEntry, removeFakeList } from './service';
 import DirectoryForm from './components/DirectoryForm';
 import type { TableListParams, TableListItem } from './data';
 import styles from './index.module.less';
@@ -31,6 +31,8 @@ const Index: React.FC = () => {
       submitFun();
     }
   };
+
+  // 增加或修改
   const onSubmit = async (value: TableListItem) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const res = await upEntry(value);
@@ -49,6 +51,49 @@ const Index: React.FC = () => {
       message.warn(res.message);
     }
   };
+
+  // 单个删除
+  const editAndDelete = (currentItem: TableListItem) => {
+    const ids: any[] = [];
+    ids.push(currentItem.id);
+    Modal.confirm({
+      title: '删除单位',
+      content: (
+        <div>
+          <div>单位名称： {currentItem.corporateName}</div>确定删除该单位吗？
+        </div>
+      ),
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        const res = await removeFakeList(ids);
+        if (res.status === 'ok') {
+          const action = actionRef.current;
+          action?.reload();
+          message.info('操作成功');
+        }
+      },
+    });
+  };
+
+  // 批量删除
+  const delHandler = (ids: string[], action: any) => {
+    Modal.confirm({
+      title: `确认删除选中的${ids.length}条吗？`,
+      content: <div style={{ color: 'red' }}>注意，删除后数据将无法恢复。</div>,
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        (async () => {
+          const result = await removeFakeList(ids);
+          if (result.status === 'ok') {
+            message.info('删除成功');
+            action.reload();
+          }
+        })();
+      },
+    });
+  };
+
   const columns: ProColumns<TableListItem>[] = [
     {
       title: '单位名称',
@@ -132,7 +177,7 @@ const Index: React.FC = () => {
       valueType: 'option',
       key: 'option',
       align: 'center',
-      render: () => (
+      render: (text, record) => (
         <div>
           <a
             key="editable"
@@ -154,7 +199,13 @@ const Index: React.FC = () => {
             查看
           </a>
           <Divider type="vertical" />
-          <a>删除</a>
+          <a
+            onClick={() => {
+              editAndDelete(record);
+            }}
+          >
+            删除
+          </a>
         </div>
       ),
     },
@@ -164,8 +215,9 @@ const Index: React.FC = () => {
       <ProTable<TableListItem>
         headerTitle="厂商名录"
         columns={columns}
+        tableAlertRender={false}
         actionRef={actionRef}
-        toolBarRender={() => [
+        toolBarRender={(action, { selectedRows }) => [
           <Button
             key="button"
             icon={<PlusOutlined />}
@@ -176,6 +228,31 @@ const Index: React.FC = () => {
           >
             新建
           </Button>,
+          selectedRows && selectedRows.length > 0 && (
+            <Dropdown
+              overlay={
+                <Menu
+                  onClick={async (e) => {
+                    const ids = selectedRows.map((row) => row.id!);
+                    switch (e.key) {
+                      case 'del':
+                        delHandler(ids, action);
+                        break;
+                      default:
+                      // do nothing
+                    }
+                  }}
+                  selectedKeys={[]}
+                >
+                  <Menu.Item key="del">批量删除</Menu.Item>
+                </Menu>
+              }
+            >
+              <Button>
+                批量操作 <DownOutlined />
+              </Button>
+            </Dropdown>
+          ),
         ]}
         request={(params, sorter, filter) => {
           const opts: TableListParams = {
