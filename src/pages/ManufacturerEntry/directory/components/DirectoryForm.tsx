@@ -24,7 +24,22 @@ const formLayout = {
 let setSubmitFun: () => void;
 
 const DirectoryForm = (props: PropsType) => {
-  const { disabled, onSubmit, submitFun, isSubmin } = props;
+  const { disabled, onSubmit, submitFun, isSubmin, current } = props;
+  const [info, setInfo] = useState<TableListItem | null | undefined>(null);
+
+  useEffect(() => {
+    const ChannelName: any[] = [];
+    if (current) {
+      const currents = { ...current };
+      // eslint-disable-next-line array-callback-return
+      currents.Channels.map((item: { id: any }) => {
+        ChannelName.push(item.id);
+      });
+
+      currents.Channels = ChannelName;
+      setInfo(currents);
+    }
+  }, [current]);
 
   // 详细类别
   const [typeItems, setTypeItems] = useState([]);
@@ -52,18 +67,21 @@ const DirectoryForm = (props: PropsType) => {
 
   // 表单提交
   const handleFinish = (values: TableListItem) => {
+    if (current) {
+      // eslint-disable-next-line no-param-reassign
+      values.id = current.id;
+    }
     const Channels: { id: any }[] = [];
-    // eslint-disable-next-line no-param-reassign
-    values.type = '厂商';
     values.Channels.map((item: any) => Channels.push({ id: item }));
     // eslint-disable-next-line no-param-reassign
     values.Channels = Channels;
+    // eslint-disable-next-line no-param-reassign
+    values.type = '厂商';
     if (onSubmit) {
       onSubmit(values);
     }
   };
 
-  const [info, setInfo] = useState<TableListItem | null>(null);
   const formItemList: FormItemType[] = [
     {
       type: 'input',
@@ -71,6 +89,11 @@ const DirectoryForm = (props: PropsType) => {
       label: '单位名称',
       disabled,
       rules: [{ required: true, message: '请填写单位名称' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, corporateName: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
@@ -78,6 +101,11 @@ const DirectoryForm = (props: PropsType) => {
       label: '联系人',
       disabled,
       rules: [{ required: true, message: '请填写联系人' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, contacts: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
@@ -85,6 +113,11 @@ const DirectoryForm = (props: PropsType) => {
       label: '手机号',
       disabled,
       rules: [{ required: true, message: '请填写手机号' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, contactsMobile: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'select',
@@ -106,6 +139,11 @@ const DirectoryForm = (props: PropsType) => {
       label: '邮箱',
       disabled,
       rules: [{ required: true, message: '请填写邮箱' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, email: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
@@ -113,24 +151,44 @@ const DirectoryForm = (props: PropsType) => {
       label: '电话',
       disabled,
       rules: [{ required: true, message: '请填写电话' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, tel: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
       name: 'address',
       label: '地址',
       disabled,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, address: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
       name: 'zipCode',
       label: '邮编',
       disabled,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, zipCode: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
       name: 'website',
       label: '官方网站',
       disabled,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, website: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'textArea',
@@ -138,6 +196,11 @@ const DirectoryForm = (props: PropsType) => {
       label: '申请理由',
       disabled,
       rules: [{ required: true, message: '请填写申请理由' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, descStr: value } : null;
+        setInfo(newInfo);
+      },
     },
   ];
   return (
@@ -145,7 +208,7 @@ const DirectoryForm = (props: PropsType) => {
       <CustomForm
         formLayout={formLayout} // 表单布局
         formItems={formItemList} // 表单字段
-        values={{ ...info }} // 表单字段的内容
+        values={info} // 表单字段的内容
         onFinish={handleFinish} // 表单提交
         onFinishFailed={({ errorFields }) => {
           // 提交失败的回调

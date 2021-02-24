@@ -95,7 +95,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
     setCurrent(currentItem);
     if (text === 'info') {
       setDisabled(true);
-    } else if (text === 'info') {
+    } else if (text === 'edit') {
       setDisabled(false);
     }
   };

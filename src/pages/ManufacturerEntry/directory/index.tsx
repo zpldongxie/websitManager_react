@@ -25,6 +25,8 @@ const Index: React.FC = () => {
   const [disabled, setDisabled] = useState<boolean>(false);
   // 判断是否是修改
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  // 编辑时的数据回填
+  const [current, setCurrent] = useState<TableListItem>();
 
   const handleSubmit = (submitFun: any) => {
     if (typeof submitFun === 'function') {
@@ -32,7 +34,7 @@ const Index: React.FC = () => {
     }
   };
 
-  // 增加或修改
+  // 保存
   const onSubmit = async (value: TableListItem) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const res = await upEntry(value);
@@ -40,6 +42,7 @@ const Index: React.FC = () => {
       setVisible(false);
       setIsSubmin(false);
       setDisabled(false);
+      setCurrent(undefined);
       const action = actionRef.current;
       action?.reload();
       message.info('操作成功');
@@ -102,11 +105,12 @@ const Index: React.FC = () => {
       editable: false,
       width: 250,
       key: 'corporateName',
-      render: (text) => (
+      render: (text, record) => (
         <div
           onClick={() => {
             setVisible(true);
             setDisabled(true);
+            setCurrent(record);
           }}
         >
           {text}
@@ -184,6 +188,7 @@ const Index: React.FC = () => {
             onClick={() => {
               setVisible(true);
               setIsEdit(true);
+              setCurrent(record);
             }}
           >
             编辑
@@ -296,6 +301,7 @@ const Index: React.FC = () => {
           setIsSubmin(false);
           setDisabled(false);
           setIsEdit(false);
+          setCurrent(undefined);
         }}
         footer={
           disabled ? null : (
@@ -307,6 +313,7 @@ const Index: React.FC = () => {
                   setIsSubmin(false);
                   setDisabled(false);
                   setIsEdit(false);
+                  setCurrent(undefined);
                 }}
               >
                 取消
@@ -329,6 +336,7 @@ const Index: React.FC = () => {
           onSubmit={onSubmit}
           isSubmin={isSubmin}
           disabled={disabled}
+          current={current}
         />
       </Modal>
     </PageHeaderWrapper>
