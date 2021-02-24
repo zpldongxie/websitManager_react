@@ -1,6 +1,5 @@
 export type ServiceStatus = '申请中' | '初审通过' | '正式入驻' | '申请驳回' | '禁用';
 export type status = '未发送' | '发送失败' | '发送成功';
-
 // 渲染表单行
 export type TableListItem = {
   key: number;
@@ -112,7 +111,13 @@ export type TableListItem = {
    * @memberof TableListItem
    */
   sendEmailStatus: status;
+
+  /**
+   * 详细类别
+   */
+  Channels: any[];
 };
+
 // 翻页信息
 export type TableListPagination = {
   total: number;
@@ -136,8 +141,8 @@ export type TableListParams = {
   corporateName?: string;
   tel?: string;
   contacts?: string;
-  contactsMobile?: number;
-  demandType?: string;
+  contactsMobile?: string;
+  type?: string;
   pageSize?: number;
   current?: number;
   filter?: Record<string, any[]>;

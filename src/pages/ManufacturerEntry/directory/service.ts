@@ -16,8 +16,9 @@ export async function queryList(params?: TableListParams) {
   });
 
   if (result.status === 'ok') {
+    const data = result.data.list.filter((item: { type: string }) => item.type === '厂商');
     return {
-      data: result.data.list,
+      data,
       total: result.data.total,
       success: true,
       pageSize: params?.pageSize,

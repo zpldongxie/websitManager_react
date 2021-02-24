@@ -32,8 +32,8 @@ const DirectoryForm = (props: PropsType) => {
     if (current) {
       const currents = { ...current };
       // eslint-disable-next-line array-callback-return
-      currents.Channels.map((item: { id: any }) => {
-        ChannelName.push(item.id);
+      currents.Channels.map((item: { name: any }) => {
+        ChannelName.push(item.name);
       });
 
       currents.Channels = ChannelName;

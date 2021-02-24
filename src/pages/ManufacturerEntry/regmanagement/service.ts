@@ -10,14 +10,15 @@ import type { TableListParams } from './data';
  * @return {*}
  */
 export async function queryList(params?: TableListParams) {
-  const result = await request('/api/getServiceRequestList', {
+  const result = await request('/api/getEntryList', {
     method: 'POST',
     data: { ...params },
   });
 
   if (result.status === 'ok') {
+    const data = result.data.list.filter((item: { type: string }) => item.type === '厂商');
     return {
-      data: result.data.list,
+      data,
       total: result.data.total,
       success: true,
       pageSize: params?.pageSize,
@@ -46,4 +47,34 @@ export async function getNavList() {
     return result.data;
   }
   return [];
+}
+
+/**
+ * 新增或修改
+ *
+ * @export
+ * @param {TableListParams} params
+ * @returns
+ */
+export async function upEntry(params: TableListParams) {
+  return request('/api/entry', {
+    method: 'PUT',
+    data: {
+      ...params,
+    },
+  });
+}
+
+/**
+ * 删除一个或多个
+ *
+ * @export
+ * @param {{ ids: string[] }} ids
+ * @returns
+ */
+export async function removeFakeList(ids: string[]) {
+  return request('/api/entrys', {
+    method: 'DELETE',
+    data: { ids },
+  });
 }

@@ -24,7 +24,22 @@ const formLayout = {
 let setSubmitFun: () => void;
 
 const RegmanagementForm = (props: PropsType) => {
-  const { disabled, onSubmit, submitFun, isSubmin } = props;
+  const { disabled, onSubmit, submitFun, isSubmin, current } = props;
+  const [info, setInfo] = useState<TableListItem | null | undefined>(null);
+
+  useEffect(() => {
+    const ChannelName: any[] = [];
+    if (current) {
+      const currents = { ...current };
+      // eslint-disable-next-line array-callback-return
+      currents.Channels.map((item: { name: any }) => {
+        ChannelName.push(item.name);
+      });
+
+      currents.Channels = ChannelName;
+      setInfo(currents);
+    }
+  }, [current]);
 
   // 详细类别
   const [typeItems, setTypeItems] = useState([]);
@@ -36,7 +51,7 @@ const RegmanagementForm = (props: PropsType) => {
       const parentNav = navList.find((nav: { name: string }) => nav.name === '厂商名录');
       const list = navList
         .filter((nav: { parentId: any }) => nav.parentId === parentNav.id)
-        .map((item: { name: any }, key: any) => ({ value: key, text: item.name }))
+        .map((item: { name: any; id: string }) => ({ value: item.id, text: item.name }))
         .reverse();
       setTypeItems(list);
     })();
@@ -52,42 +67,69 @@ const RegmanagementForm = (props: PropsType) => {
 
   // 表单提交
   const handleFinish = (values: TableListItem) => {
+    if (current) {
+      // eslint-disable-next-line no-param-reassign
+      values.id = current.id;
+    }
+    const Channels: { id: any }[] = [];
+    values.Channels.map((item: any) => Channels.push({ id: item }));
+    // eslint-disable-next-line no-param-reassign
+    values.Channels = Channels;
+    // eslint-disable-next-line no-param-reassign
+    values.type = '厂商';
     if (onSubmit) {
       onSubmit(values);
     }
   };
-  const [info, setInfo] = useState<TableListItem | null>(null);
   const formItemList: FormItemType[] = [
     {
       type: 'input',
       name: 'corporateName',
       label: '单位名称',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      rules: [{ required: true, message: '请填写单位名称' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, corporateName: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
       name: 'contacts',
       label: '联系人',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      rules: [{ required: true, message: '请填写联系人' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, contacts: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
       name: 'contactsMobile',
       label: '手机号',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      rules: [{ required: true, message: '请填写手机号' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, contactsMobile: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'select',
-      name: 'type',
+      name: 'Channels',
       label: '详细类别',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      mode: 'multiple',
+      rules: [{ required: true, message: '请选择详细类别' }],
       items: typeItems,
       onChange: (_: any, formatString: any) => {
-        setInfo({ ...info!, type: formatString.value });
+        const typeData: any = [];
+        formatString.map((item: any) => typeData.push(item.value));
+        setInfo({ ...info!, Channels: typeData });
       },
     },
     {
@@ -95,31 +137,56 @@ const RegmanagementForm = (props: PropsType) => {
       name: 'email',
       label: '邮箱',
       disabled,
-      rules: [{ required: true, message: '请设置显示状态' }],
+      rules: [{ required: true, message: '请填写邮箱' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, email: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
       name: 'address',
       label: '地址',
       disabled,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, address: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
       name: 'zipCode',
       label: '邮编',
       disabled,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, zipCode: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'input',
       name: 'website',
       label: '官方网站',
       disabled,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, website: value } : null;
+        setInfo(newInfo);
+      },
     },
     {
       type: 'textArea',
       name: 'descStr',
       label: '申请理由',
       disabled,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, descStr: value } : null;
+        setInfo(newInfo);
+      },
     },
   ];
   return (
