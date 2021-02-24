@@ -111,6 +111,11 @@ export type TableListItem = {
    * @memberof TableListItem
    */
   sendEmailStatus: status;
+
+  /**
+   * 详细类别
+   */
+  Channels: any[];
 };
 
 // 翻页信息
@@ -136,8 +141,8 @@ export type TableListParams = {
   corporateName?: string;
   tel?: string;
   contacts?: string;
-  contactsMobile?: number;
-  demandType?: string;
+  contactsMobile?: string;
+  type?: string;
   pageSize?: number;
   current?: number;
   filter?: Record<string, any[]>;

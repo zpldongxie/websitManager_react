@@ -199,6 +199,7 @@ const Index: React.FC = () => {
             onClick={() => {
               setVisible(true);
               setDisabled(true);
+              setCurrent(record);
             }}
           >
             查看

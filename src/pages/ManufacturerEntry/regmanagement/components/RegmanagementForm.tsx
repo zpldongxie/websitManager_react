@@ -146,6 +146,18 @@ const RegmanagementForm = (props: PropsType) => {
     },
     {
       type: 'input',
+      name: 'tel',
+      label: '电话',
+      disabled,
+      rules: [{ required: true, message: '请填写电话' }],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        const newInfo = info ? { ...info, tel: value } : null;
+        setInfo(newInfo);
+      },
+    },
+    {
+      type: 'input',
       name: 'address',
       label: '地址',
       disabled,
@@ -182,6 +194,7 @@ const RegmanagementForm = (props: PropsType) => {
       name: 'descStr',
       label: '申请理由',
       disabled,
+      rules: [{ required: true, message: '请填写申请理由' }],
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         const newInfo = info ? { ...info, descStr: value } : null;
