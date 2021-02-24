@@ -2,7 +2,7 @@
  * @description:
  * @author: zpl
  * @Date: 2021-02-02 11:46:49
- * @LastEditTime: 2021-02-02 12:11:41
+ * @LastEditTime: 2021-02-21 09:01:34
  * @LastEditors: zpl
  */
 import React from 'react';
@@ -21,7 +21,7 @@ const ShowStatus: FC<PropsType> = ({ defaultValue, handleChange }: PropsType) =>
   return (
     <Select
       defaultValue={defaultValue}
-      style={{ width: '8em', textAlign: 'center' }}
+      style={{ width: '10em', textAlign: 'center' }}
       bordered={false}
       onChange={handleChange}
     >
