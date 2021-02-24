@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { PlusOutlined, DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Divider, Modal, message, Tooltip, Dropdown, Menu } from 'antd';
+import { Button, Divider, Modal, message, Tooltip, Dropdown, Menu, Steps, Input } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -11,6 +11,8 @@ import type { TableListParams, TableListItem } from './data';
 import RegmanagementForm from './components/RegmanagementForm';
 import styles from './index.module.less';
 
+const { Step } = Steps;
+const { TextArea } = Input;
 /**
  * 产品入驻-申请审批
  */
@@ -27,6 +29,9 @@ const Index: React.FC = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   // 编辑时的数据回填
   const [current, setCurrent] = useState<TableListItem>();
+  // 控制审核Modal的开关
+  const [examineVisible, setExamineVisible] = useState<boolean>(false);
+  const [apply, setApply] = useState<boolean>(false);
 
   const handleSubmit = (submitFun: any) => {
     if (typeof submitFun === 'function') {
@@ -204,7 +209,13 @@ const Index: React.FC = () => {
             编辑
           </a>
           <Divider type="vertical" />
-          <a>审核</a>
+          <a
+            onClick={() => {
+              setExamineVisible(true);
+            }}
+          >
+            审核
+          </a>
           <Divider type="vertical" />
           <a
             onClick={() => {
@@ -294,6 +305,57 @@ const Index: React.FC = () => {
         }}
         rowSelection={{}}
       />
+      <Modal
+        title="审核"
+        visible={examineVisible}
+        onCancel={() => {
+          setExamineVisible(false);
+          setApply(false);
+        }}
+        width={640}
+        footer={
+          apply ? (
+            <div>
+              <Button
+                onClick={() => {
+                  setApply(false);
+                }}
+              >
+                取消驳回
+              </Button>
+              <Button danger>确认驳回</Button>
+            </div>
+          ) : (
+            <div>
+              <Button
+                danger
+                onClick={() => {
+                  setApply(true);
+                }}
+              >
+                驳回申请
+              </Button>
+              <Button type="primary">确认入驻</Button>
+            </div>
+          )
+        }
+      >
+        <div>
+          <Steps progressDot current={1}>
+            <Step title="申请中" />
+            <Step title="初审通过" />
+            <Step title="入驻成功" />
+          </Steps>
+          {apply ? (
+            <div style={{ marginTop: 60 }}>
+              <p>请填写驳回原因：</p>
+              <TextArea rows={4} />
+            </div>
+          ) : (
+            ''
+          )}
+        </div>
+      </Modal>
       <Modal
         visible={visible}
         title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新建'}`}
