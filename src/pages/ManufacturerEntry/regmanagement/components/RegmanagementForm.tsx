@@ -18,10 +18,18 @@ type PropsType = {
   isSubmin?: boolean;
 };
 const formLayout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 16 },
+  labelCol: { flex: '7em' },
+  wrapperCol: { span: 24 },
 };
 let setSubmitFun: () => void;
+
+const statusItems = [
+  { value: '申请中', text: '申请中' },
+  { value: '初审通过', text: '初审通过' },
+  { value: '正式入驻', text: '正式入驻' },
+  { value: '申请驳回', text: '申请驳回' },
+  { value: '禁用', text: '禁用' },
+];
 
 const RegmanagementForm = (props: PropsType) => {
   const { disabled, onSubmit, submitFun, isSubmin, current } = props;
@@ -32,8 +40,8 @@ const RegmanagementForm = (props: PropsType) => {
     if (current) {
       const currents = { ...current };
       // eslint-disable-next-line array-callback-return
-      currents.Channels.map((item: { name: any }) => {
-        ChannelName.push(item.name);
+      currents.Channels.map((item: { id: any }) => {
+        ChannelName.push(item.id);
       });
 
       currents.Channels = ChannelName;
@@ -83,111 +91,151 @@ const RegmanagementForm = (props: PropsType) => {
   };
   const formItemList: FormItemType[] = [
     {
-      type: 'input',
-      name: 'corporateName',
-      label: '单位名称',
-      disabled,
-      rules: [{ required: true, message: '请填写单位名称' }],
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        const newInfo = info ? { ...info, corporateName: value } : null;
-        setInfo(newInfo);
-      },
+      type: 'group',
+      key: 'group1',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'corporateName',
+          label: '单位名称',
+          disabled,
+          rules: [{ required: true, message: '请填写单位名称' }],
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, corporateName: value } : null;
+            setInfo(newInfo);
+          },
+        },
+        {
+          type: 'input',
+          name: 'contacts',
+          label: '联系人',
+          disabled,
+          rules: [{ required: true, message: '请填写联系人' }],
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, contacts: value } : null;
+            setInfo(newInfo);
+          },
+        },
+      ],
     },
     {
-      type: 'input',
-      name: 'contacts',
-      label: '联系人',
-      disabled,
-      rules: [{ required: true, message: '请填写联系人' }],
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        const newInfo = info ? { ...info, contacts: value } : null;
-        setInfo(newInfo);
-      },
+      type: 'group',
+      key: 'group1',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'contactsMobile',
+          label: '手机号',
+          disabled,
+          rules: [{ required: true, message: '请填写手机号' }],
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, contactsMobile: value } : null;
+            setInfo(newInfo);
+          },
+        },
+        {
+          type: 'select',
+          name: 'Channels',
+          label: '详细类别',
+          disabled,
+          mode: 'multiple',
+          rules: [{ required: true, message: '请选择详细类别' }],
+          items: typeItems,
+          onChange: (_: any, formatString: any) => {
+            const typeData: any = [];
+            formatString.map((item: any) => typeData.push(item.value));
+            setInfo({ ...info!, Channels: typeData });
+          },
+        },
+      ],
     },
     {
-      type: 'input',
-      name: 'contactsMobile',
-      label: '手机号',
-      disabled,
-      rules: [{ required: true, message: '请填写手机号' }],
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        const newInfo = info ? { ...info, contactsMobile: value } : null;
-        setInfo(newInfo);
-      },
+      type: 'group',
+      key: 'group1',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'email',
+          label: '邮箱',
+          disabled,
+          rules: [{ required: true, message: '请填写邮箱' }],
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, email: value } : null;
+            setInfo(newInfo);
+          },
+        },
+        {
+          type: 'input',
+          name: 'tel',
+          label: '电话',
+          disabled,
+          rules: [{ required: true, message: '请填写电话' }],
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, tel: value } : null;
+            setInfo(newInfo);
+          },
+        },
+      ],
     },
     {
-      type: 'select',
-      name: 'Channels',
-      label: '详细类别',
-      disabled,
-      mode: 'multiple',
-      rules: [{ required: true, message: '请选择详细类别' }],
-      items: typeItems,
-      onChange: (_: any, formatString: any) => {
-        const typeData: any = [];
-        formatString.map((item: any) => typeData.push(item.value));
-        setInfo({ ...info!, Channels: typeData });
-      },
+      type: 'group',
+      key: 'group1',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'address',
+          label: '地址',
+          disabled,
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, address: value } : null;
+            setInfo(newInfo);
+          },
+        },
+        {
+          type: 'input',
+          name: 'zipCode',
+          label: '邮编',
+          disabled,
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, zipCode: value } : null;
+            setInfo(newInfo);
+          },
+        },
+      ],
     },
     {
-      type: 'input',
-      name: 'email',
-      label: '邮箱',
-      disabled,
-      rules: [{ required: true, message: '请填写邮箱' }],
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        const newInfo = info ? { ...info, email: value } : null;
-        setInfo(newInfo);
-      },
-    },
-    {
-      type: 'input',
-      name: 'tel',
-      label: '电话',
-      disabled,
-      rules: [{ required: true, message: '请填写电话' }],
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        const newInfo = info ? { ...info, tel: value } : null;
-        setInfo(newInfo);
-      },
-    },
-    {
-      type: 'input',
-      name: 'address',
-      label: '地址',
-      disabled,
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        const newInfo = info ? { ...info, address: value } : null;
-        setInfo(newInfo);
-      },
-    },
-    {
-      type: 'input',
-      name: 'zipCode',
-      label: '邮编',
-      disabled,
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        const newInfo = info ? { ...info, zipCode: value } : null;
-        setInfo(newInfo);
-      },
-    },
-    {
-      type: 'input',
-      name: 'website',
-      label: '官方网站',
-      disabled,
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        const newInfo = info ? { ...info, website: value } : null;
-        setInfo(newInfo);
-      },
+      type: 'group',
+      key: 'group1',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'website',
+          label: '官方网站',
+          disabled,
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, website: value } : null;
+            setInfo(newInfo);
+          },
+        },
+        {
+          type: 'select',
+          name: 'status',
+          label: '状态',
+          disabled,
+          items: statusItems,
+          onChange: (_: any, formatString: any) => {
+            setInfo({ ...info!, status: formatString.value });
+          },
+        },
+      ],
     },
     {
       type: 'textArea',

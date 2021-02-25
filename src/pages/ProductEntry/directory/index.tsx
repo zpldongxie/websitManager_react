@@ -295,7 +295,7 @@ const Index: React.FC = () => {
       <Modal
         visible={visible}
         title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新建'}`}
-        width={640}
+        width="45vw"
         destroyOnClose
         onCancel={() => {
           setVisible(false);

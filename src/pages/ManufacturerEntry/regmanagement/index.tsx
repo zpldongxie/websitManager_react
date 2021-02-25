@@ -173,7 +173,7 @@ const Index: React.FC = () => {
       valueEnum: {
         申请中: { text: '申请中', status: 'Processing' },
         初审通过: { text: '初审通过', status: 'Processing' },
-        正式入住: { text: '正式入住', status: 'Success' },
+        正式入驻: { text: '正式入驻', status: 'Success' },
         申请驳回: { text: '申请驳回', status: 'Warning' },
         禁用: { text: '禁用', status: 'Error' },
       },
@@ -312,7 +312,7 @@ const Index: React.FC = () => {
           setExamineVisible(false);
           setApply(false);
         }}
-        width={640}
+        width="45vw"
         footer={
           apply ? (
             <div>
@@ -359,7 +359,7 @@ const Index: React.FC = () => {
       <Modal
         visible={visible}
         title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新建'}`}
-        width={640}
+        width="45vw"
         destroyOnClose
         onCancel={() => {
           setVisible(false);
