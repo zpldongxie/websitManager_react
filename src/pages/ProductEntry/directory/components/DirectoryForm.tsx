@@ -46,6 +46,7 @@ const DirectoryForm = (props: PropsType) => {
 
       currents.Channels = ChannelName;
       setInfo(currents);
+      setIsShowReject(currents.status);
     }
   }, [current]);
 
@@ -250,20 +251,19 @@ const DirectoryForm = (props: PropsType) => {
             setInfo({ ...info!, status: formatString.value });
           },
         },
-        isShowReject === '申请驳回'
-          ? {
-              type: 'input',
-              name: 'rejectDesc',
-              label: '驳回原因',
-              rules: [{ required: true, message: '请填写驳回原因' }],
-              disabled,
-              onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                const { value } = event.target;
-                const newInfo = info ? { ...info, rejectDesc: value } : null;
-                setInfo(newInfo);
-              },
-            }
-          : {},
+        {
+          type: 'input',
+          name: 'rejectDesc',
+          label: '驳回原因',
+          rules: [{ required: true, message: '请填写驳回原因' }],
+          disabled,
+          hidden: isShowReject !== '申请驳回',
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, rejectDesc: value } : null;
+            setInfo(newInfo);
+          },
+        },
       ],
     },
   ];

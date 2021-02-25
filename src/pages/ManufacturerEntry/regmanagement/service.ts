@@ -16,7 +16,11 @@ export async function queryList(params?: TableListParams) {
   });
 
   if (result.status === 'ok') {
-    const data = result.data.list.filter((item: { type: string }) => item.type === '厂商');
+    const data = result.data.list.filter(
+      (item: { type: string; status: string }) =>
+        item.type === '厂商' &&
+        (item.status === '申请中' || item.status === '初审通过' || item.status === '申请驳回'),
+    );
     return {
       data,
       total: data.length,

@@ -10,7 +10,7 @@ type OperationModalProps = {
   current?: AuditMemberParams;
   onSubmit?: (values: AuditMemberParams) => void;
   onCancel: () => void;
-}
+};
 /**
  * 根据流程状态获取提示信息和可操作按钮
  *
@@ -63,7 +63,7 @@ const getOpt = (
     case '正式会员':
       return {
         desc: '该申请单位或申请人已成功加入协会，成为本协会正式会员。',
-        btns: []
+        btns: [],
       };
     default:
       return {
@@ -168,10 +168,12 @@ const AuditModal: FC<OperationModalProps> = (props) => {
         >
           {desc}
         </div>
-        <div style={{
-          textAlign: 'center',
-          padding: '0 3rem',
-        }}>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '0 3rem',
+          }}
+        >
           <Input.TextArea
             hidden={!showRejectReason}
             value={rejectDesc}
@@ -205,8 +207,8 @@ const AuditModal: FC<OperationModalProps> = (props) => {
   return (
     <Modal
       title={`审核`}
-      width={600}
-      className='standardListForm'
+      width="45vw"
+      className="standardListForm"
       bodyStyle={{ padding: '28px 0 0' }}
       destroyOnClose
       visible={visible}
