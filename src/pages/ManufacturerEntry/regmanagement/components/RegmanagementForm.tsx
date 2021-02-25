@@ -229,6 +229,7 @@ const RegmanagementForm = (props: PropsType) => {
           type: 'select',
           name: 'status',
           label: '状态',
+          rules: [{ required: true, message: '请选择状态' }],
           disabled,
           items: statusItems,
           onChange: (_: any, formatString: any) => {
@@ -240,9 +241,9 @@ const RegmanagementForm = (props: PropsType) => {
     {
       type: 'textArea',
       name: 'descStr',
-      label: '申请理由',
+      label: '申请描述',
       disabled,
-      rules: [{ required: true, message: '请填写申请理由' }],
+      rules: [{ required: true, message: '请填写申请描述' }],
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         const newInfo = info ? { ...info, descStr: value } : null;

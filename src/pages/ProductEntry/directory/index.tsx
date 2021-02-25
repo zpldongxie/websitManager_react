@@ -170,7 +170,7 @@ const Index: React.FC = () => {
       valueEnum: {
         申请中: { text: '申请中', status: 'Processing' },
         初审通过: { text: '初审通过', status: 'Processing' },
-        正式入住: { text: '正式入住', status: 'Success' },
+        正式入驻: { text: '正式入驻', status: 'Success' },
         申请驳回: { text: '申请驳回', status: 'Warning' },
         禁用: { text: '禁用', status: 'Error' },
       },

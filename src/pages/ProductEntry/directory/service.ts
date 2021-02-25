@@ -19,7 +19,7 @@ export async function queryList(params?: TableListParams) {
     const data = result.data.list.filter((item: { type: string }) => item.type === '产品');
     return {
       data,
-      total: result.data.total,
+      total: data.length,
       success: true,
       pageSize: params?.pageSize,
       current: params?.current,
