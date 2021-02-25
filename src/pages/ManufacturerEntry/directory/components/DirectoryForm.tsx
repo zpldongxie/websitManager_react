@@ -16,6 +16,7 @@ type PropsType = {
   onCancel?: () => void;
   submitFun?: any;
   isSubmin?: boolean;
+  isEdit?: boolean;
 };
 const formLayout = {
   labelCol: { flex: '7em' },
@@ -23,7 +24,8 @@ const formLayout = {
 };
 let setSubmitFun: () => void;
 
-const statusItems = [
+// 编辑时的状态
+const editstatusItems = [
   { value: '申请中', text: '申请中' },
   { value: '初审通过', text: '初审通过' },
   { value: '正式入驻', text: '正式入驻' },
@@ -31,11 +33,18 @@ const statusItems = [
   { value: '禁用', text: '禁用' },
 ];
 
+// 新增时的状态
+const statusItems = [
+  { value: '正式入驻', text: '正式入驻' },
+  { value: '禁用', text: '禁用' },
+];
+
 const DirectoryForm = (props: PropsType) => {
-  const { disabled, onSubmit, submitFun, isSubmin, current } = props;
+  const { disabled, onSubmit, submitFun, isSubmin, current, isEdit } = props;
   const [info, setInfo] = useState<TableListItem | null | undefined>(null);
   const [isShowReject, setIsShowReject] = useState('');
   useEffect(() => {
+    // 处理详细类别
     const ChannelName: any[] = [];
     if (current) {
       const currents = { ...current };
@@ -131,7 +140,15 @@ const DirectoryForm = (props: PropsType) => {
           name: 'contactsMobile',
           label: '手机号',
           disabled,
-          rules: [{ required: true, message: '请填写手机号' }],
+          rules: [
+            { required: true, message: '请填写手机号' },
+            {
+              pattern: new RegExp(
+                /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/,
+              ),
+              message: '手机号格式有误',
+            },
+          ],
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             const { value } = event.target;
             const newInfo = info ? { ...info, contactsMobile: value } : null;
@@ -143,7 +160,13 @@ const DirectoryForm = (props: PropsType) => {
           name: 'tel',
           label: '电话',
           disabled,
-          rules: [{ required: true, message: '请填写电话' }],
+          rules: [
+            { required: true, message: '请填写手机号' },
+            {
+              pattern: new RegExp(/\d{3}-\d{8}|\d{4}-\d{7}/),
+              message: '电话格式有误',
+            },
+          ],
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             const { value } = event.target;
             const newInfo = info ? { ...info, tel: value } : null;
@@ -161,7 +184,13 @@ const DirectoryForm = (props: PropsType) => {
           name: 'email',
           label: '邮箱',
           disabled,
-          rules: [{ required: true, message: '请填写邮箱' }],
+          rules: [
+            { required: true, message: '请填写邮箱' },
+            {
+              type: 'email',
+              message: '邮箱格式有误',
+            },
+          ],
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             const { value } = event.target;
             const newInfo = info ? { ...info, email: value } : null;
@@ -245,7 +274,7 @@ const DirectoryForm = (props: PropsType) => {
           label: '状态',
           disabled,
           rules: [{ required: true, message: '请选择状态' }],
-          items: statusItems,
+          items: isEdit ? editstatusItems : statusItems,
           onChange: (_: any, formatString: any) => {
             setIsShowReject(formatString.value);
             setInfo({ ...info!, status: formatString.value });
@@ -255,7 +284,7 @@ const DirectoryForm = (props: PropsType) => {
           type: 'input',
           name: 'rejectDesc',
           label: '驳回原因',
-          rules: [{ required: true, message: '请填写驳回原因' }],
+          rules: [{ required: isShowReject === '申请驳回', message: '请填写驳回原因' }],
           disabled,
           hidden: isShowReject !== '申请驳回',
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {

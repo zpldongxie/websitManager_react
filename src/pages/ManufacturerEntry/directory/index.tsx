@@ -1,6 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { PlusOutlined, DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Divider, Modal, message, Tooltip, Dropdown, Menu } from 'antd';
+import {
+  PlusOutlined,
+  DownOutlined,
+  ExclamationCircleOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons';
+import { Button, Divider, Modal, message, Tooltip, Dropdown, Menu, Popconfirm } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -168,10 +173,7 @@ const Index: React.FC = () => {
       editable: false,
       filters: true,
       valueEnum: {
-        申请中: { text: '申请中', status: 'Processing' },
-        初审通过: { text: '初审通过', status: 'Processing' },
         正式入驻: { text: '正式入驻', status: 'Success' },
-        申请驳回: { text: '申请驳回', status: 'Warning' },
         禁用: { text: '禁用', status: 'Error' },
       },
       width: 110,
@@ -194,17 +196,22 @@ const Index: React.FC = () => {
           >
             编辑
           </a>
-          {/* <Divider type="vertical" /> */}
-          {/* <a
-            key="view"
-            onClick={() => {
-              setVisible(true);
-              setDisabled(true);
-              setCurrent(record);
-            }}
-          >
-            查看
-          </a> */}
+          <Divider type="vertical" />
+          {record.status === '禁用' ? (
+            <Popconfirm
+              title="确定启用该单位吗？"
+              icon={<QuestionCircleOutlined style={{ color: '#87d068' }} />}
+            >
+              <a>启用</a>
+            </Popconfirm>
+          ) : (
+            <Popconfirm
+              title="确定禁用该单位吗？"
+              icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+            >
+              <a>禁用</a>
+            </Popconfirm>
+          )}
           <Divider type="vertical" />
           <a
             onClick={() => {
@@ -339,6 +346,7 @@ const Index: React.FC = () => {
           isSubmin={isSubmin}
           disabled={disabled}
           current={current}
+          isEdit={isEdit}
         />
       </Modal>
     </PageHeaderWrapper>

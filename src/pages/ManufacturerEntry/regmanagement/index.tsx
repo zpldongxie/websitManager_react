@@ -171,11 +171,9 @@ const Index: React.FC = () => {
       editable: false,
       filters: true,
       valueEnum: {
-        申请中: { text: '申请中', status: 'Processing' },
+        申请中: { text: '申请中', status: 'Default' },
         初审通过: { text: '初审通过', status: 'Processing' },
-        正式入驻: { text: '正式入驻', status: 'Success' },
         申请驳回: { text: '申请驳回', status: 'Warning' },
-        禁用: { text: '禁用', status: 'Error' },
       },
       width: 110,
     },
@@ -208,14 +206,20 @@ const Index: React.FC = () => {
           >
             编辑
           </a>
-          <Divider type="vertical" />
-          <a
-            onClick={() => {
-              setExamineVisible(true);
-            }}
-          >
-            审核
-          </a>
+          {record.status === '申请驳回' ? (
+            ''
+          ) : (
+            <span>
+              <Divider type="vertical" />
+              <a
+                onClick={() => {
+                  setExamineVisible(true);
+                }}
+              >
+                审核
+              </a>
+            </span>
+          )}
           <Divider type="vertical" />
           <a
             onClick={() => {
@@ -312,7 +316,7 @@ const Index: React.FC = () => {
           setExamineVisible(false);
           setApply(false);
         }}
-        width="45vw"
+        width={640}
         footer={
           apply ? (
             <div>
@@ -402,6 +406,7 @@ const Index: React.FC = () => {
           isSubmin={isSubmin}
           disabled={disabled}
           current={current}
+          isEdit={isEdit}
         />
       </Modal>
     </PageHeaderWrapper>
