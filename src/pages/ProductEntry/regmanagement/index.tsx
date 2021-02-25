@@ -124,8 +124,8 @@ const Index: React.FC = () => {
     {
       title: '联系人',
       dataIndex: 'contacts',
-      search: false,
       editable: false,
+      width: 100,
     },
     {
       title: '手机号',
@@ -358,7 +358,7 @@ const Index: React.FC = () => {
       </Modal>
       <Modal
         visible={visible}
-        title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新建'}`}
+        title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新增'}`}
         width="45vw"
         destroyOnClose
         onCancel={() => {

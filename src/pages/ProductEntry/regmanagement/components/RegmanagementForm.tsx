@@ -34,7 +34,7 @@ const statusItems = [
 const RegmanagementForm = (props: PropsType) => {
   const { disabled, onSubmit, submitFun, isSubmin, current } = props;
   const [info, setInfo] = useState<TableListItem | null | undefined>(null);
-
+  const [isShowReject, setIsShowReject] = useState('');
   useEffect(() => {
     const ChannelName: any[] = [];
     if (current) {
@@ -89,6 +89,7 @@ const RegmanagementForm = (props: PropsType) => {
       onSubmit(values);
     }
   };
+
   const formItemList: FormItemType[] = [
     {
       type: 'group',
@@ -122,7 +123,7 @@ const RegmanagementForm = (props: PropsType) => {
     },
     {
       type: 'group',
-      key: 'group1',
+      key: 'group2',
       groupItems: [
         {
           type: 'input',
@@ -133,38 +134,6 @@ const RegmanagementForm = (props: PropsType) => {
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             const { value } = event.target;
             const newInfo = info ? { ...info, contactsMobile: value } : null;
-            setInfo(newInfo);
-          },
-        },
-        {
-          type: 'select',
-          name: 'Channels',
-          label: '详细类别',
-          disabled,
-          mode: 'multiple',
-          rules: [{ required: true, message: '请选择详细类别' }],
-          items: typeItems,
-          onChange: (_: any, formatString: any) => {
-            const typeData: any = [];
-            formatString.map((item: any) => typeData.push(item.value));
-            setInfo({ ...info!, Channels: typeData });
-          },
-        },
-      ],
-    },
-    {
-      type: 'group',
-      key: 'group1',
-      groupItems: [
-        {
-          type: 'input',
-          name: 'email',
-          label: '邮箱',
-          disabled,
-          rules: [{ required: true, message: '请填写邮箱' }],
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            const { value } = event.target;
-            const newInfo = info ? { ...info, email: value } : null;
             setInfo(newInfo);
           },
         },
@@ -184,7 +153,36 @@ const RegmanagementForm = (props: PropsType) => {
     },
     {
       type: 'group',
-      key: 'group1',
+      key: 'group3',
+      groupItems: [
+        {
+          type: 'input',
+          name: 'email',
+          label: '邮箱',
+          disabled,
+          rules: [{ required: true, message: '请填写邮箱' }],
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, email: value } : null;
+            setInfo(newInfo);
+          },
+        },
+        {
+          type: 'input',
+          name: 'website',
+          label: '官方网站',
+          disabled,
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = event.target;
+            const newInfo = info ? { ...info, website: value } : null;
+            setInfo(newInfo);
+          },
+        },
+      ],
+    },
+    {
+      type: 'group',
+      key: 'group4',
       groupItems: [
         {
           type: 'input',
@@ -211,32 +209,18 @@ const RegmanagementForm = (props: PropsType) => {
       ],
     },
     {
-      type: 'group',
-      key: 'group1',
-      groupItems: [
-        {
-          type: 'input',
-          name: 'website',
-          label: '官方网站',
-          disabled,
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            const { value } = event.target;
-            const newInfo = info ? { ...info, website: value } : null;
-            setInfo(newInfo);
-          },
-        },
-        {
-          type: 'select',
-          name: 'status',
-          label: '状态',
-          disabled,
-          items: statusItems,
-          rules: [{ required: true, message: '请选择状态' }],
-          onChange: (_: any, formatString: any) => {
-            setInfo({ ...info!, status: formatString.value });
-          },
-        },
-      ],
+      type: 'select',
+      name: 'Channels',
+      label: '详细类别',
+      disabled,
+      mode: 'multiple',
+      rules: [{ required: true, message: '请选择详细类别' }],
+      items: typeItems,
+      onChange: (_: any, formatString: any) => {
+        const typeData: any = [];
+        formatString.map((item: any) => typeData.push(item.value));
+        setInfo({ ...info!, Channels: typeData });
+      },
     },
     {
       type: 'textArea',
@@ -250,13 +234,45 @@ const RegmanagementForm = (props: PropsType) => {
         setInfo(newInfo);
       },
     },
+    {
+      type: 'group',
+      key: 'group5',
+      groupItems: [
+        {
+          type: 'select',
+          name: 'status',
+          label: '状态',
+          disabled,
+          rules: [{ required: true, message: '请选择状态' }],
+          items: statusItems,
+          onChange: (_: any, formatString: any) => {
+            setIsShowReject(formatString.value);
+            setInfo({ ...info!, status: formatString.value });
+          },
+        },
+        isShowReject === '申请驳回'
+          ? {
+              type: 'input',
+              name: 'rejectDesc',
+              label: '驳回原因',
+              rules: [{ required: true, message: '请填写驳回原因' }],
+              disabled,
+              onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                const { value } = event.target;
+                const newInfo = info ? { ...info, rejectDesc: value } : null;
+                setInfo(newInfo);
+              },
+            }
+          : {},
+      ],
+    },
   ];
   return (
     <div>
       <CustomForm
         formLayout={formLayout} // 表单布局
         formItems={formItemList} // 表单字段
-        values={{ ...info }} // 表单字段的内容
+        values={info} // 表单字段的内容
         onFinish={handleFinish} // 表单提交
         onFinishFailed={({ errorFields }) => {
           // 提交失败的回调

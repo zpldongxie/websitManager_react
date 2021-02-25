@@ -124,8 +124,8 @@ const Index: React.FC = () => {
     {
       title: '联系人',
       dataIndex: 'contacts',
-      search: false,
       editable: false,
+      width: 100,
     },
     {
       title: '手机号',

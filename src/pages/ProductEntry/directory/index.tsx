@@ -121,9 +121,8 @@ const Index: React.FC = () => {
       title: '联系人',
       dataIndex: 'contacts',
       editable: false,
-      search: false,
       key: 'contacts',
-      width: 150,
+      width: 100,
     },
     {
       title: '手机号',
@@ -155,6 +154,7 @@ const Index: React.FC = () => {
       key: 'createdAt',
       search: false,
       editable: false,
+      width: 200,
       sorter: true,
       render: (text) => {
         return <div>{moment(text as string).format('YYYY-MM-DD HH:mm')}</div>;
@@ -181,6 +181,7 @@ const Index: React.FC = () => {
       valueType: 'option',
       key: 'option',
       align: 'center',
+      width: 300,
       render: (text, record) => (
         <div>
           <a
@@ -193,7 +194,7 @@ const Index: React.FC = () => {
           >
             编辑
           </a>
-          <Divider type="vertical" />
+          {/* <Divider type="vertical" />
           <a
             key="view"
             onClick={() => {
@@ -203,7 +204,7 @@ const Index: React.FC = () => {
             }}
           >
             查看
-          </a>
+          </a> */}
           <Divider type="vertical" />
           <a
             onClick={() => {
