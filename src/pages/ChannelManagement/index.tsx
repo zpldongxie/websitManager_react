@@ -161,7 +161,7 @@ const TableList: React.FC = () => {
       title: '栏目标题',
       dataIndex: 'name',
       ellipsis: true,
-      width: '15em',
+      width: '30em',
       render: (text, record) => (
         <a
           onClick={() => {

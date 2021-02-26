@@ -44,7 +44,9 @@ const RegmanagementForm = (props: PropsType) => {
   const { disabled, onSubmit, submitFun, isSubmin, current, isEdit } = props;
   const [info, setInfo] = useState<TableListItem | null | undefined>(null);
   const [isShowReject, setIsShowReject] = useState('');
+  const [textAreaLength, setTextAreaLength] = useState(0);
   useEffect(() => {
+    // 处理详细类别
     const ChannelName: any[] = [];
     if (current) {
       const currents = { ...current };
@@ -99,6 +101,7 @@ const RegmanagementForm = (props: PropsType) => {
       onSubmit(values);
     }
   };
+
   const formItemList: FormItemType[] = [
     {
       type: 'group',
@@ -142,9 +145,7 @@ const RegmanagementForm = (props: PropsType) => {
           rules: [
             { required: true, message: '请填写手机号' },
             {
-              pattern: new RegExp(
-                /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/,
-              ),
+              pattern: new RegExp(/^1[3456789]\d{9}$/),
               message: '手机号格式有误',
             },
           ],
@@ -160,9 +161,11 @@ const RegmanagementForm = (props: PropsType) => {
           label: '电话',
           disabled,
           rules: [
-            { required: true, message: '请填写电话' },
+            { required: true, message: '请填写手机号' },
             {
-              pattern: new RegExp(/\d{3}-\d{8}|\d{4}-\d{7}/),
+              pattern: new RegExp(
+                /^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/,
+              ),
               message: '电话格式有误',
             },
           ],
@@ -228,6 +231,12 @@ const RegmanagementForm = (props: PropsType) => {
           type: 'input',
           name: 'zipCode',
           label: '邮编',
+          rules: [
+            {
+              pattern: new RegExp('^[1-9]\\d{5}$'),
+              message: '邮编格式有误',
+            },
+          ],
           disabled,
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             const { value } = event.target;
@@ -243,7 +252,6 @@ const RegmanagementForm = (props: PropsType) => {
       label: '详细类别',
       disabled,
       mode: 'multiple',
-      rules: [{ required: true, message: '请选择详细类别' }],
       items: typeItems,
       onChange: (_: any, formatString: any) => {
         const typeData: any = [];
@@ -255,12 +263,21 @@ const RegmanagementForm = (props: PropsType) => {
       type: 'textArea',
       name: 'descStr',
       label: '申请描述',
+      isLengthShow: true,
+      textAreaLength,
       disabled,
-      rules: [{ required: true, message: '请填写申请描述' }],
+      rules: [
+        { required: true, message: '请填写申请描述' },
+        {
+          pattern: new RegExp(/^[\S\s]{0,200}$/),
+          message: '输入的字符过长',
+        },
+      ],
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         const newInfo = info ? { ...info, descStr: value } : null;
         setInfo(newInfo);
+        setTextAreaLength(value.length);
       },
     },
     {

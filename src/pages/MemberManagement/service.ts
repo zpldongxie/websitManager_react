@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
 import request from 'umi-request';
-import type { PersonalUpsertParams, TableListParams, UpsertParams, AuditMemberParams } from './data.d';
+import type {
+  PersonalUpsertParams,
+  TableListParams,
+  UpsertParams,
+  AuditMemberParams,
+} from './data.d';
 
 /**
  * 按条件查询企业会员列表
@@ -15,6 +20,13 @@ export async function queryCompanyMemberList(params?: TableListParams) {
     data: { ...params },
   });
   if (result.status === 'ok') {
+    // eslint-disable-next-line array-callback-return
+    result.data.list.map((item: { sendEmailStatus: string }) => {
+      if (item.sendEmailStatus !== '发送失败' && item.sendEmailStatus !== '未发送') {
+        // eslint-disable-next-line no-param-reassign
+        item.sendEmailStatus = '发送成功';
+      }
+    });
     return {
       data: result.data.list,
       total: result.data.total,
@@ -116,6 +128,13 @@ export async function queryPersonalMemberList(params?: TableListParams) {
     data: { ...params },
   });
   if (result.status === 'ok') {
+    // eslint-disable-next-line array-callback-return
+    result.data.list.map((item: { sendEmailStatus: string }) => {
+      if (item.sendEmailStatus !== '发送失败' && item.sendEmailStatus !== '未发送') {
+        // eslint-disable-next-line no-param-reassign
+        item.sendEmailStatus = '发送成功';
+      }
+    });
     return {
       data: result.data.list,
       total: result.data.total,
@@ -204,7 +223,6 @@ export async function removePersonalMember(ids: string[]) {
     },
   });
 }
-
 
 /**
  * 查询会员等级

@@ -81,3 +81,16 @@ export async function removeFakeList(ids: string[]) {
     data: { ids },
   });
 }
+
+/**
+ * 审核
+ *
+ */
+export async function upEntryAudit(params: any) {
+  return request('/api/entry/audit', {
+    method: 'PUT',
+    data: {
+      ...params,
+    },
+  });
+}

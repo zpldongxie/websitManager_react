@@ -1,9 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  DownOutlined,
-  PlusOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
+import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Popover, Modal, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -270,14 +266,14 @@ const TableList: React.FC = () => {
       dataIndex: 'sendEmailStatus',
       search: false,
       hideInTable: currentStatus === 'official',
-      sorter: true,
       ellipsis: true,
       width: '8em',
-      render: (_, record) => (
-        <span>
-          {record.sendEmailStatus?.split(/T/g)[0]} {record.sendEmailStatus?.substring(11, 16)}
-        </span>
-      ),
+      filters: true,
+      valueEnum: {
+        未发送: { text: '未发送' },
+        发送成功: { text: '发送成功' },
+        发送失败: { text: '发送失败' },
+      },
     },
     {
       title: currentStatus === 'official' ? '状态' : '审核状态',

@@ -3,7 +3,7 @@ export type status = '未发送' | '发送失败' | '发送成功';
 // 渲染表单行
 export type TableListItem = {
   key: number;
-  id?: string;
+  id: string;
   /**
    * 单位名称
    *

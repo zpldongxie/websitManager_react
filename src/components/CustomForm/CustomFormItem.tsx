@@ -132,11 +132,20 @@ const FormTimeRange = (props: FormTimeRangeProps) => {
 
 // -----------------------------FormTextArea------------------------------------
 const FormTextArea = (props: FormTextAreaProps) => {
-  const { disabled, placeholder, ...formProps } = props;
+  const { disabled, placeholder, isLengthShow, textAreaLength, ...formProps } = props;
   return (
-    <Form.Item {...formProps}>
-      <TextArea disabled={disabled} rows={4} placeholder={placeholder || '请输入'} />
-    </Form.Item>
+    <div>
+      <Form.Item {...formProps}>
+        <TextArea disabled={disabled} rows={4} placeholder={placeholder || '请输入'} />
+      </Form.Item>
+      {isLengthShow ? (
+        <span style={{ float: 'right', color: '#a5a5a5', marginTop: '-25px' }}>
+          {textAreaLength} / 200
+        </span>
+      ) : (
+        ''
+      )}
+    </div>
   );
 };
 

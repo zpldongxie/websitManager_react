@@ -1,20 +1,26 @@
 import React, { useState, useRef } from 'react';
-import {
-  DownOutlined,
-  PlusOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
-import { Button, Dropdown, Menu, Popover, Modal, message, } from 'antd';
+import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Menu, Popover, Modal, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import type { PersonalTableListItem, TableListParams, AuditMemberParams, TableListItem } from './data.d';
+import type {
+  PersonalTableListItem,
+  TableListParams,
+  AuditMemberParams,
+  TableListItem,
+} from './data.d';
 import Option from './components/Option';
 import OperationModal from './components/OperationModal';
 import AuditModal from './components/AuditModal';
 import IconFont from '@/components/CustomIcon';
 
-import { queryPersonalMemberList, removePersonalMember, upsertPersonalMember, auditPersonalMember } from './service';
+import {
+  queryPersonalMemberList,
+  removePersonalMember,
+  upsertPersonalMember,
+  auditPersonalMember,
+} from './service';
 
 import styles from './index.module.less';
 
@@ -64,7 +70,11 @@ const TableList: React.FC = () => {
   const showAuditModal = (item: PersonalTableListItem) => {
     const currentItem = { ...item };
     setAuditVisible(true);
-    setCurrentAudit({ id: currentItem.id, status: currentItem.status, rejectDesc: currentItem.rejectDesc });
+    setCurrentAudit({
+      id: currentItem.id,
+      status: currentItem.status,
+      rejectDesc: currentItem.rejectDesc,
+    });
   };
   const handleDone = () => {
     setDone(false);
@@ -80,7 +90,7 @@ const TableList: React.FC = () => {
     const pram = { ...values };
     const result = await upsertPersonalMember(pram);
     setLoadingSpin(true);
-    if (result.status === "ok") {
+    if (result.status === 'ok') {
       setOpVisible(false);
       setLoadingSpin(false);
       const action = actionRef.current;
@@ -98,7 +108,7 @@ const TableList: React.FC = () => {
   const handleAuditSubmit = async (values: AuditMemberParams) => {
     const pram = { ...values };
     const result = await auditPersonalMember(pram);
-    if (result.status === "ok") {
+    if (result.status === 'ok') {
       setAuditVisible(false);
       const action = actionRef.current;
       action?.reload();
@@ -112,7 +122,7 @@ const TableList: React.FC = () => {
       setAuditVisible(false);
       message.error('审核失败，请联系管理员或稍后重试。');
     }
-  }
+  };
   const columns: ProColumns<PersonalTableListItem>[] = [
     {
       title: 'ID',
@@ -141,9 +151,11 @@ const TableList: React.FC = () => {
       ellipsis: true,
       width: '5em',
       render: (text, record) => (
-        <a onClick={() => {
-          showCheckModal(record)
-        }}>
+        <a
+          onClick={() => {
+            showCheckModal(record);
+          }}
+        >
           {text}
         </a>
       ),
@@ -168,7 +180,7 @@ const TableList: React.FC = () => {
     {
       title: '邮箱',
       search: false,
-      hideInTable: currentStatus !== "official",
+      hideInTable: currentStatus !== 'official',
       dataIndex: 'email',
       width: '7em',
       ellipsis: true,
@@ -177,52 +189,54 @@ const TableList: React.FC = () => {
       title: '入会日期',
       dataIndex: 'logonDate',
       search: false,
-      hideInTable: currentStatus !== "official",
+      hideInTable: currentStatus !== 'official',
       sorter: true,
       ellipsis: true,
       width: '8em',
       render: (_, record) => (
         <span>{record && record.logonDate && record.logonDate.split(/T/g)[0]}</span>
-      )
+      ),
     },
     {
       title: '申请日期',
       dataIndex: 'createdAt',
       search: false,
-      hideInTable: currentStatus === "official",
+      hideInTable: currentStatus === 'official',
       sorter: true,
       ellipsis: true,
       width: '8em',
-      render: (_, record) => (
-        <span>{record.createdAt?.split(/T/g)[0]}</span>
-      )
+      render: (_, record) => <span>{record.createdAt?.split(/T/g)[0]}</span>,
     },
     {
       title: '更新日期',
       dataIndex: 'updatedAt',
       search: false,
-      hideInTable: currentStatus === "official",
+      hideInTable: currentStatus === 'official',
       sorter: true,
       ellipsis: true,
       width: '8em',
       render: (_, record) => (
-        <span>{record.updatedAt?.split(/T/g)[0]}  {record.updatedAt?.substring(11,16)}</span>
-      )
+        <span>
+          {record.updatedAt?.split(/T/g)[0]} {record.updatedAt?.substring(11, 16)}
+        </span>
+      ),
     },
     {
       title: '发件状态',
       dataIndex: 'sendEmailStatus',
       search: false,
-      hideInTable: currentStatus === "official",
-      sorter: true,
+      hideInTable: currentStatus === 'official',
       ellipsis: true,
       width: '8em',
-      render: (_, record) => (
-        <span>{record.sendEmailStatus?.split(/T/g)[0]}  {record.sendEmailStatus?.substring(11,16)}</span>
-      )
+      filters: true,
+      valueEnum: {
+        未发送: { text: '未发送' },
+        发送成功: { text: '发送成功' },
+        发送失败: { text: '发送失败' },
+      },
     },
     {
-      title: currentStatus === "official" ? '状态' : '审核状态',
+      title: currentStatus === 'official' ? '状态' : '审核状态',
       dataIndex: 'status',
       width: '7em',
       valueEnum: {
@@ -242,27 +256,32 @@ const TableList: React.FC = () => {
         }
         return dom;
       },
-      filters: currentStatus === "official" ? [{
-        text: '正式会员',
-        value: '正式会员',
-      },
-      {
-        text: '禁用',
-        value: '禁用',
-      },] : [
-          {
-            text: '申请中',
-            value: '申请中',
-          },
-          {
-            text: '初审通过',
-            value: '初审通过',
-          },
-          {
-            text: '申请驳回',
-            value: '申请驳回',
-          },
-        ],
+      filters:
+        currentStatus === 'official'
+          ? [
+              {
+                text: '正式会员',
+                value: '正式会员',
+              },
+              {
+                text: '禁用',
+                value: '禁用',
+              },
+            ]
+          : [
+              {
+                text: '申请中',
+                value: '申请中',
+              },
+              {
+                text: '初审通过',
+                value: '初审通过',
+              },
+              {
+                text: '申请驳回',
+                value: '申请驳回',
+              },
+            ],
       search: false,
     },
     {
@@ -300,7 +319,6 @@ const TableList: React.FC = () => {
   return (
     <>
       <PageHeaderWrapper className={styles.contentListWrapper} title={false}>
-
         <ProTable<PersonalTableListItem>
           actionRef={actionRef}
           rowKey="id"
@@ -325,12 +343,9 @@ const TableList: React.FC = () => {
           }}
           toolBarRender={(action, { selectedRows }) => [
             <>
-              <Button
-                type="primary"
-                onClick={showModal}
-              >
+              <Button type="primary" onClick={showModal}>
                 <PlusOutlined /> 新建
-                </Button>
+              </Button>
             </>,
             selectedRows && selectedRows.length > 0 && (
               <Dropdown
@@ -365,7 +380,10 @@ const TableList: React.FC = () => {
               ...params,
               sorter: Object.keys(sorter).length ? sorter : { status: 'descend' },
               filter,
-              status: currentStatus === "official" ? ['正式会员', '禁用'] : ['申请中', '初审通过', '申请驳回']
+              status:
+                currentStatus === 'official'
+                  ? ['正式会员', '禁用']
+                  : ['申请中', '初审通过', '申请驳回'],
             };
             return queryPersonalMemberList(opts);
           }}

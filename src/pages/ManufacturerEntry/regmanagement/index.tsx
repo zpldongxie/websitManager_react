@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { PlusOutlined, DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Divider, Modal, message, Tooltip, Dropdown, Menu, Steps, Input } from 'antd';
+import { Button, Divider, Modal, message, Tooltip, Dropdown, Menu, Steps, Input, Spin } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import moment from 'moment';
 
-import { queryList, upEntry, removeFakeList } from './service';
+import { queryList, upEntry, removeFakeList, upEntryAudit } from './service';
 import type { TableListParams, TableListItem } from './data';
 import RegmanagementForm from './components/RegmanagementForm';
 import styles from './index.module.less';
@@ -16,6 +16,13 @@ const { TextArea } = Input;
 /**
  * 厂商入驻-申请审批
  */
+
+const statusItems = [
+  { value: 0, text: '申请中', id: '' },
+  { value: 1, text: '初审通过', id: '' },
+  { value: 2, text: '正式入驻', id: '' },
+  { value: 3, text: '申请驳回', id: '' },
+];
 
 const Index: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -32,6 +39,11 @@ const Index: React.FC = () => {
   // 控制审核Modal的开关
   const [examineVisible, setExamineVisible] = useState<boolean>(false);
   const [apply, setApply] = useState<boolean>(false);
+  // 审核的数据
+  const [examineStatus, setExamineStatus] = useState<any>();
+  const [textAreaValue, setTextAreaValue] = useState();
+  const [loading, setLoading] = useState(false);
+  const [ifFooterButton, setIfFooterButton] = useState<boolean>(true);
 
   const handleSubmit = (submitFun: any) => {
     if (typeof submitFun === 'function') {
@@ -102,6 +114,46 @@ const Index: React.FC = () => {
     });
   };
 
+  // 审核
+  const examine = async (value: any, reject: string) => {
+    const item = { ...value };
+    if (reject === '申请驳回') {
+      item.text = '申请驳回';
+    } else {
+      // eslint-disable-next-line no-lonely-if
+      if (value.text === '申请中') {
+        item.text = '初审通过';
+      } else if (value.text === '初审通过') {
+        item.text = '正式入驻';
+      }
+    }
+    const result = await upEntryAudit({
+      status: item.text,
+      id: item.id,
+      rejectDesc: textAreaValue || '',
+    });
+    if (result.status === 'ok') {
+      const examin = statusItems.find((status) => status.text === item.text);
+      examin!.id = item.id;
+      setExamineStatus(examin);
+      const action = actionRef.current;
+      setApply(false);
+      setLoading(false);
+      if (examin?.text === '正式入驻') {
+        setIfFooterButton(false);
+      }
+      action?.reload();
+      message.info('操作成功');
+    }
+  };
+
+  const onTextAreaChange = ({ target: { value } }: any) => {
+    if (value.length > 500) {
+      message.warning('最多输入500个字符');
+    } else {
+      setTextAreaValue(value);
+    }
+  };
   const columns: ProColumns<TableListItem>[] = [
     {
       title: '单位名称',
@@ -110,7 +162,7 @@ const Index: React.FC = () => {
       editable: false,
       width: 300,
       render: (text, record) => (
-        <div
+        <a
           onClick={() => {
             setVisible(true);
             setDisabled(true);
@@ -118,7 +170,7 @@ const Index: React.FC = () => {
           }}
         >
           {text}
-        </div>
+        </a>
       ),
     },
     {
@@ -134,7 +186,7 @@ const Index: React.FC = () => {
     },
     {
       title: '详细类别',
-      dataIndex: 'type',
+      dataIndex: 'Channels',
       search: false,
       editable: false,
       render: (text, row) => {
@@ -178,15 +230,15 @@ const Index: React.FC = () => {
       width: 110,
     },
     {
-      title: '邮件发送状态',
+      title: '发件状态',
       dataIndex: 'sendEmailStatus',
       search: false,
       editable: false,
       filters: true,
       valueEnum: {
-        未发送: { text: '未发送', status: 'Default' },
-        发送成功: { text: '发送成功', status: 'Success' },
-        发送失败: { text: '发送失败', status: 'Error' },
+        未发送: { text: '未发送' },
+        发送成功: { text: '发送成功' },
+        发送失败: { text: '发送失败' },
       },
       width: 130,
     },
@@ -214,6 +266,9 @@ const Index: React.FC = () => {
               <a
                 onClick={() => {
                   setExamineVisible(true);
+                  const examineitem = statusItems.find((item) => record.status === item.text);
+                  examineitem!.id = record.id;
+                  setExamineStatus(examineitem);
                 }}
               >
                 审核
@@ -315,54 +370,68 @@ const Index: React.FC = () => {
         onCancel={() => {
           setExamineVisible(false);
           setApply(false);
+          setIfFooterButton(true);
         }}
         width={640}
         footer={
-          apply ? (
-            <div>
+          ifFooterButton ? (
+            <div style={{ padding: '14px' }}>
+              <span style={{ paddingRight: '20px' }}>
+                {apply ? (
+                  <Button
+                    danger
+                    onClick={() => {
+                      if (textAreaValue) {
+                        examine(examineStatus, '申请驳回');
+                        setLoading(true);
+                      } else {
+                        message.warning('请填写驳回原因');
+                      }
+                    }}
+                  >
+                    确认拒绝
+                  </Button>
+                ) : (
+                  <Button
+                    danger
+                    onClick={() => {
+                      setApply(true);
+                    }}
+                  >
+                    驳回申请
+                  </Button>
+                )}
+              </span>
               <Button
+                type="primary"
                 onClick={() => {
-                  setApply(false);
+                  examine(examineStatus, '');
+                  setLoading(true);
                 }}
               >
-                取消驳回
+                {examineStatus?.text === '初审通过' ? '同意入驻' : '同意申请'}
               </Button>
-              <Button danger>确认驳回</Button>
             </div>
           ) : (
-            <div>
-              <Button
-                danger
-                onClick={() => {
-                  setApply(true);
-                }}
-              >
-                驳回申请
-              </Button>
-              <Button type="primary">确认入驻</Button>
-            </div>
+            ''
           )
         }
       >
-        <div>
-          <Steps progressDot current={1}>
+        <Spin spinning={loading}>
+          <Steps progressDot current={examineStatus?.value}>
             <Step title="申请中" />
             <Step title="初审通过" />
             <Step title="入驻成功" />
           </Steps>
-          {apply ? (
-            <div style={{ marginTop: 60 }}>
-              <p>请填写驳回原因：</p>
-              <TextArea rows={4} />
-            </div>
-          ) : (
-            ''
-          )}
-        </div>
+          <div style={{ padding: '48px 0', textAlign: 'center' }}>
+            同意入驻或驳回，如果驳回，需填写驳回原因。
+          </div>
+          {apply ? <TextArea rows={4} onChange={onTextAreaChange} /> : ''}
+        </Spin>
       </Modal>
       <Modal
         visible={visible}
-        title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新建'}`}
+        title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新增'}`}
         width="45vw"
         destroyOnClose
         onCancel={() => {

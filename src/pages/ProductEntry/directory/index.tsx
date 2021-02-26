@@ -11,7 +11,7 @@ import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import moment from 'moment';
 
-import { queryList, upEntry, removeFakeList } from './service';
+import { queryList, upEntry, removeFakeList, upEntryAudit } from './service';
 import DirectoryForm from './components/DirectoryForm';
 import type { TableListParams, TableListItem } from './data';
 import styles from './index.module.less';
@@ -102,6 +102,22 @@ const Index: React.FC = () => {
     });
   };
 
+  // 审核
+  const examine = async (value: any) => {
+    const item = { ...value };
+    if (value.status === '正式入驻') {
+      item.text = '禁用';
+    } else if (value.status === '禁用') {
+      item.text = '正式入驻';
+    }
+    const result = await upEntryAudit({ status: item.text, id: item.id });
+    if (result.status === 'ok') {
+      const action = actionRef.current;
+      action?.reload();
+      message.info('操作成功');
+    }
+  };
+
   const columns: ProColumns<TableListItem>[] = [
     {
       title: '单位名称',
@@ -111,7 +127,7 @@ const Index: React.FC = () => {
       width: 250,
       key: 'corporateName',
       render: (text, record) => (
-        <div
+        <a
           onClick={() => {
             setVisible(true);
             setDisabled(true);
@@ -119,7 +135,7 @@ const Index: React.FC = () => {
           }}
         >
           {text}
-        </div>
+        </a>
       ),
     },
     {
@@ -159,8 +175,8 @@ const Index: React.FC = () => {
       key: 'createdAt',
       search: false,
       editable: false,
-      width: 200,
       sorter: true,
+      width: 200,
       render: (text) => {
         return <div>{moment(text as string).format('YYYY-MM-DD HH:mm')}</div>;
       },
@@ -201,6 +217,9 @@ const Index: React.FC = () => {
             <Popconfirm
               title="确定启用该单位吗？"
               icon={<QuestionCircleOutlined style={{ color: '#87d068' }} />}
+              onConfirm={() => {
+                examine(record);
+              }}
             >
               <a>启用</a>
             </Popconfirm>
@@ -208,6 +227,9 @@ const Index: React.FC = () => {
             <Popconfirm
               title="确定禁用该单位吗？"
               icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+              onConfirm={() => {
+                examine(record);
+              }}
             >
               <a>禁用</a>
             </Popconfirm>
@@ -227,7 +249,7 @@ const Index: React.FC = () => {
   return (
     <PageHeaderWrapper title={false}>
       <ProTable<TableListItem>
-        headerTitle="厂商名录"
+        headerTitle="产品清单"
         columns={columns}
         tableAlertRender={false}
         actionRef={actionRef}
@@ -302,7 +324,7 @@ const Index: React.FC = () => {
       />
       <Modal
         visible={visible}
-        title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新建'}`}
+        title={disabled ? '查看信息' : `${isEdit ? '编辑' : '新增'}`}
         width="45vw"
         destroyOnClose
         onCancel={() => {

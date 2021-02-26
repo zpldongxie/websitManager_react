@@ -43,6 +43,14 @@ export type FormTimeRangeProps = {
 export type FormTextAreaProps = {
   disabled?: boolean;
   placeholder?: string;
+  /**
+   * 是否展示textArea右下边的数字长度
+   */
+  isLengthShow?: boolean;
+  /**
+   * textArea输入值的长度
+   */
+  textAreaLength?: number;
 } & FormItemProps;
 
 export type FormSwitchProps = {
@@ -99,6 +107,15 @@ export type FormItemType = {
    * select选择框的属性 'multiple': 多选，'tags': 可输入
    */
   mode?: 'multiple' | 'tags';
+
+  /**
+   * 是否展示textArea右下边的数字长度
+   */
+  isLengthShow?: boolean;
+  /**
+   * textArea输入值的长度
+   */
+  textAreaLength?: number;
   /**
    * 类型为group横向排列时，可设置宽度，不设置时为平均分配
    *

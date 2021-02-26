@@ -21,6 +21,13 @@ export async function queryList(params?: TableListParams) {
         item.type === '产品' &&
         (item.status === '申请中' || item.status === '初审通过' || item.status === '申请驳回'),
     );
+    // eslint-disable-next-line array-callback-return
+    data.map((item: { sendEmailStatus: string }) => {
+      if (item.sendEmailStatus !== '发送失败' && item.sendEmailStatus !== '未发送') {
+        // eslint-disable-next-line no-param-reassign
+        item.sendEmailStatus = '发送成功';
+      }
+    });
     return {
       data,
       total: data.length,
@@ -80,5 +87,18 @@ export async function removeFakeList(ids: string[]) {
   return request('/api/entrys', {
     method: 'DELETE',
     data: { ids },
+  });
+}
+
+/**
+ * 审核
+ *
+ */
+export async function upEntryAudit(params: any) {
+  return request('/api/entry/audit', {
+    method: 'PUT',
+    data: {
+      ...params,
+    },
   });
 }
