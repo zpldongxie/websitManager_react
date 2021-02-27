@@ -1,8 +1,10 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable no-param-reassign */
 import { parse } from 'querystring';
 import pathRegexp from 'path-to-regexp';
 import type { Route } from '@/models/connect';
-import type { ChannelType, TreeNodeType } from './data';
+import type { ChannelType, TreeNodeType, ChannelSettingList, ChannelSettingType, SiteSettingList } from './data';
+import _ from 'lodash';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -29,6 +31,8 @@ export const convertChannelsToTree = (
       channels.push({
         value: channel.id,
         label: channel.name,
+        key: channel.id!,
+        title: channel.name,
         ...channel,
       });
       list.splice(i, 1);
@@ -83,3 +87,143 @@ export const getRouteAuthority = (path: string, routeData: Route[]) => {
   });
   return authorities;
 };
+
+/**
+ * 转换接口返回数据为栏目配置组件需要的数据结构
+ *
+ * @param {ChannelSettingType} channel 原始数据
+ */
+export const convertSettingData = (
+  setting: ChannelSettingType,
+  data: ChannelSettingList[],
+  disable?: boolean,
+) => {
+  let index: number = 0;
+  switch (setting.type) {
+    case "pic":
+      index = 0;
+      break;
+    case "url":
+      index = 1;
+      break;
+    case "desc":
+      index = 2;
+      break;
+    case "video":
+      index = 3;
+      break;
+    default:
+      break;
+  }
+  const dataList = data[index].list;
+  const groupName = setting.group === "" ? '未分组' : setting.group;
+  let newGroup: boolean = true;
+  if (disable) {
+    setting.disabled = true;
+  }
+  setting.key = setting.id;
+  for (let k = 0; k < dataList.length; k++) {
+    if (dataList[k].groupName === groupName) {
+      newGroup = false;
+      dataList[k].dataResource.push(setting);
+    }
+  }
+  if (newGroup) {
+    dataList.unshift({
+      groupName,
+      groupEdit: false,
+      dataResource: [setting]
+    });
+  }
+};
+
+/**
+ * 转换全站配置接口返回数据为栏目配置组件需要的数据结构
+ *
+ * @param {SiteSettingList} channel 原始数据
+ */
+export const convertSiteSetting = (
+  site: SiteSettingList,
+) => {
+  const resourceData: ChannelSettingList[] = [{
+    type: 'pic',
+    tabName: '图片',
+    list: []
+  }, {
+    type: 'url',
+    tabName: '链接',
+    list: []
+  }, {
+    type: 'desc',
+    tabName: '文本',
+    list: []
+  }, {
+    type: 'video',
+    tabName: '视频',
+    list: []
+  }];
+  const channelSetting = site.list;
+  for (let j: number = 0; j < channelSetting!.length; j++) {
+    const setting = channelSetting![j];
+    convertSettingData(setting, resourceData, true);
+  }
+  site.ChannelSettingList = resourceData;
+};
+/**
+ * 转换栏目接口返回数据为栏目配置组件需要的数据结构
+ *
+ * @param {ChannelType} channel 原始数据
+ */
+export const convertChannelSetting = (
+  channel: ChannelType,
+) => {
+  const channelSetting = channel.ChannelSettings;
+  const resourceData: ChannelSettingList[] = [{
+    type: 'pic',
+    tabName: '图片',
+    list: []
+  }, {
+    type: 'url',
+    tabName: '链接',
+    list: []
+  }, {
+    type: 'desc',
+    tabName: '文本',
+    list: []
+  }, {
+    type: 'video',
+    tabName: '视频',
+    list: []
+  }];
+  for (let j: number = 0; j < channelSetting!.length; j++) {
+    const setting = channelSetting![j];
+    convertSettingData(setting, resourceData);
+  }
+  channel.ChannelSettingList = resourceData;
+};
+
+/**
+ * 
+ * @param tree 
+ * @param key 
+ * @param value 
+ * @param childrenKey 
+ */
+export const findItemFromTree = (tree: any[], key: string, value: any, childrenKey: string = 'children') => {
+  let current: any = null;
+  tree.find((item: any) => {
+    if (item[key] === value) {
+      current = item;
+      return true;
+    }
+    if (item[childrenKey] && Array.isArray(item[childrenKey])) {
+      const child = findItemFromTree(item[childrenKey], key, value, childrenKey);
+      if (child) {
+        current = child;
+        return true;
+      }
+    }
+    return false;
+  });
+  return current;
+}
