@@ -2,7 +2,7 @@
 import type { FC } from 'react';
 import React, { useRef, useState, useEffect } from 'react';
 import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Divider, Menu, Modal, message } from 'antd';
+import { Button, Dropdown, Divider, Menu, Modal, message, Popover } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 
@@ -12,6 +12,7 @@ import type { Dispatch } from 'umi';
 import { connect } from 'umi';
 import moment from 'moment';
 import OperationModal from './components/OperationModal';
+import IconFont from '@/components/CustomIcon';
 import type { StateType } from './model';
 import type { TrainingDataType, TableListParams } from './data.d';
 import { queryList, removeFakeList } from './service';
@@ -45,6 +46,8 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   const [visible, setVisible] = useState<boolean>(false);
   const [current, setCurrent] = useState<Partial<TrainingDataType> | undefined>(undefined);
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [hoverId, setHoverId] = useState(''); // 鼠标经过id预览图标时对应的文章ID
+
   const valueEnum = {};
   // eslint-disable-next-line array-callback-return
   channelList.reverse().map((item) => {
@@ -183,6 +186,25 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
   };
 
   const columns: ProColumns<TrainingDataType>[] = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      search: false,
+      width: '3em',
+      render: (id) => (
+        <Popover content={id} title="id">
+          <IconFont
+            onMouseOver={() => {
+              setHoverId(id as string);
+            }}
+            onMouseLeave={() => {
+              setHoverId('');
+            }}
+            type={hoverId === id ? 'iconyanjing' : 'iconyanjing_bi'}
+          />
+        </Popover>
+      ),
+    },
     {
       title: '培训标题',
       dataIndex: 'title',
