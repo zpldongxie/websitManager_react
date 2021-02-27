@@ -100,7 +100,7 @@ const ArticlePreview = ({ visiable = false, id, hiddenHandler }: PropsType) => {
               <div className="content-title">{content ? content.title : ''}</div>
               <div className="content-time">{`时间： ${
                 content ? moment(content.conDate).format('YYYY-MM-DD HH:mm') : ''
-              }`}</div>
+              }`}<span style={{marginLeft: 10}}>{` 来源：${content?.source}`}</span></div>
               <div className="content-mainCon">
                 <Interweave content={content ? content.mainCon : ''} />
               </div>
