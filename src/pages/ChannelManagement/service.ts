@@ -55,14 +55,21 @@ export async function queryAllTypes() {
 export async function moveChannel(
   id: string,
   afterId: string,
-  sorterMode: '排序模式' | '嵌套模式',
+  sorterMode: '前后排序' | '层级嵌套',
 ) {
+  let newSorterMode = '';
+  if(sorterMode === '前后排序'){
+    newSorterMode = '排序模式'
+  }else{
+    newSorterMode = '嵌套模式'
+
+  }
   const result = await request('/api/channel/move', {
     method: 'POST',
     data: {
       id,
       afterId,
-      sorterMode,
+      sorterMode:newSorterMode,
     },
   });
   return result;

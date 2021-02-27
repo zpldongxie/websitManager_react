@@ -69,7 +69,7 @@ const DragableBodyRow = ({ index, moveRow, className, style, ...restProps }: DBR
 };
 
 const TableList: React.FC = () => {
-  const [sorterMode, setSorterMode] = useState<'排序模式' | '嵌套模式'>('排序模式');
+  const [sorterMode, setSorterMode] = useState<'前后排序' | '层级嵌套'>('前后排序');
   // 模态框
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   // 模态框中的信息是否可编辑
@@ -284,7 +284,7 @@ const TableList: React.FC = () => {
           headerTitle="栏目管理"
           actionRef={actionRef}
           rowKey="id"
-          className={sorterMode === '排序模式' ? 'sort-table' : 'insert-table'}
+          className={sorterMode === '前后排序' ? 'sort-table' : 'insert-table'}
           components={components}
           onRow={(record) => {
             return {
@@ -311,11 +311,11 @@ const TableList: React.FC = () => {
                 <Menu
                   onClick={(e) => {
                     switch (e.key) {
-                      case '排序模式':
-                        setSorterMode('排序模式');
+                      case '前后排序':
+                        setSorterMode('前后排序');
                         break;
-                      case '嵌套模式':
-                        setSorterMode('嵌套模式');
+                      case '层级嵌套':
+                        setSorterMode('层级嵌套');
                         break;
                       default:
                       // do nothing
@@ -323,8 +323,8 @@ const TableList: React.FC = () => {
                   }}
                   selectedKeys={[]}
                 >
-                  <Menu.Item key="排序模式">排序模式</Menu.Item>
-                  <Menu.Item key="嵌套模式">嵌套模式</Menu.Item>
+                  <Menu.Item key="前后排序">前后排序</Menu.Item>
+                  <Menu.Item key="层级嵌套">层级嵌套</Menu.Item>
                 </Menu>
               }
             >
