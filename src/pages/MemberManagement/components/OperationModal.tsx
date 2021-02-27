@@ -25,6 +25,7 @@ const formLayout = {
   wrapperCol: { flex: 'auto' },
 };
 
+
 let submitFun: () => void;
 
 const OperationModal: FC<OperationModalProps> = (props) => {
@@ -363,7 +364,6 @@ const OperationModal: FC<OperationModalProps> = (props) => {
             type: 'select',
             name: 'status',
             label: '审核状态',
-            hidden: status === '禁用' || status === '正式会员',
             disabled,
             items: auditStatus,
             onChange: (_: any, formatString: any) => {
