@@ -306,9 +306,6 @@ const TableList: React.FC = () => {
             auditHandler={() => {
               showAuditModal(record);
             }}
-            checkHandler={() => {
-              showCheckModal(record);
-            }}
           />
         </div>
       ),
@@ -391,7 +388,7 @@ const TableList: React.FC = () => {
           rowSelection={{}}
         />
       </PageHeaderWrapper>
-      <OperationModal
+      {opVisible ? <OperationModal
         type="personal"
         visible={opVisible}
         current={currentOp}
@@ -400,14 +397,14 @@ const TableList: React.FC = () => {
         onDone={handleDone}
         onCancel={handleCancel}
         onSubmitPersonal={handleOperationSubmit}
-      />
-      <AuditModal
+      /> :''}
+      {auditVisible ? <AuditModal
         type="personal"
         visible={auditVisible}
         current={currentAudit}
         onCancel={handleCancel}
         onSubmit={handleAuditSubmit}
-      />
+      /> : ''}
     </>
   );
 };

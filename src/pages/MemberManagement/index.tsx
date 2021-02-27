@@ -428,7 +428,7 @@ const TableList: React.FC = () => {
         />
       </PageHeaderWrapper>
 
-      <OperationModal
+      {opVisible ? <OperationModal
         visible={opVisible}
         current={currentOp}
         done={done}
@@ -436,13 +436,13 @@ const TableList: React.FC = () => {
         onDone={handleDone}
         onCancel={handleCancel}
         onSubmit={handleOperationSubmit}
-      />
-      <AuditModal
+      /> : ''}
+      {auditVisible ? <AuditModal
         visible={auditVisible}
         current={currentAudit}
         onCancel={handleCancel}
         onSubmit={handleAuditSubmit}
-      />
+      /> : ''}
     </>
   );
 };
