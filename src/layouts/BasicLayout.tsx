@@ -32,7 +32,7 @@ const noMatch = (
     }
   />
 );
-export interface BasicLayoutProps extends ProLayoutProps {
+export type BasicLayoutProps = {
   breadcrumbNameMap: Record<string, MenuDataItem>;
   route: ProLayoutProps['route'] & {
     authority: string[];
@@ -42,7 +42,7 @@ export interface BasicLayoutProps extends ProLayoutProps {
     pwa: boolean;
   };
   dispatch: Dispatch;
-}
+} & ProLayoutProps
 export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
   breadcrumbNameMap: Record<string, MenuDataItem>;
 };
@@ -132,10 +132,14 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       menuDataRender={menuDataRender}
       menuFooterRender={() => {
         return (
-          <Row justify="center" style={{ color: '#fff', padding: '1rem 0' }}>
+          <>
+          <Row justify="center" style={{ color: 'rgba(255, 255, 255, 0.65)', padding: '0' }}>
             <Col style={{ display: collapsed ? 'none' : 'block' }}>版本号：</Col>
             <Col>{settings.versoin}</Col>
           </Row>
+          <Row justify="center" style={{ color: 'rgba(255, 255, 255, 0.65)', padding: '0 0 1rem 0' }}>
+          </Row>
+          </>
         );
       }}
       rightContentRender={() => <RightContent />}

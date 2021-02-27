@@ -41,6 +41,19 @@ export default defineConfig({
       authority: ['admin', 'user'],
       routes: [
         {
+          // 操作说明
+          path: '/instructions',
+          component: '../layouts/BlankLayout',
+          authority: ['admin', 'user'],
+          routes: [
+            {
+              name: 'info',
+              path: '/instructions',
+              component: './Instructions',
+            },
+          ],
+        },
+        {
           // 文章编辑
           path: '/editArticle',
           component: '../layouts/BlankLayout',
