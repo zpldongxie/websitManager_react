@@ -144,7 +144,9 @@ const DirectoryForm = (props: PropsType) => {
           rules: [
             { required: true, message: '请填写手机号' },
             {
-              pattern: new RegExp(/^1[3456789]\d{9}$/),
+              pattern: new RegExp(
+                /^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/,
+              ),
               message: '手机号格式有误',
             },
           ],
@@ -160,11 +162,9 @@ const DirectoryForm = (props: PropsType) => {
           label: '电话',
           disabled,
           rules: [
-            { required: true, message: '请填写手机号' },
+            { required: true, message: '请填写电话' },
             {
-              pattern: new RegExp(
-                /^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/,
-              ),
+              pattern: new RegExp(/^\d{5,12}$/),
               message: '电话格式有误',
             },
           ],

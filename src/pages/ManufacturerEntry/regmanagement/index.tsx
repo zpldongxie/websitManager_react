@@ -337,6 +337,7 @@ const Index: React.FC = () => {
             ...params,
             sorter,
             filter,
+            type: '厂商'
           };
           return queryList(opts);
         }}

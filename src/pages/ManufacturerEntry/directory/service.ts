@@ -17,12 +17,11 @@ export async function queryList(params?: TableListParams) {
 
   if (result.status === 'ok') {
     const data = result.data.list.filter(
-      (item: { type: string; status: string }) =>
-        item.type === '厂商' && (item.status === '正式入驻' || item.status === '禁用'),
+      (item: { type: string; status: string }) => (item.status === '正式入驻' || item.status === '禁用'),
     );
     return {
       data,
-      total: data.length,
+      total: result.data.total,
       success: true,
       pageSize: params?.pageSize,
       current: params?.current,

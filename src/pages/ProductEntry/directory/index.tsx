@@ -295,6 +295,7 @@ const Index: React.FC = () => {
             ...params,
             sorter,
             filter,
+            type: '产品'
           };
           return queryList(opts);
         }}

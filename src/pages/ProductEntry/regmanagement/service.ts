@@ -17,9 +17,7 @@ export async function queryList(params?: TableListParams) {
 
   if (result.status === 'ok') {
     const data = result.data.list.filter(
-      (item: { type: string; status: string }) =>
-        item.type === '产品' &&
-        (item.status === '申请中' || item.status === '初审通过' || item.status === '申请驳回'),
+      (item: { type: string; status: string }) => (item.status === '申请中' || item.status === '初审通过' || item.status === '申请驳回'),
     );
     // eslint-disable-next-line array-callback-return
     data.map((item: { sendEmailStatus: string }) => {
@@ -30,7 +28,7 @@ export async function queryList(params?: TableListParams) {
     });
     return {
       data,
-      total: data.length,
+      total: result.data.total,
       success: true,
       pageSize: params?.pageSize,
       current: params?.current,
