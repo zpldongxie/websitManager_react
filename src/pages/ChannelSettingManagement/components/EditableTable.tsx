@@ -4,7 +4,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import type { ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import type { ChannelSettingType } from '@/utils/data';
-import { Divider, message } from 'antd';
+import { Divider, message, Popconfirm } from 'antd';
 import myContext from '../myContext';
 import { deleteChannelSetting } from '../service';
 
@@ -125,13 +125,30 @@ const EditableTable: FC<TableProps> = (props) => {
             编辑
         </a>
           <Divider type="vertical" />
-          <a
-            key="delete"
-            style={{ "color": "red" }}
-            onClick={() => handleDelete(record.id)}
+          <Popconfirm
+            title="删除之后，数据不可恢复，确定要删除吗?"
+            onConfirm={async () => {
+              try {
+                if (record.id) {
+                  const idArray = [record.id];
+                  const result = await deleteChannelSetting(idArray);
+                  if (result.success) {
+                    refreshData!();
+                    message.info('删除成功');
+                  } else {
+                    message.error('删除失败，请联系管理员或稍后重试。');
+                  }
+                }
+              } catch (err) {
+                message.error('删除失败，请联系管理员或稍后重试。');
+              }
+            }}
+            okText="Yes"
+            cancelText="No"
+            placement="topLeft"
           >
-            删除
-        </a>
+            <a href="#">删除</a>
+          </Popconfirm>
         </>
       }
     },
