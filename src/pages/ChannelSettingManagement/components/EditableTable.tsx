@@ -157,6 +157,7 @@ const EditableTable: FC<TableProps> = (props) => {
           onSubmit && onSubmit(record);
         },
         onChange: setEditableRowKeys,
+        actionRender: (row, config, defaultDom) => [defaultDom.save, defaultDom.cancel],
       }}
     />
   );

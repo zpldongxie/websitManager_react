@@ -53,6 +53,11 @@ const SettingGroup: FC<GroupProps> = (props) => {
   }, [channel, list, settingExtend, siteData, type])
 
   const handleAdd = () => {
+    const curJudge = dataSource.filter((item) => item.groupEdit === true);
+    if(curJudge.length > 0){
+      message.warning('同时间只能修改或新增一个分组名称');
+      return;
+    }
     const newArr: ChannelSettingGroupList[] = [{
       groupName: '',
       groupEdit: true,
@@ -66,6 +71,11 @@ const SettingGroup: FC<GroupProps> = (props) => {
     let newDataSource = [...(dataSource || [])];
     if (ind < newDataSource.length) {
       if (evtType === "Edit") {
+        const curJudge = dataSource.filter((item) => item.groupEdit === true);
+        if(curJudge.length > 0){
+          message.warning('同时间只能修改或新增一个分组名称');
+          return;
+        }
         newDataSource[ind].groupEdit = true;
       } else {
         newDataSource[ind].groupEdit = false; const tabHeader = (e.target as HTMLImageElement).closest('div[class*="tabHeader"]');
@@ -92,11 +102,18 @@ const SettingGroup: FC<GroupProps> = (props) => {
     }
     setDataSource(newDataSource);
   };
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) =>{
+    e.stopPropagation();
+    if((e.target as HTMLInputElement).value.trim() === ""){
+      message.warning('分组名称不可为空');
+      e.target.focus();
+    }
+  };
   const panelHeader = (name: string, index: number, status?: boolean) => {
     return (
       <div className={styles.tabHeader} >
         {status ? <>
-          <Input defaultValue={name} autoFocus />
+          <Input defaultValue={name} autoFocus onBlur={(e) => handleBlur(e)} />
           <IconFont
             onClick={(e) => handleRename(e, index, "save")}
             type='icon-ok'
@@ -129,7 +146,7 @@ const SettingGroup: FC<GroupProps> = (props) => {
         defaultActiveKey={index === 0 ? '1' : ''}
         key={index}
       >
-        <Panel header={panelHeader(item.groupName!, index, item.groupEdit)} key={index * 1 + 1}>
+        <Panel collapsible={item.groupEdit ? 'disabled' : 'header'} header={panelHeader(item.groupName!, index, item.groupEdit)} key={index * 1 + 1}>
           <EditableTable type={type} groupName={item.groupName!} channel={channel} curDataSource={item.dataResource} onSubmit={onSubmit} />
         </Panel>
       </Collapse>)}

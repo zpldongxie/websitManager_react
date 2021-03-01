@@ -1,7 +1,7 @@
 .channelSettingWrapper {
   :global {
     .ant-layout {
-      height: calc(100vh - 226px);
+      height: calc(100vh - 165px);
       overflow: hidden;
       min-height: auto;
       background: #fff;
@@ -39,7 +39,8 @@
 
         .ant-tabs-extra-content {
           line-height: 22px;
-          *{
+
+          * {
             display: inline-block;
             vertical-align: middle;
           }
@@ -53,37 +54,43 @@
             padding-left: 40px;
             line-height: 30px;
             position: relative;
-            .ant-collapse-extra{
+            cursor: pointer;
+
+            .ant-collapse-extra {
               position: absolute;
-              top:12px;
-              right:12px;
+              top: 12px;
+              right: 12px;
+            }
+
+            >.anticon>svg {
+              display: inline-block;
+              height: 15px !important;
+              width: 15px !important;
             }
           }
 
           .ant-table-wrapper {
             margin-bottom: 12px;
-            .ant-table-thead{
-              th:nth-child(1){
+
+            .ant-table-thead {
+              th:nth-child(1) {
                 text-align: center;
               }
             }
-            .ant-table-row{
-              td:nth-child(1){
+
+            .ant-table-row {
+              td:nth-child(1) {
                 text-align: center;
-                span.ant-input-suffix{
+
+                span.ant-input-suffix {
                   display: none;
                 }
               }
             }
+
             .ant-divider-vertical {
               margin: 0 15px;
             }
-          }
-
-          .anticon svg {
-            display: inline-block;
-            height: 17px !important;
-            width: 17px !important;
           }
         }
       }
@@ -95,18 +102,22 @@
 
     input {
       width: 200px;
+      margin-right: 12px;
     }
 
-    span {
+    :global {
+      .anticon svg {
+        display: inline-block;
+        height: 18px !important;
+        width: 18px !important;
+      }
+    }
+
+    >span {
       padding: 6px;
 
-      img {
-        width: 20px;
-        margin: 0 12px;
-
-        &+img {
-          margin-left: 0;
-        }
+      >span {
+        margin-left: 12px;
       }
     }
   }
@@ -119,6 +130,10 @@
     border: none !important;
     letter-spacing: 1px;
     margin-bottom: 12px;
+
+    &:focus {
+      outline: none;
+    }
 
     >span {
       margin-right: 10px;
