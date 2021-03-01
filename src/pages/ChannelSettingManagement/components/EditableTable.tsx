@@ -25,14 +25,6 @@ const EditableTable: FC<TableProps> = (props) => {
 
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] = useState<ChannelSettingType[] | undefined>([]);
-  const handleDelete = async (id: any) => {
-    const idArray = [id];
-    const result = await deleteChannelSetting(idArray);
-    if (result.success) {
-      refreshData!();
-      message.info('数据删除成功');
-    }
-  }
   useEffect(() => {
     // 开启继承的时候，需要把全站配置拼接进来
     if (channel !== 'site' && settingExtend) {
