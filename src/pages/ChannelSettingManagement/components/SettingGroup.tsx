@@ -79,9 +79,15 @@ const SettingGroup: FC<GroupProps> = (props) => {
         newDataSource[ind].groupEdit = true;
       } else {
         newDataSource[ind].groupEdit = false; const tabHeader = (e.target as HTMLImageElement).closest('div[class*="tabHeader"]');
-        const groupName = (tabHeader!.querySelector(".ant-input") as HTMLInputElement).value;
+        const curGroup = (tabHeader!.querySelector(".ant-input") as HTMLInputElement);
+        const groupName = curGroup.value;
         if (evtType === "save") {
           newDataSource[ind].groupName = groupName;
+          if(groupName.trim() === ""){
+            message.warning('分组名称不可为空');
+            curGroup.focus();
+            return;
+          }
           if(newDataSource[ind].dataResource.length > 0){
             const idArr = newDataSource[ind].dataResource.map((item) => item.id);
             const queryParams = {
@@ -102,18 +108,11 @@ const SettingGroup: FC<GroupProps> = (props) => {
     }
     setDataSource(newDataSource);
   };
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) =>{
-    e.stopPropagation();
-    if((e.target as HTMLInputElement).value.trim() === ""){
-      message.warning('分组名称不可为空');
-      e.target.focus();
-    }
-  };
   const panelHeader = (name: string, index: number, status?: boolean) => {
     return (
       <div className={styles.tabHeader} >
         {status ? <>
-          <Input defaultValue={name} autoFocus onBlur={(e) => handleBlur(e)} />
+          <Input defaultValue={name} autoFocus />
           <IconFont
             onClick={(e) => handleRename(e, index, "save")}
             type='icon-ok'
