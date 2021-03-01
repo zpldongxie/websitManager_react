@@ -279,7 +279,21 @@ export default defineConfig({
                   // 基本设置
                   name: 'base',
                   path: '/websiteConf/base',
-                  component: './TrainingManagement',
+                  component: './WebsiteConfBase',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  //版权信息设置
+                  name: 'copyright',
+                  path: '/websiteConf/copyright',
+                  component: './WebsiteConfCopyright',
+                  authority: ['admin', 'user'],
+                },
+                {
+                  //联系方式设置
+                  name: 'contact',
+                  path: '/websiteConf/contact',
+                  component: './WebsiteConfContact',
                   authority: ['admin', 'user'],
                 },
               ],
