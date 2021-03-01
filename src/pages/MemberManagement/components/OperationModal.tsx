@@ -142,13 +142,9 @@ const OperationModal: FC<OperationModalProps> = (props) => {
             disabled,
             rules: [
               {
-                pattern: new RegExp(
-                  /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/,
-                ),
-                message: '电话格式有误',
-              },
-              { required: true, message: '请输入手机号' },
-            ],
+                pattern: new RegExp(/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/),
+                message: '手机格式有误',
+              }, { required: true, message: '请输入手机号' }]
           },
           {
             type: 'input',
@@ -158,6 +154,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
             rules: [
               {
                 type: 'email',
+                pattern: new RegExp(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/),
                 message: '联系邮箱格式有误',
               },
               { required: true, message: '请输入联系邮箱' },
@@ -176,13 +173,18 @@ const OperationModal: FC<OperationModalProps> = (props) => {
             disabled,
             rules: [
               {
-                pattern: new RegExp(/\d{3}-\d{8}|\d{4}-\d{7}/),
+                pattern: new RegExp(/^(0\d{2,3})?-?(\d{7,8})$/),
                 message: '电话格式有误',
-              },
-              { required: true, message: '请输入单位电话' },
-            ],
+              }, { required: true, message: '请输入单位电话' }
+            ]
           },
-          { type: 'input', name: 'zipCode', label: '单位邮编', disabled },
+          { type: 'input', name: 'zipCode', label: '单位邮编',rules: [
+            {
+              pattern: new RegExp(/^[0-9]\d{5}$/),
+              message: '邮编格式有误',
+            },
+          ], disabled, },
+          
         ],
       },
       {
@@ -275,9 +277,7 @@ const OperationModal: FC<OperationModalProps> = (props) => {
             disabled,
             rules: [
               {
-                pattern: new RegExp(
-                  /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/,
-                ),
+                pattern:  new RegExp(/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/),
                 message: '手机号码格式有误',
               },
               { required: true, message: '请输入手机号' },

@@ -30,6 +30,8 @@ export default {
   'menu.home': '首页',
   'menu.websiteConf': '网站设置',
   'menu.websiteConf.base': '基本设置',
+  'menu.websiteConf.copyright': '版权信息设置',
+  'menu.websiteConf.contact': '联系方式设置',
   'menu.system': '系统配置',
   'menu.login': '登录',
   'menu.register': '注册',

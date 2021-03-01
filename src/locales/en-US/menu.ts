@@ -30,6 +30,8 @@ export default {
   'menu.home': 'Home',
   'menu.websiteConf': 'Website SetUp',
   'menu.websiteConf.base': 'Basic Settings',
+  'menu.websiteConf.copyright': 'Copyright Information Settings',
+  'menu.websiteConf.contact': 'Contact Information Settings',
   'menu.system': 'System Configuration',
   'menu.login': 'Login',
   'menu.register': 'Register',

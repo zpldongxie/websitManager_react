@@ -66,7 +66,7 @@ const UpdateForm = (props: PropsType) => {
       name: '',
       enName: '',
       ChannelTypeId: channelTypeItems.find((type) => type.text === '文章列表')?.value || '',
-      parentId: '',
+      parentId: null,
       keyWord: '',
       url: '',
       descStr: '',
