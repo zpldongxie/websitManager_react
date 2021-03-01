@@ -160,7 +160,7 @@ const Index: React.FC = () => {
       dataIndex: 'corporateName',
       ellipsis: true,
       editable: false,
-      width: 300,
+      width: 250,
       render: (text, record) => (
         <a
           onClick={() => {
