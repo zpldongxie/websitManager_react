@@ -98,6 +98,8 @@ const SettingGroup: FC<GroupProps> = (props) => {
             updateChannelSettings(queryParams).then(result=>{
               if(result.success){
                 message.success('分组名称修改成功');
+              }else{
+                message.error('分组名称修改失败');
               }
             });
           }
@@ -112,7 +114,7 @@ const SettingGroup: FC<GroupProps> = (props) => {
     return (
       <div className={styles.tabHeader} >
         {status ? <>
-          <Input defaultValue={name} autoFocus />
+          <Input defaultValue={name} autoFocus maxLength={20} />
           <IconFont
             onClick={(e) => handleRename(e, index, "save")}
             type='icon-ok'
@@ -136,6 +138,8 @@ const SettingGroup: FC<GroupProps> = (props) => {
     if(result.success){
       refreshData!();
       message.info('数据提交成功');
+    }else{
+      message.error('数据提交失败');
     }
   };
   return (
