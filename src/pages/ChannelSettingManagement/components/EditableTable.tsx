@@ -26,6 +26,7 @@ const EditableTable: FC<TableProps> = (props) => {
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] = useState<ChannelSettingType[] | undefined>([]);
   useEffect(() => {
+    const newOrderDataSource = curDataSource.sort((a, b) => b.orderIndex! - a.orderIndex! );
     // 开启继承的时候，需要把全站配置拼接进来
     if (channel !== 'site' && settingExtend) {
       // 从全站配置中找对应类型
@@ -34,18 +35,18 @@ const EditableTable: FC<TableProps> = (props) => {
         // 从全站配置查找对应的分组
         const siteGroup = siteType.list.find((item) => item.groupName === groupName);
         if (siteGroup) {
-          const ids = curDataSource.map((item) => item.id);
+          const ids = newOrderDataSource.map((item) => item.id);
           const siteTempData = siteGroup.dataResource.filter((item) => !ids.includes(item.id));
-          const newData = curDataSource.concat(siteTempData);
+          const newData = newOrderDataSource.concat(siteTempData);
           setDataSource(newData)
         } else {
-          setDataSource(curDataSource);
+          setDataSource(newOrderDataSource);
         }
       } else {
-        setDataSource(curDataSource);
+        setDataSource(newOrderDataSource);
       }
     } else {
-      setDataSource(curDataSource)
+      setDataSource(newOrderDataSource)
     }
   }, [channel, curDataSource, groupName, settingExtend, siteData, type])
 
