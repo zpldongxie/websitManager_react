@@ -111,12 +111,12 @@ const TableList: React.FC = () => {
       title: '联系人',
       dataIndex: 'contacts',
       search: false,
-      // width: '15em',
+      width: 120,
     },
     {
       title: '手机号',
       dataIndex: 'contactsMobile',
-      // width: '15em',
+      width: 120,
     },
     {
       hideInTable: true,
@@ -128,8 +128,15 @@ const TableList: React.FC = () => {
     {
       title: '需求描述',
       dataIndex: 'requestDesc',
+      ellipsis: true,
       search: false,
       // width: '15em',
+    },
+    {
+      title: '发件状态',
+      dataIndex: 'sendEmailStatus',
+      search: false,
+      width: 100,
     },
     {
       title: '申请时间',
@@ -150,7 +157,7 @@ const TableList: React.FC = () => {
     {
       title: '服务状态',
       dataIndex: 'status',
-      // width: '7em',
+      width: 100,
       valueEnum: {
         申请中: { text: '申请中', status: 'Default' },
         接受申请: { text: '接受申请', status: 'Processing' },
@@ -210,7 +217,7 @@ const TableList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: '15em',
+      width: 200,
       render: (_, record) => (
         <div className={styles.optionCol}>
           <Option
