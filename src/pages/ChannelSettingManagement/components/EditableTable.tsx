@@ -26,7 +26,7 @@ const EditableTable: FC<TableProps> = (props) => {
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] = useState<ChannelSettingType[] | undefined>([]);
   useEffect(() => {
-    const newOrderDataSource = curDataSource.sort((a, b) => b.orderIndex! - a.orderIndex! );
+    const newOrderDataSource = curDataSource.sort((a, b) => a.orderIndex! - b.orderIndex! );
     // 开启继承的时候，需要把全站配置拼接进来
     if (channel !== 'site' && settingExtend) {
       // 从全站配置中找对应类型
