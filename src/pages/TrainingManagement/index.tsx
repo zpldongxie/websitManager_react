@@ -2,7 +2,7 @@
 import type { FC } from 'react';
 import React, { useRef, useState, useEffect } from 'react';
 import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Divider, Menu, Modal, message, Popover } from 'antd';
+import { Button, Dropdown, Divider, Menu, Modal, message, Popover, Typography } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 
@@ -16,6 +16,8 @@ import IconFont from '@/components/CustomIcon';
 import type { StateType } from './model';
 import type { TrainingDataType, TableListParams } from './data.d';
 import { queryList, removeFakeList } from './service';
+
+const { Paragraph } = Typography;
 
 type TrainingManagementProps = {
   trainingManagement: StateType;
@@ -192,7 +194,7 @@ export const TrainingManagement: FC<TrainingManagementProps> = (props) => {
       search: false,
       width: '3em',
       render: (id) => (
-        <Popover content={id} title="id">
+        <Popover content={<Paragraph copyable>{id}</Paragraph>} title="id">
           <IconFont
             onMouseOver={() => {
               setHoverId(id as string);

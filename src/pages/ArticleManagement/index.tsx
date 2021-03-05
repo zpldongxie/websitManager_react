@@ -4,7 +4,7 @@ import {
   PlusOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Switch, Popover, Modal, message } from 'antd';
+import { Button, Dropdown, Menu, Switch, Popover, Modal, message, Typography } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -14,10 +14,10 @@ import ChannelSelector from '@/components/ChannelSelector';
 import IconFont from '@/components/CustomIcon';
 import Option from './components/Option';
 import type { TableListItem, TableListParams } from './data.d';
-
 import { queryList, remove, moveTo, setIsHead, setIsRecom, setPub } from './service';
-
 import styles from './index.module.less';
+
+const { Paragraph } = Typography;
 
 const pubHandler = async (ids: string[], action: any) => {
   try {
@@ -106,7 +106,7 @@ const TableList: React.FC = () => {
       search: false,
       width: '3em',
       render: (id) => (
-        <Popover content={id} title="id">
+        <Popover content={<Paragraph copyable>{id}</Paragraph>} title="id">
           <IconFont
             onMouseOver={() => {
               setHoverId(id as string);
