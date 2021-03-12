@@ -32,7 +32,7 @@ const Contact = () => {
   };
  
   return (
-    <PageContainer title={false}>
+    <PageContainer title={false} className='contact'> 
      
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish} style={{backgroundColor:"white",paddingTop:"30px",paddingBottom:"10px"}}>
       <Form.Item

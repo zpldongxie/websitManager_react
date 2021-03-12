@@ -83,7 +83,7 @@ class Demo extends React.Component {
       </div>
     );
     return (
-      <PageContainer title={false}>
+      <PageContainer title={false} className='base'>
       <Form {...layout} ref={this.formRef} name="control-ref" onFinish={this.onFinish} style={{backgroundColor:"white",paddingTop:"30px",paddingBottom:"10px"}}>
         <Form.Item
         name="designation"
