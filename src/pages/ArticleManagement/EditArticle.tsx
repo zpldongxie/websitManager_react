@@ -161,6 +161,7 @@ const EditArticle = () => {
               mainCon: BraftEditor.createEditorState(data.mainCon || ''),
             };
             form.setFieldsValue(initData);
+            setType(data.contentType);
             setPubStatus(data.pubStatus);
           } else {
             message.error('获取文章内容失败，请联系管理员或稍后再试。');
