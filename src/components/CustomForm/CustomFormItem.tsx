@@ -40,7 +40,7 @@ const FormInput = (props: FormInputProps) => {
  * @returns
  */
 const FormSelect = (props: FormSelectProps) => {
-  const { disabled, placeholder, items, onChange, mode, ...formProps } = props;
+  const { disabled, placeholder, items = [], onChange, mode, ...formProps } = props;
   return (
     <Form.Item {...formProps}>
       <Select

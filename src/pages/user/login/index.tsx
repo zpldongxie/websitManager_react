@@ -21,7 +21,9 @@ const LoginMessage: React.FC<{
 }> = ({ content }) => (
   <Alert
     style={{
-      marginBottom: 24,
+      border: 'none',
+      background: 'none',
+      padding: '0px',
     }}
     message={content}
     type="error"

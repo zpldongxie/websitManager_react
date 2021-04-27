@@ -1,9 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  DownOutlined,
-  PlusOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
+import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Switch, Popover, Modal, message, Typography } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -126,8 +122,12 @@ const TableList: React.FC = () => {
       render: (text, record) => (
         <a
           onClick={() => {
-            setPreviewId(record.id);
-            setPreviewVisible(true);
+            if (record.contentType === '链接') {
+              window.open(record.mainUrl);
+            } else {
+              setPreviewId(record.id);
+              setPreviewVisible(true);
+            }
           }}
         >
           {text}
@@ -352,10 +352,11 @@ const TableList: React.FC = () => {
         request={(params, sorter, filter) => {
           const opts: TableListParams = {
             ...params,
-            sorter: Object.keys(sorter).length ? sorter : { isHead: 'descend' },
             filter,
           };
+          if (sorter) opts.sorter = Object.keys(sorter).length ? sorter : { isHead: 'descend' };
           if (isRecycleBin) opts.pubStatus = '已删除';
+
           return queryList(opts);
         }}
         beforeSearchSubmit={(params: any) => {

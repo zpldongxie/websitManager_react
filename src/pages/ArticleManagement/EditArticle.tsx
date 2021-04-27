@@ -9,21 +9,20 @@ import {
   Select,
   Image,
   Switch,
-  DatePicker,
   Button,
   Space,
   message,
+  DatePicker,
 } from 'antd';
-import dayjs from 'dayjs';
 // 引入编辑器组件
-import BraftEditor, { ExtendControlType } from 'braft-editor';
-// eslint-disable-next-line import/no-extraneous-dependencies
+import type { ExtendControlType } from 'braft-editor';
+import BraftEditor from 'braft-editor';
 import { ContentUtils } from 'braft-utils';
 import { defImg } from '@/constant';
 // 引入编辑器样式
 import 'braft-editor/dist/index.css';
 
-import { ChannelType } from '@/utils/data';
+import type { ChannelType } from '@/utils/data';
 import ArticlePreview from '@/components/ArticlePreview';
 import ChannelSelector from '@/components/ChannelSelector';
 import styles from './index.module.less';
@@ -32,6 +31,8 @@ import Success from './components/Success';
 import MyUpload from './components/MyUpload';
 import SelectImage from './components/SelectImage';
 import Extension from './components/Extension';
+import moment from 'moment';
+import type { SelectValue } from 'antd/lib/select';
 
 const { Option } = Select;
 
@@ -89,6 +90,7 @@ const unPubHandler = async (ids: string[], cb: () => void) => {
  */
 const EditArticle = () => {
   const [id, setId] = useState<string | undefined>(); // 文章ID
+  const [type, setType] = useState<'文章' | '链接'>('文章');
   const [pubStatus, setPubStatus] = useState<'草稿' | '已发布' | '已删除'>('草稿'); // 发布状态，用于控制表单是否可提交
   const [selectImageVisible, setSelectImageVisible] = useState(false); // 选择缩略图对话框
   const [successVisible, setSuccessVisible] = useState(window.location.hash === '#success'); // 操作成功对话框
@@ -98,7 +100,7 @@ const EditArticle = () => {
   const initialValues = {
     contentType: '文章',
     orderIndex: 10,
-    conDate: dayjs(),
+    conDate: moment(),
     source: '本站原创',
     isHead: false,
     isRecom: false,
@@ -110,8 +112,8 @@ const EditArticle = () => {
       const data = {
         ...params,
         thumbnail: thumbnail === defImg ? '' : thumbnail,
-        conDate: conDate.format('YYYY-MM-DD HH:mm:ss'),
-        mainCon: mainCon.toHTML(),
+        conDate: moment(conDate, 'YYYY-MM-DD HH:mm:ss'),
+        mainCon: mainCon ? mainCon.toHTML() : '',
       };
       const result = await upsert(data);
       console.dir(result);
@@ -141,7 +143,7 @@ const EditArticle = () => {
     if (editId && !id) {
       setId(editId);
     }
-  }, []);
+  }, [id]);
 
   // 如果有id参数，说明是编辑文章，需要回填信息
   useEffect(() => {
@@ -154,9 +156,9 @@ const EditArticle = () => {
             const initData = {
               ...data,
               Channels: data.Channels.map((c: ChannelType) => c.id),
-              conDate: dayjs(data.conDate),
+              conDate: moment(data.conDate, 'YYYY-MM-DD HH:mm:ss'),
               thumbnail: data.thumbnail === '' ? defImg : data.thumbnail,
-              mainCon: BraftEditor.createEditorState(data.mainCon),
+              mainCon: BraftEditor.createEditorState(data.mainCon || ''),
             };
             form.setFieldsValue(initData);
             setPubStatus(data.pubStatus);
@@ -169,7 +171,7 @@ const EditArticle = () => {
         message.error('获取文章内容失败，请联系管理员或稍后再试。');
       }
     })();
-  }, [id]);
+  }, [form, id]);
 
   const extendControls: ExtendControlType[] = [
     {
@@ -257,7 +259,12 @@ const EditArticle = () => {
                 },
               ]}
             >
-              <Select disabled={disabled}>
+              <Select
+                disabled={disabled}
+                onChange={(value: SelectValue) => {
+                  setType(value as '文章' | '链接');
+                }}
+              >
                 <Option value="文章">文章</Option>
                 <Option value="链接">链接</Option>
               </Select>
@@ -359,16 +366,8 @@ const EditArticle = () => {
             </Form.Item>
           </Col>
         </Row>
-        <Divider orientation="left">文章内容</Divider>
-        <Form.Item
-          name="mainCon"
-          rules={[
-            {
-              required: true,
-              message: '请输入正文内容！',
-            },
-          ]}
-        >
+        {type === '文章' && <Divider orientation="left">文章内容</Divider>}
+        <Form.Item name="mainCon" hidden={type === '链接'}>
           <BraftEditor
             className="my-editor"
             placeholder="请输入正文内容"
@@ -377,6 +376,14 @@ const EditArticle = () => {
             }}
             extendControls={extendControls}
           />
+        </Form.Item>
+        <Form.Item
+          name="mainUrl"
+          label="链接"
+          hidden={type === '文章'}
+          labelCol={{ sm: { span: 2 } }}
+        >
+          <Input />
         </Form.Item>
         <Form.Item name="ArticleExtensions">
           <Extension disabled={disabled} form={form} />
